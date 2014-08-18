@@ -37,7 +37,7 @@ class FtpAdapterTest extends \Pagekit\Tests\FtpTestCase
     /**
      * @expectedException \Pagekit\Component\File\Exception\IOException
      */
-    public function testFileSizeFailes()
+    public function testFileSizeFails()
     {
         $sizeFilePath = $this->workspace.'/size_source_file_does_not_exist';
         $this->assertEquals(3, $this->adapter->size($sizeFilePath));

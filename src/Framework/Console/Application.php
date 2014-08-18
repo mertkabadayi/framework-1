@@ -3,10 +3,10 @@
 namespace Pagekit\Framework\Console;
 
 use Pagekit\Framework\Console\Event\ConsoleEvent;
-use Symfony\Component\Console\Application as BaseAppliction;
+use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command as BaseCommand;
 
-class Application extends BaseAppliction
+class Application extends BaseApplication
 {
     /**
      * The Pagekit application instance.
