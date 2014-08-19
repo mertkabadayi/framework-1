@@ -36,7 +36,7 @@ class MetadataManager
     protected $prefix = 'Metadata.';
 
     /**
-     * Constuctor.
+     * Constructor.
      *
      * @param Connection $connection
      */
@@ -168,8 +168,8 @@ class MetadataManager
                     $config['relations'][$relation['name']] = $relation;
                 }
 
-                if ($identifer = $parent->getIdentifier()) {
-                    $config['identifier'] = $identifer;
+                if ($identifier = $parent->getIdentifier()) {
+                    $config['identifier'] = $identifier;
                 }
 
                 $config['events']     = $parent->getEvents();

@@ -167,7 +167,6 @@ class RememberMe
     /**
      * Generates the cookie value.
      *
-     * @param string  $class
      * @param string  $username The username
      * @param integer $expires The unixtime when the cookie expires
      * @param string  $password The encoded password

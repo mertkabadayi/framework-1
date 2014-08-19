@@ -54,7 +54,7 @@ class PackageDownloader implements DownloaderInterface
     }
 
     /**
-     * Downlod a package file.
+     * Download a package file.
      *
      * @param string $path
      * @param string $url

@@ -385,7 +385,7 @@ class FtpAdapter implements AdapterInterface
     /**
      * Ensures the specified directory exists, creates it if it does not
      *
-     * @param  string  $directory Path of the directory to test
+     * @param  string  $dir Path of the directory to test
      *
      * @throws IOException If the directory does not exists and could not be created
      */

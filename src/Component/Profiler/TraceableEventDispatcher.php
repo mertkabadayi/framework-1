@@ -298,7 +298,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, TraceableEve
                 $line = null;
             }
 
-            //Problem with caught exeptions (listener throws exeption -> not unwrapped -> wrong hash in $this->priorities)
+            //Problem with caught exceptions (listener throws exception -> not unwrapped -> wrong hash in $this->priorities)
 
             $info += [
                 'type' => 'Closure',
