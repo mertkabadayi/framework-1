@@ -165,12 +165,13 @@ class AssetManager implements \IteratorAggregate
     /**
      * Resolve asset dependencies.
      *
-     * @param AssetInterface $asset
-     * @param array          $resolved
-     * @param array          $unresolved
+     * @param  AssetInterface $asset
+     * @param  array          $resolved
+     * @param  array          $unresolved
+     * @return array
      * @throws \RuntimeException
      */
-    protected function resolveDependencies($asset, &$resolved, &$unresolved = [])
+    public function resolveDependencies($asset, &$resolved = [], &$unresolved = [])
     {
         $unresolved[$asset->getName()] = $asset;
 
@@ -178,20 +179,20 @@ class AssetManager implements \IteratorAggregate
             foreach ($asset['dependencies'] as $dependency) {
                 if (!isset($resolved[$dependency])) {
 
-                    if (!$this->registered->get($dependency)) {
-                        throw new \RuntimeException(sprintf('Asset dependency "%s" does not exists.', $dependency));
-                    }
-
                     if (isset($unresolved[$dependency])) {
                         throw new \RuntimeException(sprintf('Circular asset dependency "%s > %s" detected.', $asset->getName(), $dependency));
                     }
 
-                    $this->resolveDependencies($this->registered->get($dependency), $resolved, $unresolved);
+                    if ($d = $this->registered->get($dependency)) {
+                        $this->resolveDependencies($d, $resolved, $unresolved);
+                    }
                 }
             }
         }
 
         $resolved[$asset->getName()] = $asset;
         unset($unresolved[$asset->getName()]);
+
+        return $resolved;
     }
 }
