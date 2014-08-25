@@ -86,7 +86,7 @@ class Option
             $this->ignore = $ignore ?: [];
         }
 
-        if (isset($this->ignore[$name])) {
+        if (isset($this->ignore[$name]) || !$this->connection->isConnected()) {
             return $default;
         }
 
@@ -150,6 +150,10 @@ class Option
             throw new \InvalidArgumentException(sprintf('"%s" is a protected option and may not be modified.', $name));
         }
 
+        if (!$this->connection->isConnected()) {
+            throw new \RuntimeException('Database is not connected.');
+        }
+
         $old_value = $this->get($name);
 
         if ($value !== $old_value) {
@@ -203,6 +207,10 @@ class Option
 
         if (in_array($name, $this->protected)) {
             throw new \InvalidArgumentException(sprintf('"%s" is a protected option and may not be modified.', $name));
+        }
+
+        if (!$this->connection->isConnected()) {
+            throw new \RuntimeException('Database is not connected.');
         }
 
         if ($option = $this->connection->fetchAssoc("SELECT id, autoload FROM {$this->table} WHERE name = ?", [$name])) {
