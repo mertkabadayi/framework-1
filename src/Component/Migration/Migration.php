@@ -93,8 +93,15 @@ class Migration
             $config = require $file;
 
             if (is_array($config) && isset($config[$method])) {
-                if (call_user_func($config[$method]) === false) {
-                    break;
+
+                $result = call_user_func($config[$method]);
+
+                if (is_string($result)) {
+                    return $result;
+                }
+
+                if ($result === false) {
+                    return $version;
                 }
             }
         }
