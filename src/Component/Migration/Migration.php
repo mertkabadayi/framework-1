@@ -5,6 +5,11 @@ namespace Pagekit\Component\Migration;
 class Migration
 {
     /**
+     * @var Migrator
+     */
+    protected $migrator;
+
+    /**
      * @var string
      */
     protected $current;
@@ -29,8 +34,9 @@ class Migration
      */
     public function __construct(Migrator $migrator, $path, $current = null, $parameters = [])
     {
+        $this->migrator   = $migrator;
         $this->current    = $current;
-        $this->parameters = array_replace($migrator->getGlobals(), $parameters);
+        $this->parameters = array_replace(['migration' => $this], $parameters);
         $this->files      = $this->loadFiles($path, $migrator->getPattern());
     }
 
@@ -56,17 +62,17 @@ class Migration
      * Migrate to a version.
      *
      * @param  string|null $version
-     * @return array
+     * @return string|bool
      */
     public function run($version = null)
     {
         if (is_null($version) || is_null($this->current) || strnatcmp($this->current, $version) < 0) {
-            $value = $this->apply($this->load($this->current, $version));
+            $vers = $this->apply($this->load($this->current, $version));
         } else {
-            $value = $this->apply($this->load($version, $this->current, 'down'), 'down');
+            $vers = $this->apply($this->load($version, $this->current, 'down'), 'down');
         }
 
-        return $value;
+        return $vers;
     }
 
     /**
@@ -78,21 +84,22 @@ class Migration
      */
     protected function apply(array $files, $method = 'up')
     {
-        $value = false;
+        $version = false;
 
         foreach ($files as $version => $file) {
 
-            extract($this->parameters, EXTR_SKIP);
+            extract(array_replace($this->migrator->getGlobals(), $this->parameters), EXTR_SKIP);
 
-            $value  = $version;
             $config = require $file;
 
             if (is_array($config) && isset($config[$method])) {
-                call_user_func($config[$method]);
+                if (call_user_func($config[$method]) === false) {
+                    break;
+                }
             }
         }
 
-        return $value;
+        return $version;
     }
 
     /**
