@@ -53,6 +53,11 @@ class Option
 	protected $table;
 
     /**
+     * @var bool $initialized
+     */
+    protected $initialized = false;
+
+    /**
      * Constructor.
      *
      * @param Connection     $connection
@@ -64,6 +69,18 @@ class Option
         $this->connection = $connection;
         $this->cache      = $cache;
         $this->table      = $table;
+    }
+
+    /**
+     * Gets all option values.
+     *
+     * @return array
+     */
+    public function all()
+    {
+        $this->initialize();
+
+        return $this->options;
     }
 
     /**
@@ -90,26 +107,7 @@ class Option
             return $default;
         }
 
-        if (empty($this->autoload)) {
-
-            if ($options = $this->cache->fetch($this->prefix.'Autoload')) {
-                $this->autoload = $options;
-            }
-
-            if (empty($this->autoload) && $options = $this->connection->fetchAll("SELECT name, value FROM {$this->table} WHERE autoload = 1")) {
-
-                foreach ($options as $option) {
-                    $this->autoload[$option['name']] = json_decode($option['value'], true);
-                }
-
-                $this->cache->save($this->prefix.'Autoload', $this->autoload);
-            }
-
-            if (!empty($this->autoload)) {
-                $this->options = $this->autoload;
-            }
-
-        }
+        $this->initialize(true);
 
         if (isset($this->options[$name])) {
             return $this->options[$name];
@@ -201,10 +199,6 @@ class Option
     {
         $name = trim($name);
 
-        if (empty($name)) {
-            throw new \InvalidArgumentException('Empty option name given.');
-        }
-
         if (in_array($name, $this->protected)) {
             throw new \InvalidArgumentException(sprintf('"%s" is a protected option and may not be modified.', $name));
         }
@@ -213,10 +207,57 @@ class Option
             throw new \RuntimeException('Database is not connected.');
         }
 
-        if ($option = $this->connection->fetchAssoc("SELECT id, autoload FROM {$this->table} WHERE name = ?", [$name])) {
-            if ($this->connection->delete($this->table, ['id' => $option['id']])) {
-                unset($this->options[$name]);
-                $this->cache->delete($this->prefix.($option['autoload'] ? 'Autoload' : $name));
+        $this->initialize(true);
+
+        if ($this->connection->delete($this->table, ['name' => $name])) {
+            unset($this->options[$name]);
+            $this->cache->delete($this->prefix.(isset($this->autoload[$name]) ? 'Autoload' : $name));
+        }
+    }
+
+    /**
+     * Initialize the all or only autoload options.
+     *
+     * @param bool $autoload
+     */
+    protected function initialize($autoload = false)
+    {
+        if ($this->initialized) {
+            return;
+        }
+
+        if ($autoload) {
+
+            if (!$this->autoload) {
+                $this->autoload = $this->cache->fetch($this->prefix.'Autoload');
+            }
+
+            if ($this->autoload) {
+                return;
+            }
+        }
+
+        if ($autoload) {
+            $query = "SELECT name, value, autoload FROM {$this->table} WHERE autoload = 1";
+        } else {
+            $query = "SELECT name, value, autoload FROM {$this->table}";
+        }
+
+        if ($options = $this->connection->fetchAll($query)) {
+
+            foreach ($options as $option) {
+
+                $this->options[$option['name']] = json_decode($option['value'], true);
+
+                if ($option['autoload']) {
+                    $this->autoload[$option['name']] = $this->options[$option['name']];
+                }
+            }
+
+            $this->cache->save($this->prefix.'Autoload', $this->autoload);
+
+            if (!$autoload) {
+                $this->initialized = true;
             }
         }
     }
