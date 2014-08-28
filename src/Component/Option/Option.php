@@ -6,7 +6,7 @@ use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Pagekit\Component\Cache\CacheInterface;
 use Pagekit\Component\Database\Connection;
 
-class Option
+class Option implements \IteratorAggregate
 {
     /**
      * @var Connection $connection
@@ -81,6 +81,16 @@ class Option
         $this->initialize();
 
         return $this->options;
+    }
+
+    /**
+     * Gets all option keys.
+     *
+     * @return array
+     */
+    public function keys()
+    {
+        return array_keys($this->all());
     }
 
     /**
@@ -216,6 +226,16 @@ class Option
     }
 
     /**
+     * Returns an iterator for options.
+     *
+     * @return \ArrayIterator
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->all());
+    }
+
+    /**
      * Initialize the all or only autoload options.
      *
      * @param bool $autoload
@@ -235,11 +255,11 @@ class Option
             if ($this->autoload) {
                 return;
             }
-        }
 
-        if ($autoload) {
             $query = "SELECT name, value, autoload FROM {$this->table} WHERE autoload = 1";
+
         } else {
+
             $query = "SELECT name, value, autoload FROM {$this->table}";
         }
 
