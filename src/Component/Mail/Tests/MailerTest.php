@@ -8,7 +8,7 @@ class MailerTest extends \PHPUnit_Framework_TestCase
 {
     public function setUp()
     {
-        $this->swift = $this->getMockBuilder('Swift_Mailer')->disableOriginalConstructor()->getMock();
+        $this->swift = $this->getMockBuilder('Swift_Transport')->disableOriginalConstructor()->getMock();
         $this->queue = $this->getMockBuilder('Swift_SpoolTransport')->disableOriginalConstructor()->getMock();
         $this->mailer = new Mailer($this->swift, $this->queue);
     }

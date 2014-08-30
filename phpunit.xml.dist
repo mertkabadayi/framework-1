@@ -29,9 +29,9 @@
         </whitelist>
     </filter>
 
-    <logging>
-        <log type="coverage-html" target="./_coverage" />
-    </logging>
+    <!--<logging>-->
+        <!--<log type="coverage-html" target="./_coverage" />-->
+    <!--</logging>-->
 
     <php>
         <!-- "Real" test database -->
