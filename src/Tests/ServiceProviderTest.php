@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
-
 class ServiceProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -30,6 +29,7 @@ class ServiceProviderTest extends \PHPUnit_Framework_TestCase
 	public function createApplication()
 	{
 		$app = new Application;
+        $app['path.cache'] = __DIR__.'/cache-ignore';
 		$app['session'] = new Session(new MockArraySessionStorage);
 		$app['request'] = $this->request;
 

@@ -6,9 +6,11 @@ use Pagekit\Component\Auth\Auth;
 use Pagekit\Component\Auth\AuthServiceProvider;
 use Pagekit\Tests\ServiceProviderTest;
 
-
 class AuthServiceProviderTest extends ServiceProviderTest
 {
+    protected $user;
+    protected $provider;
+
 	public function setUp()
 	{
 		parent::setUp();
