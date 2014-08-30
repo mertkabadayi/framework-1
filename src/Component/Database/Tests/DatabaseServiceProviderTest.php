@@ -5,9 +5,9 @@ namespace Pagekit\Component\Database\Tests;
 use Doctrine\Common\Cache\ArrayCache;
 use Pagekit\Component\Cache\Cache;
 use Pagekit\Component\Database\DatabaseServiceProvider;
-use Pagekit\Tests\ServiceProviderTest;
+use Pagekit\Tests\ServiceProviderTestCase;
 
-class DatabaseServiceProviderTest extends ServiceProviderTest
+class DatabaseServiceProviderTest extends ServiceProviderTestCase
 {
     /**
      * @var DatabaseServiceProvider

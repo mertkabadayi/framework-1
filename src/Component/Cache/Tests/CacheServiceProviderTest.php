@@ -3,9 +3,9 @@
 namespace Pagekit\Component\Cache\Tests;
 
 use Pagekit\Component\Cache\CacheServiceProvider;
-use Pagekit\Tests\ServiceProviderTest;
+use Pagekit\Tests\ServiceProviderTestCase;
 
-class CacheServiceProviderTest extends ServiceProviderTest
+class CacheServiceProviderTest extends ServiceProviderTestCase
 {
 	public function setUp()
 	{

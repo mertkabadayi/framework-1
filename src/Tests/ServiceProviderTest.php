@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
-class ServiceProviderTest extends \PHPUnit_Framework_TestCase
+class ServiceProviderTestCase extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Application
