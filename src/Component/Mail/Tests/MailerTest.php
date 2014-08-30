@@ -6,6 +6,10 @@ use Pagekit\Component\Mail\Mailer;
 
 class MailerTest extends \PHPUnit_Framework_TestCase
 {
+    protected $swift;
+    protected $queue;
+    protected $mailer;
+
     public function setUp()
     {
         $this->swift = $this->getMockBuilder('Swift_Transport')->disableOriginalConstructor()->getMock();

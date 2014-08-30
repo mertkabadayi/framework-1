@@ -9,7 +9,6 @@ use Swift_Message;
 
 class MessageTest extends \PHPUnit_Framework_TestCase
 {
-
     protected $swift;
     protected $queue;
     protected $mailer;
@@ -18,7 +17,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-    	$this->swift = $this->getMockBuilder('Swift_Mailer')->disableOriginalConstructor()->getMock();
+    	$this->swift = $this->getMockBuilder('Swift_Transport')->disableOriginalConstructor()->getMock();
         $this->queue = $this->getMockBuilder('Swift_SpoolTransport')->disableOriginalConstructor()->getMock();
         $this->mailer = new Mailer($this->swift, $this->queue);
         $this->swift_message = new Swift_Message;
@@ -34,7 +33,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
 
     public function testDate()
     {
-    	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->date(20131212));
+    	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->setDate(20131212));
     	$this->assertEquals(20131212, $this->message->getDate());
     }
 
@@ -48,49 +47,49 @@ class MessageTest extends \PHPUnit_Framework_TestCase
     public function testReturnPath()
     {
     	$this->assertEquals('', $this->message->getReturnPath());
-    	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->returnPath('test@mail.com'));
+    	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->setReturnPath('test@mail.com'));
     	$this->assertEquals('test@mail.com', $this->message->getReturnPath());
     }
 
     public function testSender()
     {
     	$this->assertEquals('', $this->message->getSender());
-    	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->sender('test@mail.com', 'test'));
+    	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->setSender('test@mail.com', 'test'));
     	$this->assertEquals(['test@mail.com' => 'test'], $this->message->getSender());
     }
 
     public function testFrom()
     {
     	$this->assertEquals([], $this->message->getFrom());
-    	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->from('test@mail.com', 'test'));
+    	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->setFrom('test@mail.com', 'test'));
     	$this->assertEquals(['test@mail.com' => 'test'], $this->message->getFrom());
     }
 
     public function testReplyTo()
     {
     	$this->assertEquals('', $this->message->getReplyTo());
-    	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->replyTo('test@mail.com', 'test'));
+    	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->setReplyTo('test@mail.com', 'test'));
     	$this->assertEquals(['test@mail.com' => 'test'], $this->message->getReplyTo());
     }
 
     public function testTo()
     {
     	$this->assertEquals('', $this->message->getTo());
-    	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->to('test@mail.com', 'test'));
+    	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->setTo('test@mail.com', 'test'));
     	$this->assertEquals(['test@mail.com' => 'test'], $this->message->getTo());
     }
 
      public function testCc()
     {
     	$this->assertEquals('', $this->message->getCc());
-    	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->cc('test@mail.com', 'test'));
+    	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->setCc('test@mail.com', 'test'));
     	$this->assertEquals(['test@mail.com' => 'test'], $this->message->getCc());
     }
 
     public function testBcc()
     {
     	$this->assertEquals('', $this->message->getBcc());
-    	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->bcc('test@mail.com', 'test'));
+    	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->setBcc('test@mail.com', 'test'));
     	$this->assertEquals(['test@mail.com' => 'test'], $this->message->getBcc());
     }
 
