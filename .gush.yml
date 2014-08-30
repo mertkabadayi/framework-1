@@ -1,0 +1,3 @@
+adapter: github
+issue_tracker: github
+base: master
