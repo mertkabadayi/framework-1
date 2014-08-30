@@ -2,9 +2,7 @@
 
 namespace Pagekit\Component\Migration\Tests\Fixtures;
 
-use Pagekit\Component\Migration\MigrationInterface;
-
-class Test3 implements MigrationInterface
+class Test3
 {
     public function up()
     {
