@@ -5,12 +5,13 @@ bldr:
             calls:
                 -
                     type: exec
-                    failOnError: true
+                    failOnError: false
                     executable: php
                     arguments:
                         - vendor/bin/phpunit
                         - --exclude-group=skip
-                        - --stop-on-failure
+                        - --group=now
+                        #- --stop-on-failure
                         - --coverage-text=php://stdout
         watch:
             description: Watch Task for Local Development
