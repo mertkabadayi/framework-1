@@ -7,6 +7,9 @@ use Pagekit\Component\Mail\Message;
 use Swift_ByteStream_FileByteStream;
 use Swift_Message;
 
+/**
+ * @group now
+ */
 class MessageTest extends \PHPUnit_Framework_TestCase
 {
     protected $swift;
