@@ -22,7 +22,6 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
 		$migration->run();
 	}
 
-    /** @group now */
 	public function testGet() {
 		$migrator = new Migrator;
         $migration = $migrator->create(__DIR__.'/Fixtures');

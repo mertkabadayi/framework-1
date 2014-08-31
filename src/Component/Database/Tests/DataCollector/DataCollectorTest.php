@@ -2,12 +2,14 @@
 
 namespace Pagekit\Component\Database\Tests\DataCollector;
 
+use Pagekit\Component\Database\Connection;
 use Pagekit\Component\Database\DataCollector\DatabaseDataCollector;
 use Pagekit\Component\Database\Logging\DebugStack;
+use Pagekit\Tests\DbTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class DataCollectorTest extends \PHPUnit_Framework_TestCase
+class DataCollectorTest extends DbTestCase
 {
     /**
      * @var DebugStack
@@ -19,10 +21,16 @@ class DataCollectorTest extends \PHPUnit_Framework_TestCase
      */
     protected $collector;
 
+    /**
+     * @var Connection
+     */
+    protected $connection;
+
     public function setUp()
 	{
+        parent::setUp();
 		$this->logger = new DebugStack;
-		$this->collector = new DatabaseDataCollector($this->logger);
+		$this->collector = new DatabaseDataCollector($this->connection, $this->logger);
 	}
 
 	public function testCollect()

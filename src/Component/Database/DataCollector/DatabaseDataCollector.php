@@ -29,7 +29,6 @@ class DatabaseDataCollector extends DataCollector
      */
     public function __construct(Connection $connection, DebugStack $logger = null)
     {
-
         $this->connection = $connection;
         $this->logger     = $logger;
     }
