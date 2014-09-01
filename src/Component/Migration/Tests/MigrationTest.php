@@ -48,12 +48,23 @@ class MigrationTest extends \PHPUnit_Framework_TestCase
 
     public function testDown()
     {
-        $migration = $this->migrator->create(__DIR__.'/Fixtures', '0000_00_00_000003');
-        $this->assertEquals(['0000_00_00_000003'], $migration->get(null, 'down'));
-        $this->assertEquals(['0000_00_00_000003', '0000_00_00_000002'], $migration->get('0000_00_00_000001', 'down'));
+        $migration = $this->migrator->create(__DIR__.'/Fixtures', '0000_00_00_000003_test3');
+        $this->assertEquals(
+            [
+                '0000_00_00_000003_test3',
+            ],
+            $migration->get(null, 'down')
+        );
+        $this->assertEquals('0000_00_00_000001_test1', $migration->run('0000_00_00_000001_test1'));
 
-        $migration = $this->migrator->create(__DIR__.'/Fixtures', '0000_00_00_000003');
-        $this->assertCount(0, $migration->get('0000_00_00_000003', 'down'));
+        $migration = $this->migrator->create(__DIR__.'/Fixtures', '0000_00_00_000003_test3');
+        $this->assertEquals(
+            [
+                '',
+            ],
+            $migration->get('0000_00_00_000003', 'down')
+        );
+        $this->assertEquals('0000_00_00_000001_test1', $migration->run('0000_00_00_000001_test1'));
     }
 
     public function testVersion()
