@@ -7,15 +7,11 @@ use Pagekit\Component\Mail\Message;
 use Swift_ByteStream_FileByteStream;
 use Swift_Message;
 
-/**
- * @group now
- */
 class MessageTest extends \PHPUnit_Framework_TestCase
 {
     protected $swift;
     protected $queue;
     protected $mailer;
-    protected $swift_message;
     protected $message;
 
     public function setUp()
@@ -23,14 +19,14 @@ class MessageTest extends \PHPUnit_Framework_TestCase
     	$this->swift = $this->getMockBuilder('Swift_Transport')->disableOriginalConstructor()->getMock();
         $this->queue = $this->getMockBuilder('Swift_SpoolTransport')->disableOriginalConstructor()->getMock();
         $this->mailer = new Mailer($this->swift, $this->queue);
-        $this->swift_message = new Swift_Message;
-    	$this->message = new Message($this->mailer, $this->swift_message);
+    	$this->message = new Message();
+        $this->message->setMailer($this->mailer);
     }
 
     public function testSubject()
     {
     	$this->assertEquals('', $this->message->getSubject());
-    	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->subject('some subject'));
+    	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->setSubject('some subject'));
     	$this->assertEquals('some subject', $this->message->getSubject());
     }
 
@@ -43,7 +39,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
     public function testBody()
     {
     	$this->assertEquals('', $this->message->getBody());
-    	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->body('some subject'));
+    	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->setBody('some subject'));
     	$this->assertEquals('some subject', $this->message->getBody());
     }
 
@@ -98,20 +94,20 @@ class MessageTest extends \PHPUnit_Framework_TestCase
 
     public function testAttach()
     {
-    	$this->assertEquals(0, count($this->swift_message->getChildren()));
+    	$this->assertEquals(0, count($this->message->getChildren()));
     	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->attachFile('./Fixtures/foo.txt', 'Foo', 'text/plain'));
-    	$this->assertEquals(1, count($this->swift_message->getChildren()));
+    	$this->assertEquals(1, count($this->message->getChildren()));
 
     	$this->message->attachData('some plain text', 'Bar', 'text/plain');
-    	$this->assertEquals(2, count($this->swift_message->getChildren()));
+    	$this->assertEquals(2, count($this->message->getChildren()));
     }
 
     public function testEmbed()
     {
     	$this->assertRegExp('/cid:[0-9a-z]*@swift.generated/', $this->message->embedFile('./Fixtures/image.gif'));
-    	$this->assertEquals(1, count($this->swift_message->getChildren()));
+    	$this->assertEquals(1, count($this->message->getChildren()));
 
     	$this->message->embedData(new Swift_ByteStream_FileByteStream('./Fixtures/image.gif'), 'Image', 'image/gif');
-    	$this->assertEquals(2, count($this->swift_message->getChildren()));
+    	$this->assertEquals(2, count($this->message->getChildren()));
     }
 }
