@@ -6,25 +6,35 @@ use Pagekit\Component\Migration\Migrator;
 
 /**
  * Test class for Migrations.
+ * @group now
  */
 class MigratorTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var Migrator
+     */
+    protected $migrator;
+
+    public function setUp()
+    {
+        $this->migrator = new Migrator();
+        $this->migrator->addGlobal('app', new \StdClass());
+    }
+
 	public function testRun() {
-		$migrator = new Migrator;
-        $migration = $migrator->create(__DIR__.'/Fixtures');
-		$this->assertContains('0000_00_00_000007', $migration->run());
+        $migration = $this->migrator->create(__DIR__.'/Fixtures');
+		$this->assertContains('0000_00_00_000005_test5', $migration->run());
 	}
 
 	public function testRunException() {
 		$this->setExpectedException('InvalidArgumentException');
-		$migrator = new Migrator;
-        $migration = $migrator->create(__DIR__.'/invalidPath');
+        $migration = $this->migrator->create(__DIR__.'/invalidPath');
 		$migration->run();
 	}
 
 	public function testGet() {
-		$migrator = new Migrator;
-        $migration = $migrator->create(__DIR__.'/Fixtures');
+        $migration = $this->migrator->create(__DIR__.'/Fixtures');
+
         $refObject = new \ReflectionObject($migration);
         $refFiles = $refObject->getProperty('files');
         $refFiles->setAccessible(true);
@@ -32,8 +42,8 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
 
 		$this->assertCount(8, $files);
 
-		$migrator = new Migrator;
-        $migration = $migrator->create(__DIR__.'/Fixtures', '0000_00_00_000003_test3');
+        $migration = $this->migrator->create(__DIR__.'/Fixtures', '0000_00_00_000003_test3');
+
         $refObject = new \ReflectionObject($migration);
         $refFiles = $refObject->getProperty('files');
         $refFiles->setAccessible(true);
