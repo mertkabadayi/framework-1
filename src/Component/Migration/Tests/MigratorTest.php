@@ -6,7 +6,6 @@ use Pagekit\Component\Migration\Migrator;
 
 /**
  * Test class for Migrations.
- * @group now
  */
 class MigratorTest extends \PHPUnit_Framework_TestCase
 {
