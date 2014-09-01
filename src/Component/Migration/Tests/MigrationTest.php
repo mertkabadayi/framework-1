@@ -2,11 +2,11 @@
 
 namespace Pagekit\Component\Migration\Tests;
 
-use Pagekit\Component\Migration\Migration;
 use Pagekit\Component\Migration\Migrator;
 
 /**
  * Test class for Migrations.
+ * @group now
  */
 class MigrationTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,6 +18,7 @@ class MigrationTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->migrator = new Migrator();
+        $this->migrator->addGlobal('app', new \StdClass());
     }
 
     public function testUp()

@@ -10,7 +10,7 @@ bldr:
                     arguments:
                         - vendor/bin/phpunit
                         - --exclude-group=skip
-                        #- --group=now
+                        - --group=now
                         #- --stop-on-failure
                         - --coverage-text=php://stdout
         watch:
