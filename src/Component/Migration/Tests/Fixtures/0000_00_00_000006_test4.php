@@ -1,14 +1,10 @@
 <?php
 
-namespace Pagekit\Component\Migration\Tests\Fixtures;
+return [
+    'up' => function() use ($app) {
 
-class Test4
-{
-    public function up()
-    {
-    }
+    },
+    'down' => function() use ($app) {
 
-    public function down()
-    {
     }
-}
+];
