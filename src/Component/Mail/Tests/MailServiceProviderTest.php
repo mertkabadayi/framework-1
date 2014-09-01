@@ -5,9 +5,6 @@ namespace Pagekit\Component\Mail\Tests;
 use Pagekit\Component\Mail\MailServiceProvider;
 use Pagekit\Tests\ServiceProviderTestCase;
 
-/**
- * @group now
- */
 class MailServiceProviderTest extends ServiceProviderTestCase
 {
     /**

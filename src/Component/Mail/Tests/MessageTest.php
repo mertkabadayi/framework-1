@@ -99,7 +99,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
     public function testAttach()
     {
     	$this->assertEquals(0, count($this->swift_message->getChildren()));
-    	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->attach('./Fixtures/foo.txt', 'Foo', 'text/plain'));
+    	$this->assertInstanceOf('Pagekit\Component\Mail\Message', $this->message->attachFile('./Fixtures/foo.txt', 'Foo', 'text/plain'));
     	$this->assertEquals(1, count($this->swift_message->getChildren()));
 
     	$this->message->attachData('some plain text', 'Bar', 'text/plain');
@@ -108,7 +108,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
 
     public function testEmbed()
     {
-    	$this->assertRegExp('/cid:[0-9a-z]*@swift.generated/', $this->message->embed('./Fixtures/image.gif'));
+    	$this->assertRegExp('/cid:[0-9a-z]*@swift.generated/', $this->message->embedFile('./Fixtures/image.gif'));
     	$this->assertEquals(1, count($this->swift_message->getChildren()));
 
     	$this->message->embedData(new Swift_ByteStream_FileByteStream('./Fixtures/image.gif'), 'Image', 'image/gif');
