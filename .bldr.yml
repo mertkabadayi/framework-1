@@ -1,7 +1,0 @@
-imports:
-    - { resource: .bldr/profiles.yml }
-    - { resource: .bldr/tasks.yml }
-
-bldr:
-    name: pagekit/framework
-    description: Pagekit framework
