@@ -9,7 +9,6 @@ bldr:
             description: fix cs for once
             tasks:
                 - runFixer
-                - loadFixtures
         rebase:
             description: Rebase flow
             tasks:
