@@ -2,7 +2,6 @@
 
 namespace Pagekit\Component\Migration\Tests;
 
-use Pagekit\Component\Migration\Migration;
 use Pagekit\Component\Migration\Migrator;
 
 /**
@@ -24,7 +23,7 @@ class MigratorTest extends \PHPUnit_Framework_TestCase
 	public function testCreatesMigration()
     {
         $migration = $this->migrator->create(__DIR__.'/Fixtures');
-		$this->assertInstanceOf(Migration::class, $migration);
+		$this->assertInstanceOf('Pagekit\Component\Migration\Migration', $migration);
 	}
 
 	public function testCreateException()
