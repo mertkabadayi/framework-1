@@ -5,7 +5,7 @@ namespace Pagekit\Component\Auth;
 interface UserInterface
 {
     /**
-     * Retrieves the unique indentifier
+     * Retrieves the unique identifier
      *
      * @return string Id
      */

@@ -2,57 +2,102 @@
 
 namespace Pagekit\Component\Migration\Tests;
 
-use Pagekit\Component\Migration\Migration;
+use Pagekit\Component\Migration\Migrator;
+use ReflectionObject;
 
 /**
  * Test class for Migrations.
  */
 class MigrationTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var Migrator
+     */
+    protected $migrator;
+
+    public function setUp()
+    {
+        $this->migrator = new Migrator();
+        $this->migrator->addGlobal('app', new \StdClass());
+    }
+
     public function testUp()
     {
-        $migration = new Migration(__DIR__.'/Fixtures');
-        $this->assertEquals(['0000_00_00_000000'], $migration->up());
-        $this->assertEquals(['0000_00_00_000000', '0000_00_00_000001', '0000_00_00_000002', '0000_00_00_000003'], $migration->up('0000_00_00_000003'));
+        $migration = $this->migrator->create(__DIR__.'/Fixtures');
+        $this->assertEquals(
+            [
+                '0000_00_00_000000_init',
+                '0000_00_00_000001_test1',
+                '0000_00_00_000002_test2',
+                '0000_00_00_000003_test3',
+            ],
+            $migration->get('0000_00_00_000003_test3', 'up')
+        );
+        $this->assertEquals('0000_00_00_000003_test3', $migration->run('0000_00_00_000003_test3'));
 
-        $migration = new Migration(__DIR__.'/Fixtures', '0000_00_00_000000');
-        $this->assertEquals(['0000_00_00_000001'], $migration->up());
-        $this->assertEquals(['0000_00_00_000001', '0000_00_00_000002', '0000_00_00_000003'], $migration->up('0000_00_00_000003'));
-
-        $migration = new Migration(__DIR__.'/Fixtures', '0000_00_00_000003');
-        $this->assertCount(0, $migration->up('0000_00_00_000003'));
+        $migration = $this->migrator->create(__DIR__.'/Fixtures', '0000_00_00_000003_test3');
+        $this->assertEquals(
+            [
+                '0000_00_00_000004_test4',
+                '0000_00_00_000005_test5',
+            ],
+            $migration->get('0000_00_00_000005_test5', 'up')
+        );
+        $this->assertEquals('0000_00_00_000005_test5', $migration->run('0000_00_00_000005_test5'));
     }
 
     public function testDown()
     {
-        $migration = new Migration(__DIR__.'/Fixtures', '0000_00_00_000003');
-        $this->assertEquals(['0000_00_00_000003'], $migration->down());
-        $this->assertEquals(['0000_00_00_000003', '0000_00_00_000002'], $migration->down('0000_00_00_000001'));
+        $migration = $this->migrator->create(__DIR__.'/Fixtures', '0000_00_00_000003_test3');
+        $this->assertEquals(
+            [
+                '0000_00_00_000003_test3',
+                '0000_00_00_000002_test2',
+                '0000_00_00_000001_test1',
+                '0000_00_00_000000_init',
+            ],
+            $migration->get(null, 'down')
+        );
+        $this->assertEquals('0000_00_00_000002_test2', $migration->run('0000_00_00_000001_test1'));
 
-        $migration = new Migration(__DIR__.'/Fixtures', '0000_00_00_000003');
-        $this->assertCount(0, $migration->down('0000_00_00_000003'));
-    }
-
-    public function testVersion()
-    {
-        $migration = new Migration(__DIR__.'/Fixtures');
-        $this->assertEquals(['0000_00_00_000000', '0000_00_00_000001', '0000_00_00_000002'], $migration->version('0000_00_00_000002'));
-        $this->assertEquals(['0000_00_00_000000'], $migration->version());
-
-        $migration = new Migration(__DIR__.'/Fixtures', '0000_00_00_000002');
-        $this->assertEquals(['0000_00_00_000002', '0000_00_00_000001'], $migration->version('0000_00_00_000000'));
-        $this->assertEquals(['0000_00_00_000003', '0000_00_00_000006', '0000_00_00_000007'], $migration->version('0000_00_00_000007'));
+        $migration = $this->migrator->create(__DIR__.'/Fixtures', '0000_00_00_000004_test4');
+        $this->assertEquals(
+            [
+                '0000_00_00_000004_test4',
+                '0000_00_00_000003_test3',
+            ],
+            $migration->get('0000_00_00_000002_test2', 'down')
+        );
+        $this->assertEquals('0000_00_00_000003_test3', $migration->run('0000_00_00_000002_test2'));
     }
 
     public function testLatest()
     {
-        $migration = new Migration(__DIR__.'/Fixtures');
-        $this->assertEquals(['0000_00_00_000000', '0000_00_00_000001', '0000_00_00_000002', '0000_00_00_000003', '0000_00_00_000006', '0000_00_00_000007'], $migration->latest());
+        $migration = $this->migrator->create(__DIR__.'/Fixtures');
+        $this->assertEquals(
+            [
+                '0000_00_00_000000_init',
+                '0000_00_00_000001_test1',
+                '0000_00_00_000002_test2',
+                '0000_00_00_000003_test3',
+                '0000_00_00_000004_test4',
+                '0000_00_00_000005_test5',
+            ],
+            $migration->get()
+        );
 
-        $migration = new Migration(__DIR__.'/Fixtures', '0000_00_00_000002');
-        $this->assertEquals(['0000_00_00_000003', '0000_00_00_000006', '0000_00_00_000007'], $migration->latest());
+        $reflectionObject = new ReflectionObject($migration);
+        $loadMethod = $reflectionObject->getMethod('load');
+        $loadMethod->setAccessible('true');
+        $files = $loadMethod->invokeArgs($migration, []);
+        $this->assertCount(6, $files);
 
-        $migration = new Migration(__DIR__.'/Fixtures', '0000_00_00_000007');
-        $this->assertCount(0, $migration->latest());
+        $migration = $this->migrator->create(__DIR__.'/Fixtures', '0000_00_00_000004_test4');
+
+        $reflectionObject = new ReflectionObject($migration);
+        $loadMethod = $reflectionObject->getMethod('load');
+        $loadMethod->setAccessible('true');
+        $files = $loadMethod->invokeArgs($migration, ['0000_00_00_000004_test4', null]);
+        $this->assertCount(1, $files);
     }
 }

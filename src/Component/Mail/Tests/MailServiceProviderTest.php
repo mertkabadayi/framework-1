@@ -3,9 +3,9 @@
 namespace Pagekit\Component\Mail\Tests;
 
 use Pagekit\Component\Mail\MailServiceProvider;
-use Pagekit\Tests\ServiceProviderTest;
+use Pagekit\Tests\ServiceProviderTestCase;
 
-class MailServiceProviderTest extends ServiceProviderTest
+class MailServiceProviderTest extends ServiceProviderTestCase
 {
     /**
      * @var MailServiceProvider
@@ -15,7 +15,7 @@ class MailServiceProviderTest extends ServiceProviderTest
 	public function setUp()
 	{
 		parent::setUp();
-		$this->provider = new MailServiceProvider;
+		$this->provider = new MailServiceProvider();
 	}
 
 	public function mailDriver()
@@ -39,7 +39,7 @@ class MailServiceProviderTest extends ServiceProviderTest
 		$this->provider->boot($this->app);
 
 		$this->assertInstanceOf('Pagekit\Component\Mail\Mailer', $this->app['mailer']);
-		$this->assertInstanceOf('Swift_Mailer', $this->app['swift.mailer']);
+		$this->assertTrue($this->app['mailer.initialized']);
 		$this->assertInstanceOf('Swift_SpoolTransport', $this->app['swift.spooltransport']);
 		$this->assertInstanceOf('Swift_MemorySpool', $this->app['swift.spool']);
 		$this->assertInstanceOf('Swift_Transport_StreamBuffer', $this->app['swift.transport.buffer']);

@@ -14,7 +14,7 @@
 
     <testsuites>
         <testsuite name="Pagekit Test Suite">
-    		<directory>.</directory>
+    		<directory>src</directory>
         </testsuite>
     </testsuites>
 

@@ -1,16 +1,10 @@
 <?php
 
-namespace Pagekit\Component\Migration\Tests\Fixtures;
+return [
+    'up' => function() use ($app) {
 
-use Pagekit\Component\Migration\MigrationInterface;
+    },
+    'down' => function() use ($app) {
 
-class Test1 implements MigrationInterface
-{
-    public function up()
-    {
     }
-
-    public function down()
-    {
-    }
-}
+];

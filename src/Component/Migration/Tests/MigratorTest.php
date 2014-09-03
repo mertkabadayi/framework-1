@@ -9,28 +9,32 @@ use Pagekit\Component\Migration\Migrator;
  */
 class MigratorTest extends \PHPUnit_Framework_TestCase
 {
-	public function testRun() {
-		$migrator = new Migrator;
-		$this->assertEquals('0000_00_00_000007', $migrator->run(__DIR__.'/Fixtures'));
+    /**
+     * @var Migrator
+     */
+    protected $migrator;
+
+    public function setUp()
+    {
+        $this->migrator = new Migrator();
+        $this->migrator->addGlobal('app', new \StdClass());
+    }
+
+	public function testCreatesMigration()
+    {
+        $migration = $this->migrator->create(__DIR__.'/Fixtures');
+		$this->assertInstanceOf('Pagekit\Component\Migration\Migration', $migration);
 	}
 
-	public function testRunException() {
+	public function testCreateException()
+    {
 		$this->setExpectedException('InvalidArgumentException');
-		$migrator = new Migrator;
-		$migrator->run(__DIR__.'/invalidPath');
+        $this->migrator->create(__DIR__.'/invalidPath');
 	}
 
-	public function testGet() {
-		$migrator = new Migrator;
-		$this->assertCount(6, $migrator->get(__DIR__.'/Fixtures'));
-
-		$migrator = new Migrator;
-		$this->assertCount(2, $migrator->get(__DIR__.'/Fixtures', '0000_00_00_000003'));
-	}
-
-	public function testGetException () {
-		$this->setExpectedException('InvalidArgumentException');
-		$migrator = new Migrator;
-		$migrator->get(__DIR__.'/invalidPath');
+	public function testGetGlobals()
+    {
+        $this->migrator->addGlobal('app', new \stdClass());
+        $this->assertArrayHasKey('app', $this->migrator->getGlobals());
 	}
 }

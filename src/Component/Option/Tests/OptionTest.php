@@ -164,7 +164,23 @@ class OptionTest extends \PHPUnit_Framework_TestCase
 
     protected function getConnection()
     {
-        return $this->getMockBuilder('Pagekit\Component\Database\Connection')->disableOriginalConstructor()->setMethods(['fetchAssoc', 'fetchAll', 'executeQuery', 'getDatabasePlatform', 'update', 'insert', 'delete'])->getMock();
+        return $this
+            ->getMockBuilder('Pagekit\Component\Database\Connection')
+            ->disableOriginalConstructor()
+            ->setMethods(
+                [
+                    'fetchAssoc',
+                    'fetchAll',
+                    'executeQuery',
+                    'getDatabasePlatform',
+                    'update',
+                    'insert',
+                    'delete',
+                    'isConnected',
+                ]
+            )
+            ->getMock()
+        ;
     }
 
     protected function getCache()

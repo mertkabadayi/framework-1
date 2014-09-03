@@ -4,11 +4,13 @@ namespace Pagekit\Component\Auth\Tests;
 
 use Pagekit\Component\Auth\Auth;
 use Pagekit\Component\Auth\AuthServiceProvider;
-use Pagekit\Tests\ServiceProviderTest;
+use Pagekit\Tests\ServiceProviderTestCase;
 
-
-class AuthServiceProviderTest extends ServiceProviderTest
+class AuthServiceProviderTest extends ServiceProviderTestCase
 {
+    protected $user;
+    protected $provider;
+
 	public function setUp()
 	{
 		parent::setUp();
