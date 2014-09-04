@@ -249,7 +249,7 @@ class Option implements \IteratorAggregate
         if ($autoload) {
 
             if (!$this->autoload) {
-                $this->autoload = $this->cache->fetch($this->prefix.'Autoload');
+                $this->options = $this->autoload = $this->cache->fetch($this->prefix.'Autoload');
             }
 
             if ($this->autoload) {
