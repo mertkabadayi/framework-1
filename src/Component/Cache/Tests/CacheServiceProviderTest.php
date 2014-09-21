@@ -12,22 +12,20 @@ class CacheServiceProviderTest extends ServiceProviderTestCase
 		parent::setUp();
 	}
 
-	public function configProvider()
-	{
-		return [
-			['array'],
-			['apc'],
-			['file'],
-			['auto']];
-	}
-
 	/**
 	* @dataProvider configProvider
 	*/
 	public function testRegister($storage)
 	{
-		$provider = new CacheServiceProvider;
-		$config   = ['cache.cache.test' => ['storage' => $storage, 'path' => './', 'cache.prefix' => 'prefix_']];
+        $identifier = 'cache_test';
+		$provider = new CacheServiceProvider();
+		$config = [
+            'cache.'.$identifier => [
+                'storage' => $storage,
+                'path' => './',
+                'prefix' => 'prefix_',
+            ],
+        ];
 
 		$this->app['config'] = $this->getConfig($config);
 		$this->app->boot();
@@ -37,18 +35,28 @@ class CacheServiceProviderTest extends ServiceProviderTestCase
 				$this->markTestSkipped('The ' . __CLASS__ .' requires the use of APC');
 			} else {
 				$provider->register($this->app);
-				$this->assertInstanceOf('Pagekit\Component\Cache\Cache', $this->app['cache']);
+				$this->assertInstanceOf('Pagekit\Component\Cache\Cache', $this->app[$identifier]);
 			}
 		}
 
-		if ($storage ==  'array') {
+		if ($storage == 'array') {
 			$provider->register($this->app);
-			$this->assertInstanceOf('Pagekit\Component\Cache\Cache', $this->app['cache']);
+			$this->assertInstanceOf('Pagekit\Component\Cache\Cache', $this->app[$identifier]);
 		}
 
-		if ($storage ==  'file' || $storage == 'auto') {
+		if ($storage == 'file' || $storage == 'auto') {
 			$provider->register($this->app);
-			$this->assertInstanceOf('Pagekit\Component\Cache\Cache', $this->app['cache']);
+			$this->assertInstanceOf('Pagekit\Component\Cache\Cache', $this->app[$identifier]);
 		}
 	}
+
+    public function configProvider()
+    {
+        return [
+            ['array'],
+            ['apc'],
+            ['file'],
+            ['auto'],
+        ];
+    }
 }
