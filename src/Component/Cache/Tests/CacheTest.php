@@ -47,13 +47,13 @@ class CacheTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($this->cache->supports());
         $this->assertTrue($this->cache->supports('file'));
         $this->assertTrue($this->cache->supports('array'));
-        $this->assertFalse($this->cache->supports('SomethingStupid'));
+        $this->assertFalse($this->cache->supports('not_supported_by_default'));
     }
 
     public function testStats()
     {
         // ArrayCache doesn't offer any stats, so null is the expected results
         $stats = $this->cache->getStats();
-        $this->assertTrue( $stats === null || gettype($stats) == "array");
+        $this->assertTrue($stats === null || gettype($stats) == 'array');
     }
 }

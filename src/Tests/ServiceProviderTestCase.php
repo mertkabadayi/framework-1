@@ -28,7 +28,7 @@ class ServiceProviderTestCase extends \PHPUnit_Framework_TestCase
 
 	public function createApplication()
 	{
-		$app = new Application;
+		$app = new Application();
         $app['path.cache'] = __DIR__.'/cache-ignore';
 		$app['session'] = new Session(new MockArraySessionStorage);
 		$app['request'] = $this->request;
@@ -38,7 +38,7 @@ class ServiceProviderTestCase extends \PHPUnit_Framework_TestCase
 
 	public function getConfig($settings)
 	{
-		$config = new Config;
+		$config = new Config();
 		foreach ($settings as $key => $value) {
 			$config->set($key, $value);
 		}
