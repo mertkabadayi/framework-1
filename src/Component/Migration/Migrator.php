@@ -2,6 +2,9 @@
 
 namespace Pagekit\Component\Migration;
 
+use Pagekit\Component\Migration\Loader\FilesystemLoader;
+use Pagekit\Component\Migration\Loader\LoaderInterface;
+
 class Migrator
 {
     /**
@@ -13,6 +16,11 @@ class Migrator
      * @var string
      */
     protected $pattern = '/^(?<version>.+)\.php$/';
+
+    /**
+     * @var LoaderInterface
+     */
+    protected $loader;
 
     /**
      * Gets all global parameters.
@@ -56,6 +64,30 @@ class Migrator
     }
 
     /**
+     * Gets the loader.
+     *
+     * @return LoaderInterface
+     */
+    public function getLoader()
+    {
+        if (!isset($this->loader)) {
+            $this->loader = new FilesystemLoader;
+        }
+
+        return $this->loader;
+    }
+
+    /**
+     * Sets the loader.
+     *
+     * @param LoaderInterface $loader
+     */
+    public function setLoader($loader)
+    {
+        $this->loader = $loader;
+    }
+
+    /**
      * Creates a migration object.
      *
      * @param  string $path
@@ -65,6 +97,6 @@ class Migrator
      */
     public function create($path, $current = null, $parameters = [])
     {
-        return new Migration($this, $path, $current, $parameters);
+        return new Migration($this->getLoader()->load($path, $this->pattern, array_replace($this->globals, $parameters)), $current);
     }
 }

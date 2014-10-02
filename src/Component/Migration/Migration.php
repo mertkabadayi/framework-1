@@ -5,9 +5,9 @@ namespace Pagekit\Component\Migration;
 class Migration
 {
     /**
-     * @var Migrator
+     * @var array[]
      */
-    protected $migrator;
+    protected $versions = [];
 
     /**
      * @var string
@@ -15,29 +15,17 @@ class Migration
     protected $current;
 
     /**
-     * @var array
-     */
-    protected $parameters;
-
-    /**
-     * @var array
-     */
-    protected $files = [];
-
-    /**
      * Constructor.
      *
-     * @param Migrator $migrator
-     * @param string   $path
-     * @param string   $current
-     * @param array    $parameters
+     * @param array  $versions
+     * @param string $current
      */
-    public function __construct(Migrator $migrator, $path, $current = null, $parameters = [])
+    public function __construct($versions = array(), $current = null)
     {
-        $this->migrator   = $migrator;
-        $this->current    = $current;
-        $this->parameters = array_replace(['migration' => $this], $parameters);
-        $this->files      = $this->loadFiles($path, $migrator->getPattern());
+        $this->versions = $versions;
+        $this->current  = $current;
+
+        uksort($this->versions, 'strnatcmp');
     }
 
     /**
@@ -50,12 +38,12 @@ class Migration
     public function get($version = null, $method = 'up')
     {
         if ($method == 'up') {
-            $files = $this->load($this->current, $version);
+            $versions = $this->load($this->current, $version);
         } else {
-            $files = $this->load($version, $this->current, 'down');
+            $versions = $this->load($version, $this->current, 'down');
         }
 
-        return array_keys($files);
+        return array_keys($versions);
     }
 
     /**
@@ -78,19 +66,15 @@ class Migration
     /**
      * Applies migrations.
      *
-     * @param  array  $files
+     * @param  array  $versions
      * @param  string $method
      * @return string|bool
      */
-    protected function apply(array $files, $method = 'up')
+    protected function apply(array $versions, $method = 'up')
     {
         $version = false;
 
-        foreach ($files as $version => $file) {
-
-            extract(array_replace($this->migrator->getGlobals(), $this->parameters), EXTR_SKIP);
-
-            $config = require $file;
+        foreach ($versions as $version => $config) {
 
             if (is_array($config) && isset($config[$method])) {
 
@@ -119,48 +103,22 @@ class Migration
      */
     protected function load($start = null, $end = null, $method = 'up')
     {
-        $files = [];
+        $versions = [];
 
-        foreach ($this->files as $version => $file) {
+        foreach ($this->versions as $version => $config) {
 
             if (($start !== null && strnatcmp($start, $version) >= 0) || ($end !== null && strnatcmp($end, $version) < 0)) {
                 continue;
             }
 
-            $files[$version] = $file;
+            $versions[$version] = $config;
         }
+
 
         if ($method == 'down') {
-            $files = array_reverse($files, true);
+            $versions = array_reverse($versions, true);
         }
 
-        return $files;
-    }
-
-    /**
-     * Loads all migration files form a given path.
-     *
-     * @param  string $path
-     * @param  string $pattern
-     * @throws \InvalidArgumentException
-     * @return array
-     */
-    protected function loadFiles($path, $pattern)
-    {
-        $files = [];
-
-        if (!is_dir($path)) {
-            throw new \InvalidArgumentException(sprintf('Unable to run migrations. Could not find path "%s"', $path));
-        }
-
-        foreach (new \DirectoryIterator($path) as $file) {
-            if ($file->isFile() && preg_match($pattern, $file->getFilename(), $matches)) {
-                $files[$matches['version']] = $file->getPathname();
-            }
-        }
-
-        uksort($files, 'strnatcmp');
-
-        return $files;
+        return $versions;
     }
 }
