@@ -90,7 +90,7 @@ class Migration
 
             extract(array_replace($this->migrator->getGlobals(), $this->parameters), EXTR_SKIP);
 
-            $config = require_once $file;
+            $config = require $file;
 
             if (is_array($config) && isset($config[$method])) {
 

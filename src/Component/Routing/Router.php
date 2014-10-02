@@ -172,7 +172,7 @@ class Router implements RouterInterface, UrlGeneratorInterface
                     $this->writeCache($cache['file'], (new PhpMatcherDumper($this->getRouteCollection()))->dump($options));
                 }
 
-                require_once($cache['file']);
+                require_once $cache['file'];
 
                 $this->matcher = new $class($this->context);
 
@@ -204,7 +204,7 @@ class Router implements RouterInterface, UrlGeneratorInterface
                     $this->writeCache($cache['file'], (new UrlGeneratorDumper($this->getRouteCollection()))->dump($options));
                 }
 
-                require_once($cache['file']);
+                require_once $cache['file'];
 
                 $this->generator = new $class($this->context);
 
