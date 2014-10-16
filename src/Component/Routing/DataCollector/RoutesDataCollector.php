@@ -33,7 +33,7 @@ class RoutesDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        $path = sprintf($this->cache .'/'. $this->file, sha1(get_class($this->router->getGenerator())));
+        $path = sprintf($this->cache .'/'. $this->file, sha1(filemtime((new \ReflectionClass($this->router->getGenerator()))->getFileName())));
 
         if (!file_exists($path)) {
 
