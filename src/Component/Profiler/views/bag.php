@@ -8,8 +8,8 @@
     <tbody>
         <?php foreach ($parameters as $key => $value) : ?>
             <tr>
-                <td><?php echo $key ?></td>
-                <td><?php echo trim(json_encode($value, 64 | 256), '[]') ?></td>
+                <td><?php echo htmlentities($key) ?></td>
+                <td><?php echo htmlentities(trim(json_encode($value, 64 | 256), '[]')) ?></td>
             </tr>
         <?php endforeach ?>
     </tbody>

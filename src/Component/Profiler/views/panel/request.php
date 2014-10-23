@@ -81,8 +81,8 @@
             <?php ksort($attributes); ?>
             <?php foreach ($attributes as $key => $value) : ?>
                 <tr>
-                    <td><?php echo $key; ?></td>
-                    <td><?php echo json_encode($value, 64 | 256); ?></td>
+                    <td><?php echo htmlentities($key) ?></td>
+                    <td><?php echo htmlentities(json_encode($value, 64 | 256)) ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
