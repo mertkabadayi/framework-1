@@ -28,15 +28,15 @@ class CacheServiceProvider implements ServiceProviderInterface
                 switch ($config['storage']) {
 
                     case 'array':
-                        $storage = new ArrayCache();
+                        $storage = new ArrayCache;
                         break;
 
                     case 'apc':
-                        $storage = new ApcCache();
+                        $storage = new ApcCache;
                         break;
                         
                     case 'xcache':
-                        $storage = new XcacheCache();
+                        $storage = new XcacheCache;
                         break;
 
                     case 'file':

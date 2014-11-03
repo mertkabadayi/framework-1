@@ -98,7 +98,7 @@ class Cache implements CacheInterface
             }
         }
 
-        if (extension_loaded('xcache')) {
+        if (extension_loaded('xcache') && ini_get('xcache.var_size')) {
             $supports[] = 'xcache';
         }
 
