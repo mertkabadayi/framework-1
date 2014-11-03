@@ -106,6 +106,12 @@ interface StreamWrapperInterface
     public function stream_stat();
 
     /**
+     * @param  int $cast_as
+     * @return resource | false
+     */
+    public function stream_cast($cast_as);
+
+    /**
      * @param  string $uri
      * @return bool
      */

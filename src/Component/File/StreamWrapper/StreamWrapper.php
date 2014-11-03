@@ -123,6 +123,14 @@ class StreamWrapper implements StreamWrapperInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function stream_cast($cast_as)
+    {
+        return false;
+    }
+
+    /**
      * @param $uri string
      * @return bool
      */
