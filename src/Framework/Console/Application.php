@@ -5,23 +5,24 @@ namespace Pagekit\Framework\Console;
 use Pagekit\Framework\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command as BaseCommand;
+use Pagekit\Framework\Application as PagekitApplication;
 
 class Application extends BaseApplication
 {
     /**
      * The Pagekit application instance.
      *
-     * @var Application
+     * @var PagekitApplication
      */
     protected $pagekit;
 
     /**
      * Constructor.
      *
-     * @param Application $pagekit
+     * @param PagekitApplication $pagekit
      * @param string      $name
      */
-    public function __construct($pagekit, $name = null)
+    public function __construct(PagekitApplication $pagekit, $name = null)
     {
         parent::__construct($name ?: 'Pagekit', $pagekit['config']['app.version']);
 
