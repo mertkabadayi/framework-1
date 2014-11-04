@@ -3,6 +3,7 @@
 namespace Pagekit\Component\Routing;
 
 use Pagekit\Component\Routing\Controller\ControllerCollection;
+use Pagekit\Component\Routing\Generator\UrlGenerator;
 use Pagekit\Component\Routing\Generator\UrlGeneratorDumper;
 use Pagekit\Component\Routing\Generator\UrlGeneratorInterface;
 use Pagekit\Component\Routing\RequestContext as ExtendedRequestContext;
@@ -12,8 +13,10 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
+use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
 class Router implements RouterInterface, UrlGeneratorInterface

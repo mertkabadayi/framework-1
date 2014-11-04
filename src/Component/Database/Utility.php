@@ -66,7 +66,7 @@ class Utility
 	 * Creates a new database table.
 	 *
 	 * @param string  $table
-	 * @param Closure $callback
+	 * @param \Closure $callback
 	 */
 	public function createTable($table, \Closure $callback)
     {
