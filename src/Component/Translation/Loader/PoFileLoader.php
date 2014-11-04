@@ -131,7 +131,8 @@ class PoFileLoader extends ArrayLoader implements LoaderInterface
         $this->addMessage($messages, $item);
         fclose($stream);
 
-        return $messages;
+        // filter empty translations
+        return array_filter($messages);
     }
 
     /**
