@@ -2,8 +2,8 @@
 
 namespace Pagekit\Component\Feed\Item;
 
-use Pagekit\Component\Feed\Item;
 use Pagekit\Component\Feed\Feed;
+use Pagekit\Component\Feed\Item;
 
 class RSS2 extends Item
 {

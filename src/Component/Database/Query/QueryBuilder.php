@@ -2,7 +2,7 @@
 
 namespace Pagekit\Component\Database\Query;
 
-use PDO, Closure;
+use Closure, PDO;
 use Doctrine\DBAL\Types\Type;
 use Pagekit\Component\Database\Connection;
 
@@ -742,7 +742,7 @@ class QueryBuilder
     /**
      * Tries to guess param types
      */
-    protected function guessParamTypes(array $params = array())
+    protected function guessParamTypes(array $params = [])
     {
         $types = [];
         foreach($params as $key => $param) {
