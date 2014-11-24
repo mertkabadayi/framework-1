@@ -395,7 +395,9 @@ class Router implements RouterInterface, UrlGeneratorInterface
                 }
             }
 
-            $this->cache = ['key' => sha1(json_encode($resources)), 'modified' => $modified, 'options' => $this->options];
+            $resources['options'] = $this->options;
+
+            $this->cache = ['key' => sha1(json_encode($resources)), 'modified' => $modified];
         }
 
         $file  = sprintf($file, $this->options['cache'], $this->cache['key']);
