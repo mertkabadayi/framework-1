@@ -32,8 +32,16 @@ trait ElementsTrait
      */
     public function addElements(array $elements)
     {
-        foreach ($elements as $name => $content) {
-            $this->addElement($name, $content);
+        foreach ($elements as $name => $value) {
+            if (method_exists($this, $method = 'set'.$name)) {
+                if (is_array($value)) {
+                    call_user_func_array([$this, $method], $value);
+                } else {
+                    $this->$method($value);
+                }
+            } else {
+                $this->addElement($name, $value);
+            }
         }
 
         return $this;

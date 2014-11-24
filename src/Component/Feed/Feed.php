@@ -195,17 +195,17 @@ abstract class Feed implements FeedInterface
     }
 
     /**
-     * @return \DOMDocument
-     */
-    abstract protected function build();
-
-    /**
      * @return string
      */
     public function __toString()
     {
         return $this->generate();
     }
+
+    /**
+     * @return \DOMDocument
+     */
+    abstract protected function build();
 
     /**
      * @param  \DOMDocument $doc

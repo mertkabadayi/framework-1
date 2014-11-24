@@ -17,12 +17,13 @@ class FeedFactory
      * Creates a feed.
      *
      * @param  string $type
+     * @param  array  $elements
      * @return FeedInterface
      */
-    public function create($type = null)
+    public function create($type = null, array $elements = [])
     {
         $class = isset($this->feeds[$type]) ? $this->feeds[$type] : $this->feeds[Feed::RSS2];
-        return new $class;
+        return (new $class)->addElements($elements);
     }
 
     /**
