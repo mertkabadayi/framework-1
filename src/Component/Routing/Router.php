@@ -119,6 +119,22 @@ class Router implements RouterInterface, UrlGeneratorInterface
     }
 
     /**
+     * @return array
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * @param array $options
+     */
+    public function setOptions($options)
+    {
+        $this->options = $options;
+    }
+
+    /**
      * Gets a route by name.
      *
      * @param string $name The route name
@@ -141,7 +157,7 @@ class Router implements RouterInterface, UrlGeneratorInterface
 
             foreach ($this->aliases as $source => $alias) {
 
-                $name = $source;
+                $name   = $source;
                 $params = [];
 
                 if ($query = substr(strstr($source, '?'), 1)) {
@@ -251,9 +267,9 @@ class Router implements RouterInterface, UrlGeneratorInterface
     /**
      * Aborts the current request by sending a proper HTTP error.
      *
-     * @param int $code
-     * @param string $message
-     * @param array $headers
+     * @param  int    $code
+     * @param  string $message
+     * @param  array  $headers
      * @throws HttpException
      * @throws NotFoundHttpException
      */
@@ -339,7 +355,7 @@ class Router implements RouterInterface, UrlGeneratorInterface
 
         if ($query = substr(strstr($name, '?'), 1)) {
             parse_str($query, $params);
-            $name = strstr($name, '?', true);
+            $name       = strstr($name, '?', true);
             $parameters = array_replace($parameters, $params);
         }
 
@@ -349,7 +365,7 @@ class Router implements RouterInterface, UrlGeneratorInterface
             }
         }
 
-        return $this->getGenerator()->generate($name, $parameters, $referenceType) . $fragment;
+        return $this->getGenerator()->generate($name, $parameters, $referenceType).$fragment;
     }
 
     /**
@@ -379,7 +395,7 @@ class Router implements RouterInterface, UrlGeneratorInterface
                 }
             }
 
-            $this->cache = ['key' => sha1(json_encode($resources)), 'modified' => $modified];
+            $this->cache = ['key' => sha1(json_encode($resources)), 'modified' => $modified, 'options' => $this->options];
         }
 
         $file  = sprintf($file, $this->options['cache'], $this->cache['key']);

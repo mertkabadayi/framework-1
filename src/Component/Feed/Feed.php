@@ -235,7 +235,7 @@ abstract class Feed implements FeedInterface
             $item = $doc->createElement($name, $value);
         }
 
-        return $this->buildAttributes($item, (array)$attributes);
+        return $this->buildAttributes($item, (array) $attributes);
     }
 
     /**

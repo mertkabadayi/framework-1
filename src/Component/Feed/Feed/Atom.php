@@ -43,7 +43,7 @@ class Atom extends Feed
     public static function uuid($key = null, $prefix = '')
     {
         $hash = str_split(md5($key ?: uniqid()), 4);
-        foreach ([2,1,1,1,3] as $length) {
+        foreach ([2, 1, 1, 1, 3] as $length) {
             $uuid[] = implode('', array_splice($hash, 0, $length));
         }
         return $prefix.implode('-', $uuid);

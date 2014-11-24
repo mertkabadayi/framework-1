@@ -1,8 +1,8 @@
 {
-    "name": "pagekit/feed",
+    "name"    : "pagekit/feed",
     "homepage": "http://pagekit.com",
-    "license": "MIT",
-    "require": {
+    "license" : "MIT",
+    "require" : {
         "php": ">=5.4.0"
     },
     "autoload": {
@@ -10,7 +10,7 @@
             "Pagekit\\Component\\Feed\\": ""
         }
     },
-    "extra": {
+    "extra"   : {
         "branch-alias": {
             "dev-master": "0.9-dev"
         }
