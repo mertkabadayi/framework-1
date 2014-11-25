@@ -189,4 +189,15 @@ class Command extends BaseCommand
     {
         $this->output->writeln("<error>$string</error>");
     }
+
+    /**
+     * Aborts command execution.
+     *
+     * @param string $string
+     */
+    public function abort($string)
+    {
+        $this->error($string);
+        exit;
+    }
 }
