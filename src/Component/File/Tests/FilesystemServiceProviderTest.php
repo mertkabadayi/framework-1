@@ -28,6 +28,7 @@ class FilesystemServiceProviderTest extends \PHPUnit_Framework_TestCase
 		$app = new Application;
 		$app['session'] = new Session(new MockArraySessionStorage);
 		$app['request'] = $this->request;
+		$app['path.cache'] = null;
 		$app->boot();
 
 		return $app;
