@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Annotation\Route as BaseRoute;
 class Route extends BaseRoute {
 
     /**
-     * {@inheritdocs}
+     * {@inheritdoc}
      */
     public function __construct(array $data)
     {

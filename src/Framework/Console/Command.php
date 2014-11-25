@@ -64,12 +64,9 @@ class Command extends BaseCommand
     }
 
     /**
-     * Initialize the console command.
-     *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
+     * {@inheritdoc}
      */
-    public function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output)
     {
         $this->input = $input;
         $this->output = $output;
