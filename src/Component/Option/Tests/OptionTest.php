@@ -34,7 +34,7 @@ class OptionTest extends \PHPUnit_Framework_TestCase
         $connection = $this->getConnection();
         $connection->expects($this->once())
                    ->method('fetchAll')
-                   ->will($this->returnValue([['name' => 'foo', 'value' => json_encode('bar')]]));
+                   ->will($this->returnValue([['name' => 'foo', 'value' => json_encode('bar'), 'autoload' => 1]]));
 
         $options = $this->getOptions($connection, $cache = $this->getCache());
 
@@ -125,11 +125,6 @@ class OptionTest extends \PHPUnit_Framework_TestCase
     public function testRemove()
     {
         $connection = $this->getConnection();
-        $connection->expects($this->exactly(3))
-                   ->method('fetchAssoc')
-                   ->will($this->returnCallback(function() {
-                        static $i; return $i++ == 1 ? ['id' => 1, 'autoload' => 0] : null;
-                   }));
         $connection->expects($this->once())
                    ->method('delete')
                    ->will($this->returnValue(1));
@@ -164,7 +159,7 @@ class OptionTest extends \PHPUnit_Framework_TestCase
 
     protected function getConnection()
     {
-        return $this
+        $mock = $this
             ->getMockBuilder('Pagekit\Component\Database\Connection')
             ->disableOriginalConstructor()
             ->setMethods(
@@ -179,8 +174,12 @@ class OptionTest extends \PHPUnit_Framework_TestCase
                     'isConnected',
                 ]
             )
-            ->getMock()
-        ;
+            ->getMock();
+
+        $mock->method('isConnected')
+             ->will($this->returnValue(true));
+
+        return $mock;
     }
 
     protected function getCache()

@@ -1,5 +1,5 @@
 /_coverage
-.DS_Store
 /vendor
 *.lock
 *.phar
+.DS_Store

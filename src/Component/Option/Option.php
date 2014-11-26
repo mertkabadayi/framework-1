@@ -209,6 +209,10 @@ class Option implements \IteratorAggregate
     {
         $name = trim($name);
 
+        if (empty($name)) {
+            throw new \InvalidArgumentException('Empty option name given.');
+        }
+
         if (in_array($name, $this->protected)) {
             throw new \InvalidArgumentException(sprintf('"%s" is a protected option and may not be modified.', $name));
         }
@@ -248,8 +252,8 @@ class Option implements \IteratorAggregate
 
         if ($autoload) {
 
-            if (!$this->autoload) {
-                $this->options = $this->autoload = $this->cache->fetch($this->prefix.'Autoload');
+            if (!$this->autoload and $options = $this->cache->fetch($this->prefix.'Autoload')) {
+                $this->options = $this->autoload = $options;
             }
 
             if ($this->autoload) {
