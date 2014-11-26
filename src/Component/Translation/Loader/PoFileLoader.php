@@ -13,6 +13,9 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
  */
 class PoFileLoader extends ArrayLoader implements LoaderInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function load($resource, $locale, $domain = 'messages')
     {
         if (!stream_is_local($resource)) {

@@ -35,6 +35,9 @@ class MoFileLoader extends ArrayLoader implements LoaderInterface
      */
     const MO_HEADER_SIZE = 28;
 
+    /**
+     * {@inheritdoc}
+     */
     public function load($resource, $locale, $domain = 'messages')
     {
         if (!stream_is_local($resource)) {

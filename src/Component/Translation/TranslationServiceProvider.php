@@ -3,6 +3,7 @@
 namespace Pagekit\Component\Translation;
 
 use Pagekit\Component\Translation\Loader\MoFileLoader;
+use Pagekit\Component\Translation\Loader\PhpFileLoader;
 use Pagekit\Component\Translation\Loader\PoFileLoader;
 use Pagekit\Framework\Application;
 use Pagekit\Framework\ServiceProviderInterface;
@@ -22,6 +23,7 @@ class TranslationServiceProvider implements ServiceProviderInterface
         $app['translator'] = function($app) {
 
             $translator = new Translator($app['config']['app.locale']);
+            $translator->addLoader('php', new PhpFileLoader);
             $translator->addLoader('mo', new MoFileLoader);
             $translator->addLoader('po', new PoFileLoader);
             $translator->addLoader('array', new ArrayLoader);
