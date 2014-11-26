@@ -10,7 +10,7 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
 /**
  * PhpFileLoader loads translations from PHP files returning an array of translations.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+ * @copyright Copyright (c) 2004-2014 Fabien Potencier
  */
 class PhpFileLoader extends ArrayLoader implements LoaderInterface
 {
