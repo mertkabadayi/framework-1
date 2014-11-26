@@ -2,8 +2,8 @@
 
 namespace Pagekit\Component\File\Tests\Archive;
 
-use Pagekit\Component\File\Archive\Zip;
 use ZipArchive;
+use Pagekit\Component\File\Archive\Zip;
 
 /**
  * Zip Test class.
@@ -28,8 +28,8 @@ class ZipTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('zip extension missing');
         }
 
-        $this->workspace = $this->getTempDir('zip_');
         $this->zip = new Zip;
+        $this->workspace = $this->getTempDir('zip_');
     }
 
     public function tearDown()
@@ -39,20 +39,9 @@ class ZipTest extends \PHPUnit_Framework_TestCase
 
     public function testExtract()
     {
-        // create test zip
-        $zipFile = $this->workspace.'/test.zip';
-        $zipArchive = new \ZipArchive;
-        if (!$zipArchive->open($zipFile, \ZIPARCHIVE::OVERWRITE)) {
-            $this->markTestIncomplete(sprintf('Unable to open zip archive at %s.', $zipFile));
-        }
-        $zipArchive->addFile(__DIR__.'/Fixtures/test', 'test');
-        if (!$zipArchive->status == \ZIPARCHIVE::ER_OK) {
-            $this->markTestIncomplete(sprintf('Unable to build zip archive at %s.', $zipFile));
-        }
-        $zipArchive->close();
+        $this->zip->extract(__DIR__.'/Fixtures/test.zip', $this->workspace);
 
-        $this->zip->extract($zipFile, $this->workspace.'/testFolder');
-        $this->assertFileExists($this->workspace.'/testFolder/test');
+        $this->assertFileExists($this->workspace.'/test.txt');
     }
 
     /**
