@@ -222,7 +222,8 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
             touch($dir.DIRECTORY_SEPARATOR.$file);
         }
 
-        $this->filesystem->changeMode($dir, 0755, 0000, true);
+        $this->assertTrue($this->filesystem->changeMode($dir, 0755, 0000, true));
+
         foreach ($files as $file) {
             $this->assertEquals(755, $this->getFilePermissions($dir.DIRECTORY_SEPARATOR.$file));
         }
@@ -235,7 +236,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $file = $this->workspace.DIRECTORY_SEPARATOR.'file';
         touch($file);
 
-        $this->filesystem->changeMode($file, 0770, 0022);
+        $this->assertTrue($this->filesystem->changeMode($file, 0770, 0022));
         $this->assertEquals(750, $this->getFilePermissions($file));
     }
 
@@ -280,7 +281,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $dir = $this->workspace.DIRECTORY_SEPARATOR.'dir';
         mkdir($dir);
 
-        $this->filesystem->changeOwner($dir, $this->getFileOwner($dir));
+        $this->assertTrue($this->filesystem->changeOwner($dir, $this->getFileOwner($dir)));
     }
 
     public function testChownRecursive()
@@ -292,7 +293,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $file = $dir.DIRECTORY_SEPARATOR.'file';
         touch($file);
 
-        $this->filesystem->changeOwner($dir, $this->getFileOwner($dir), true);
+        $this->assertTrue($this->filesystem->changeOwner($dir, $this->getFileOwner($dir), true));
     }
 
     public function testChownFail()
@@ -317,7 +318,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $dir = $this->workspace.DIRECTORY_SEPARATOR.'dir';
         mkdir($dir);
 
-        $this->filesystem->changeGroup($dir, $this->getFileGroup($dir));
+        $this->assertTrue($this->filesystem->changeGroup($dir, $this->getFileGroup($dir)));
     }
 
     public function testChgrpRecursive()
@@ -329,7 +330,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $file = $dir.DIRECTORY_SEPARATOR.'file';
         touch($file);
 
-        $this->filesystem->changeGroup($dir, $this->getFileGroup($dir), true);
+        $this->assertTrue($this->filesystem->changeGroup($dir, $this->getFileGroup($dir), true));
     }
 
     public function testChgrpFail()
