@@ -204,9 +204,9 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         touch($file);
 
         $this->filesystem->changeMode($file, 0400);
-        $this->filesystem->changeMode($dir, 0753);
+        $this->filesystem->changeMode($dir, 0755);
 
-        $this->assertEquals(753, $this->getFilePermissions($dir));
+        $this->assertEquals(755, $this->getFilePermissions($dir));
         $this->assertEquals(400, $this->getFilePermissions($file));
     }
 
@@ -222,9 +222,9 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
             touch($dir.DIRECTORY_SEPARATOR.$file);
         }
 
-        $this->filesystem->changeMode($dir, 0777, 0000, true);
+        $this->filesystem->changeMode($dir, 0755, 0000, true);
         foreach ($files as $file) {
-            $this->assertEquals(777, $this->getFilePermissions($dir.DIRECTORY_SEPARATOR.$file));
+            $this->assertEquals(755, $this->getFilePermissions($dir.DIRECTORY_SEPARATOR.$file));
         }
     }
 
@@ -250,10 +250,10 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         mkdir($directory);
         touch($file);
 
-        $this->filesystem->changeMode($files, 0753);
+        $this->filesystem->changeMode($files, 0755);
 
-        $this->assertEquals(753, $this->getFilePermissions($file));
-        $this->assertEquals(753, $this->getFilePermissions($directory));
+        $this->assertEquals(755, $this->getFilePermissions($file));
+        $this->assertEquals(755, $this->getFilePermissions($directory));
     }
 
     public function testChmodChangesModeOfTraversableFileObject()
@@ -267,10 +267,10 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         mkdir($directory);
         touch($file);
 
-        $this->filesystem->changeMode($files, 0753);
+        $this->filesystem->changeMode($files, 0755);
 
-        $this->assertEquals(753, $this->getFilePermissions($file));
-        $this->assertEquals(753, $this->getFilePermissions($directory));
+        $this->assertEquals(755, $this->getFilePermissions($file));
+        $this->assertEquals(755, $this->getFilePermissions($directory));
     }
 
     public function testChown()
