@@ -95,7 +95,7 @@ class SessionServiceProvider implements ServiceProviderInterface
 
     public function onEarlyKernelRequest(GetResponseEvent $event)
     {
-        if (!isset($this->app['session.options']['cookie_path'])) {
+        if (!$this->app['session.test'] && !isset($this->app['session.options']['cookie_path'])) {
             $this->app['session.storage']->setOptions(['cookie_path' => $event->getRequest()->getBasePath() ?: '/']);
         }
 
