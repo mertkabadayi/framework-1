@@ -401,8 +401,7 @@ class Router implements RouterInterface, UrlGeneratorInterface
         }
 
         $file  = sprintf($file, $this->options['cache'], $this->cache['key']);
-        $time  = file_exists($file) ? filemtime($file) : 0;
-        $fresh = $time >= $this->cache['modified'];
+        $fresh = file_exists($file) && filemtime($file) >= $this->cache['modified'];
 
         return array_merge(compact('fresh', 'file'), $this->cache);
     }
