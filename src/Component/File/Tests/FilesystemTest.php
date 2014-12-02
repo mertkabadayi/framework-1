@@ -225,6 +225,7 @@ class FilesystemTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->filesystem->changeMode($dir, 0755, 0000, true));
 
         foreach ($files as $file) {
+            clearstatcache($dir.DIRECTORY_SEPARATOR.$file);
             $this->assertEquals(755, $this->getFilePermissions($dir.DIRECTORY_SEPARATOR.$file));
         }
     }
