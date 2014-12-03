@@ -6,7 +6,7 @@ use Pagekit\Framework\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Pagekit\Framework\Controller\Controller;
 
-class ApplicationTraitTestCase extends \PHPUnit_Framework_TestCase {
+class ApplicationTraitTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * @var Application
