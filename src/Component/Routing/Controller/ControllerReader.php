@@ -67,6 +67,10 @@ class ControllerReader implements ControllerReaderInterface
             'requirements' => [],
             'options'      => [],
             'defaults'     => [],
+            'host'         => '',
+            'schemes'      => [],
+            'methods'      => [],
+            'condition'    => ''
         ], $options);
 
         if ($annotation = $this->getAnnotationReader()->getClassAnnotation($class, $this->routeAnnotation)) {
@@ -89,6 +93,22 @@ class ControllerReader implements ControllerReaderInterface
 
             if ($annotation->getDefaults() !== null) {
                 $options['defaults'] = $annotation->getDefaults();
+            }
+
+            if ($annotation->getHost() !== null) {
+                $options['host'] = $annotation->getHost();
+            }
+
+            if ($annotation->getSchemes() !== null) {
+                $options['schemes'] = $annotation->getSchemes();
+            }
+
+            if ($annotation->getMethods() !== null) {
+                $options['methods'] = $annotation->getMethods();
+            }
+
+            if ($annotation->getCondition() !== null) {
+                $options['condition'] = $annotation->getCondition();
             }
         }
 
@@ -164,8 +184,18 @@ class ControllerReader implements ControllerReaderInterface
             $path = $annotation->getPath();
 
             $options['requirements'] = array_merge($options['requirements'], $annotation->getRequirements());
-            $options['options'] = array_merge($options['options'], $annotation->getOptions());
-            $options['defaults'] = array_merge($options['defaults'], $annotation->getDefaults());
+            $options['options']      = array_merge($options['options'], $annotation->getOptions());
+            $options['defaults']     = array_merge($options['defaults'], $annotation->getDefaults());
+            $options['schemes']      = array_merge($options['schemes'], $annotation->getSchemes());
+            $options['methods']      = array_merge($options['methods'], $annotation->getMethods());
+
+            if ($annotation->getHost() !== null) {
+                $options['host'] = $annotation->getHost();
+            }
+
+            if ($annotation->getCondition() !== null) {
+                $options['condition'] = $annotation->getCondition();
+            }
         }
 
         if (empty($name)) {
@@ -176,7 +206,16 @@ class ControllerReader implements ControllerReaderInterface
             $path = $this->getDefaultRoutePath($class, $method, $options);
         }
 
-        $route = new Route(rtrim($options['path'].$path, '/'), $options['defaults'], $options['requirements'], $options['options']);
+        $route = new Route(
+            rtrim($options['path'].$path, '/'),
+            $options['defaults'],
+            $options['requirements'],
+            $options['options'],
+            $options['host'],
+            $options['schemes'],
+            $options['methods'],
+            $options['condition']
+        );
 
         $this->configureRoute($route, $class, $method, $options);
 
