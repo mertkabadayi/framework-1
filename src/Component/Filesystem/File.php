@@ -87,14 +87,14 @@ class File
      */
     public static function copy($source, $target)
     {
-        $source = self::getPathInfo($source);
-        $target = self::getPathInfo($target);
+        $source = self::getPathInfo($source, 'pathname');
+        $target = self::getPathInfo($target, 'pathname');
 
-        if (!is_file($source['pathname']) || !self::makeDir($target['root'].dirname($target['path']))) {
+        if (!is_file($source) || !self::makeDir(dirname($target))) {
             return false;
         }
 
-        return @copy($source['pathname'], $target['pathname']);
+        return @copy($source, $target);
     }
 
     /**
@@ -109,25 +109,25 @@ class File
 
         foreach ($files as $file) {
 
-            $file = self::getPathInfo($file);
+            $file = self::getPathInfo($file, 'pathname');
 
-            if (is_dir($file['pathname'])) {
+            if (is_dir($file)) {
 
-                if ($file['path'] !== '') {
-                    $file['pathname'] .= '/';
+                if (substr($file, -1) != '/') {
+                    $file .= '/';
                 }
 
-                foreach (self::listDir($file['pathname']) as $name) {
-                    if (!self::delete($file['pathname'].$name)) {
+                foreach (self::listDir($file) as $name) {
+                    if (!self::delete($file.$name)) {
                         return false;
                     }
                 }
 
-                if (!@rmdir($file['pathname'])) {
+                if (!@rmdir($file)) {
                     return false;
                 }
 
-            } elseif (!@unlink($file['pathname'])) {
+            } elseif (!@unlink($file)) {
                 return false;
             }
         }
@@ -172,29 +172,29 @@ class File
      */
     public static function copyDir($source, $target)
     {
-        $source = self::getPathInfo($source);
-        $target = self::getPathInfo($target);
+        $source = self::getPathInfo($source, 'pathname');
+        $target = self::getPathInfo($target, 'pathname');
 
-        if (!is_dir($source['pathname']) || !self::makeDir($target['pathname'])) {
+        if (!is_dir($source) || !self::makeDir($target)) {
             return false;
         }
 
-        if ($source['path'] !== '') {
-            $source['pathname'] .= '/';
+        if (substr($source, -1) != '/') {
+            $source .= '/';
         }
 
-        if ($target['path'] !== '') {
-            $target['pathname'] .= '/';
+        if (substr($target, -1) != '/') {
+            $target .= '/';
         }
 
-        foreach (self::listDir($source['pathname']) as $file) {
-            if (is_dir($source['pathname'].$file)) {
+        foreach (self::listDir($source) as $file) {
+            if (is_dir($source.$file)) {
 
-                if (!self::copyDir($source['pathname'].$file, $target['pathname'].$file)) {
+                if (!self::copyDir($source.$file, $target.$file)) {
                     return false;
                 }
 
-            } elseif (!self::copy($source['pathname'].$file, $target['pathname'].$file)) {
+            } elseif (!self::copy($source.$file, $target.$file)) {
                 return false;
             }
         }
