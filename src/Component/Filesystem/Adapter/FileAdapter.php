@@ -37,7 +37,7 @@ class FileAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function parsePathInfo(array $info)
+    public function getPathInfo(array $info)
     {
         $info['realpath'] = $info['pathname'];
 

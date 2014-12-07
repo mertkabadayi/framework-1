@@ -47,7 +47,7 @@ class File
         }
 
         if ($adapter = self::getAdapter($info['protocol'])) {
-            $info = $adapter->parsePathInfo($info);
+            $info = $adapter->getPathInfo($info);
         }
 
         if ($option === null) {

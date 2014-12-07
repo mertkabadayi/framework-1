@@ -37,7 +37,7 @@ class PathAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function parsePathInfo(array $info)
+    public function getPathInfo(array $info)
     {
         $info['realpath'] = $this->path.rtrim('/'.$info['path'], '/');
 
