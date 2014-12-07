@@ -23,6 +23,7 @@ class TempAdapterTest extends \PHPUnit_Framework_TestCase
     public function tearDown()
     {
         $this->removeDir($this->workspace);
+        stream_wrapper_unregister('temp');
     }
 
     public function testCopyFile()

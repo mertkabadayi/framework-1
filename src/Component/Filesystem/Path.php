@@ -5,7 +5,7 @@ namespace Pagekit\Component\Filesystem;
 class Path
 {
     /**
-     * Parses a path into root, path, pathname, protocol.
+     * Parses and canonicalizes a path into root, path, dirname, pathname, protocol.
      *
      * @param  string $path
      * @param  string $option
@@ -40,6 +40,8 @@ class Path
 
         $path = implode('/', $parts);
         $info = compact('root', 'path');
+
+        $info['dirname']  = $root.substr($path, 0, strrpos($path, '/'));
         $info['pathname'] = $root.$path;
         $info['protocol'] = strpos($root, '://') ? substr($root, 0, -3) : 'file';
 

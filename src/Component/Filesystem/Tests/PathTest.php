@@ -41,12 +41,12 @@ class PathTest extends \PHPUnit_Framework_TestCase
     public function dataPaths()
     {
         return [
-            ['dir/file.txt', ['root' => '', 'path' => 'dir/file.txt', 'pathname' => 'dir/file.txt', 'protocol' => 'file']],
-            ['dir/./file.txt', ['root' =>'', 'path' => 'dir/file.txt', 'pathname' => 'dir/file.txt', 'protocol' => 'file']],
-            ['dir/../file.txt', ['root' => '', 'path' => 'file.txt', 'pathname' => 'file.txt', 'protocol' => 'file']],
-            ['/dir/file.txt', ['root' => '/', 'path' => 'dir/file.txt', 'pathname' => '/dir/file.txt', 'protocol' => 'file']],
-            ['C:\dir\file.txt', ['root' => 'C:/', 'path' => 'dir/file.txt', 'pathname' => 'C:/dir/file.txt', 'protocol' => 'file']],
-            ['http://dir/file.txt', ['root' => 'http://', 'path' => 'dir/file.txt', 'pathname' => 'http://dir/file.txt', 'protocol' => 'http']]
+            ['dir/file.txt', ['root' => '', 'path' => 'dir/file.txt', 'dirname' => 'dir', 'pathname' => 'dir/file.txt', 'protocol' => 'file']],
+            ['dir/./file.txt', ['root' =>'', 'path' => 'dir/file.txt', 'dirname' => 'dir', 'pathname' => 'dir/file.txt', 'protocol' => 'file']],
+            ['dir/../file.txt', ['root' => '', 'path' => 'file.txt', 'dirname' => '', 'pathname' => 'file.txt', 'protocol' => 'file']],
+            ['/dir/file.txt', ['root' => '/', 'path' => 'dir/file.txt', 'dirname' => '/dir', 'pathname' => '/dir/file.txt', 'protocol' => 'file']],
+            ['C:\dir\file.txt', ['root' => 'C:/', 'path' => 'dir/file.txt', 'dirname' => 'C:/dir', 'pathname' => 'C:/dir/file.txt', 'protocol' => 'file']],
+            ['http://dir/file.txt', ['root' => 'http://', 'path' => 'dir/file.txt', 'dirname' => 'http://dir', 'pathname' => 'http://dir/file.txt', 'protocol' => 'http']]
         ];
     }
 }

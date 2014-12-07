@@ -10,13 +10,28 @@ class PathAdapter implements AdapterInterface
     protected $path;
 
     /**
+     * @var string
+     */
+    protected $wrapper;
+
+    /**
      * Constructor.
      *
      * @param string $path;
+     * @param string $wrapper;
      */
-    public function __construct($path)
+    public function __construct($path, $wrapper = null)
     {
-        $this->path = $path;
+        $this->path    = $path;
+        $this->wrapper = $wrapper ?: 'Pagekit\Component\Filesystem\StreamWrapper';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStreamWrapper()
+    {
+        return $this->wrapper;
     }
 
     /**
@@ -24,7 +39,7 @@ class PathAdapter implements AdapterInterface
      */
     public function parsePathInfo(array $info)
     {
-        $info['pathname'] = $this->path.rtrim('/'.$info['path'], '/');
+        $info['realpath'] = $this->path.rtrim('/'.$info['path'], '/');
 
         return $info;
     }

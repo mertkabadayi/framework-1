@@ -9,7 +9,7 @@ class File
     protected static $adapters = [];
 
     /**
-     * Gets file URL.
+     * Gets file path URL.
      *
      * @param  string $file
      * @return string|false
@@ -20,14 +20,15 @@ class File
     }
 
     /**
-     * Gets file path.
+     * Gets canonicalized file path or realpath.
      *
      * @param  string $file
+     * @param  bool   $realpath
      * @return string|false
      */
-    public static function getPath($file)
+    public static function getPath($file, $realpath = false)
     {
-        return self::getPathInfo($file, 'pathname') ?: false;
+        return self::getPathInfo($file, $realpath ? 'realpath' : 'pathname') ?: false;
     }
 
     /**
@@ -88,13 +89,13 @@ class File
     public static function copy($source, $target)
     {
         $source = self::getPathInfo($source, 'pathname');
-        $target = self::getPathInfo($target, 'pathname');
+        $target = self::getPathInfo($target);
 
-        if (!is_file($source) || !self::makeDir(dirname($target))) {
+        if (!is_file($source) || !self::makeDir($target['dirname'])) {
             return false;
         }
 
-        return @copy($source, $target);
+        return @copy($source, $target['pathname']);
     }
 
     /**
@@ -221,5 +222,9 @@ class File
     public static function registerAdapter($protocol, AdapterInterface $adapter)
     {
         self::$adapters[$protocol] = $adapter;
+
+        if ($wrapper = $adapter->getStreamWrapper()) {
+            stream_wrapper_register($protocol, $wrapper);
+        }
     }
 }
