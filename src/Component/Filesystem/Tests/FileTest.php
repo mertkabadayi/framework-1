@@ -25,16 +25,11 @@ class FileTest extends \PHPUnit_Framework_TestCase
         $this->removeDir($this->workspace);
     }
 
-    public function testGetUrl()
+    public function testGetUrlLocal()
     {
-        $this->assertSame('http://localhost/Fixtures', File::getUrl($this->fixtures));
-    }
-
-    public function testGetUrlNotFound()
-    {
-        $dir = __DIR__.'/Directory';
-
-        $this->assertFalse(File::getUrl($dir));
+        $this->assertSame('/Fixtures', File::getUrl($this->fixtures));
+        $this->assertSame('//localhost/Fixtures', File::getUrl($this->fixtures, 'network'));
+        $this->assertSame('http://localhost/Fixtures', File::getUrl($this->fixtures, true));
     }
 
     public function testGetUrlExternal()
@@ -42,8 +37,20 @@ class FileTest extends \PHPUnit_Framework_TestCase
         $ftp  = 'ftp://example.com';
         $http = 'http://username:password@example.com/path?arg=value#anchor';
 
-        $this->assertSame($ftp, File::getUrl($ftp));
-        $this->assertSame($http, File::getUrl($http));
+        $this->assertSame('/', File::getUrl($ftp));
+        $this->assertSame('//example.com', File::getUrl($ftp, 'network'));
+        $this->assertSame($ftp, File::getUrl($ftp, true));
+
+        $this->assertSame('/path?arg=value#anchor', File::getUrl($http));
+        $this->assertSame('//username:password@example.com/path?arg=value#anchor', File::getUrl($http, 'network'));
+        $this->assertSame($http, File::getUrl($http, true));
+    }
+
+    public function testGetUrlNotFound()
+    {
+        $dir = __DIR__.'/Directory';
+
+        $this->assertFalse(File::getUrl($dir));
     }
 
     public function testGetPath()

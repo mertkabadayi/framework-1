@@ -12,11 +12,22 @@ class File
      * Gets file path URL.
      *
      * @param  string $file
+     * @param  mixed  $referenceType
      * @return string|false
      */
-    public static function getUrl($file)
+    public static function getUrl($file, $referenceType = false)
     {
-        return self::getPathInfo($file, 'url') ?: false;
+        if (!$url = self::getPathInfo($file, 'url')) {
+            return false;
+        }
+
+        if ($referenceType === false) {
+            $url = strlen($path = parse_url($url, PHP_URL_PATH)) > 1 ? substr($url, strpos($url, $path)) : '/';
+        } elseif ($referenceType === 'network') {
+            $url = substr($url, strpos($url, '//'));
+        }
+
+        return $url;
     }
 
     /**
