@@ -104,7 +104,7 @@ EOF;
         return \$this->doGenerate(\$variables, \$defaults, \$requirements, \$tokens, \$parameters, \$name, \$referenceType, \$hostTokens, \$requiredSchemes);
     }
 
-    protected function getRouteProperties(\$name)
+    public function getRouteProperties(\$name)
     {
         if (isset(self::\$declaredRoutes[\$name])) {
             return self::\$declaredRoutes[\$name];

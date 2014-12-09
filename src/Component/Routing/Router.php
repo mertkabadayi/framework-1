@@ -7,6 +7,8 @@ use Pagekit\Component\Routing\Generator\UrlGenerator;
 use Pagekit\Component\Routing\Generator\UrlGeneratorDumper;
 use Pagekit\Component\Routing\Generator\UrlGeneratorInterface;
 use Pagekit\Component\Routing\RequestContext as ExtendedRequestContext;
+use Pagekit\Framework\Event\Event;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -21,6 +23,11 @@ use Symfony\Component\Routing\RouterInterface;
 
 class Router implements RouterInterface, UrlGeneratorInterface
 {
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $events;
+
     /**
      * @var HttpKernelInterface
      */
@@ -72,14 +79,20 @@ class Router implements RouterInterface, UrlGeneratorInterface
     protected $cache;
 
     /**
+     * @var UrlResolverInterface[]
+     */
+    protected $resolver = [];
+
+    /**
      * Constructor.
      *
      * @param HttpKernelInterface  $kernel
      * @param ControllerCollection $controllers
      * @param array                $options
      */
-    public function __construct(HttpKernelInterface $kernel, ControllerCollection $controllers, array $options = [])
+    public function __construct(EventDispatcherInterface $events, HttpKernelInterface $kernel, ControllerCollection $controllers, array $options = [])
     {
+        $this->events      = $events;
         $this->kernel      = $kernel;
         $this->controllers = $controllers;
         $this->aliases     = [];
@@ -155,15 +168,14 @@ class Router implements RouterInterface, UrlGeneratorInterface
 
             $this->routes = $this->controllers->getRoutes();
 
+            $this->events->dispatch('route.collection', new Event(['router' => $this, 'collection' => $this->routes]));
+
             foreach ($this->aliases as $source => $alias) {
 
                 $name   = $source;
-                $params = [];
+                $params = ['_resolver' => $alias[1]];
 
-                if ($query = substr(strstr($source, '?'), 1)) {
-                    $name = strstr($source, '?', true);
-                    parse_str($query, $params);
-                }
+                $this->parseParams($name, $params);
 
                 if ($route = $this->routes->get($name)) {
                     $this->routes->add($source, new Route($alias[0], array_merge($route->getDefaults(), $params, ['_variables' => $route->compile()->getPathVariables()])));
@@ -252,16 +264,15 @@ class Router implements RouterInterface, UrlGeneratorInterface
     /**
      * Adds an alias.
      *
-     * @param string   $path
-     * @param string   $name
-     * @param callable $inbound
-     * @param callable $outbound
+     * @param string $path
+     * @param string $name
+     * @param string $resolver
      */
-    public function addAlias($path, $name, callable $inbound = null, callable $outbound = null)
+    public function addAlias($path, $name, $resolver = null)
     {
         $path = preg_replace('/^[^\/]/', '/$0', $path);
 
-        $this->aliases[$name] = [$path, $inbound, $outbound];
+        $this->aliases[$name] = [$path, $resolver];
     }
 
     /**
@@ -333,8 +344,8 @@ class Router implements RouterInterface, UrlGeneratorInterface
     {
         $params = $this->getMatcher()->match($pathinfo);
 
-        if ($alias = $this->getAlias($params['_route']) and is_callable($alias[1])) {
-            $params = call_user_func($alias[1], $params);
+        if ($resolver = $this->getResolver($params)) {
+            $params = $resolver->match($params);
         }
 
         if (false !== $pos = strpos($params['_route'], '?')) {
@@ -353,19 +364,17 @@ class Router implements RouterInterface, UrlGeneratorInterface
             $name = strstr($name, '#', true);
         }
 
-        if ($query = substr(strstr($name, '?'), 1)) {
-            parse_str($query, $params);
-            $name       = strstr($name, '?', true);
-            $parameters = array_replace($parameters, $params);
+        $this->parseParams($name, $parameters);
+
+        $generator = $this->getGenerator();
+        if ($referenceType !== self::LINK_URL
+            && ($props = $generator->getRouteProperties($generator->generate($name, $parameters, 'link')) or $props = $generator->getRouteProperties($name))
+            && $resolver = $this->getResolver($props[1])
+        ) {
+            $parameters = $resolver->generate($parameters);
         }
 
-        if ($referenceType !== self::LINK_URL) {
-            if ($alias = $this->getAlias($this->getGenerator()->generate($name, $parameters, 'link')) and is_callable($alias[2])) {
-                $parameters = call_user_func($alias[2], $parameters);
-            }
-        }
-
-        return $this->getGenerator()->generate($name, $parameters, $referenceType).$fragment;
+        return $generator->generate($name, $parameters, $referenceType).$fragment;
     }
 
     /**
@@ -418,5 +427,42 @@ class Router implements RouterInterface, UrlGeneratorInterface
         if (!file_put_contents($file, $content)) {
             throw new \RuntimeException("Failed to write cache file ($file).");
         }
+    }
+
+    /**
+     * Separates internal links into $name and $parameters.
+     *
+     * @param string $name
+     * @param array  $parameters
+     */
+    protected function parseParams(&$name, array &$parameters)
+    {
+        if ($query = substr(strstr($name, '?'), 1)) {
+            parse_str($query, $params);
+            $name       = strstr($name, '?', true);
+            $parameters = array_replace($parameters, $params);
+        }
+    }
+
+    /**
+     * Gets resolver instance from parameters.
+     *
+     * @param  array $parameters
+     * @return UrlResolverInterface|null
+     */
+    protected function getResolver(array $parameters = [])
+    {
+        $resolver = isset($parameters['_resolver']) ? $parameters['_resolver'] : false;
+
+        if (!isset($this->resolver[$resolver])) {
+
+            if (!is_subclass_of($resolver, 'Pagekit\Component\Routing\UrlResolverInterface')) {
+                return null;
+            }
+
+            $this->resolver[$resolver] = new $resolver;
+        }
+
+        return $this->resolver[$resolver];
     }
 }
