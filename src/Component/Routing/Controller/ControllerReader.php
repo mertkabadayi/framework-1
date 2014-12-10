@@ -41,6 +41,11 @@ class ControllerReader implements ControllerReaderInterface
     protected $routeAnnotation = 'Pagekit\Component\Routing\Annotation\Route';
 
     /**
+     * @var \ReflectionClass
+     */
+    protected $route;
+
+    /**
      * Constructor.
      *
      * @param EventDispatcherInterface $events
@@ -50,6 +55,7 @@ class ControllerReader implements ControllerReaderInterface
     {
         $this->events = $events;
         $this->reader = $reader;
+        $this->route  = new ReflectionClass('Symfony\Component\Routing\Route');
     }
 
     /**
@@ -63,52 +69,22 @@ class ControllerReader implements ControllerReaderInterface
 
         $options = array_replace([
             'path'         => null,
-            'name'         => null,
+            'defaults'     => [],
             'requirements' => [],
             'options'      => [],
-            'defaults'     => [],
             'host'         => '',
             'schemes'      => [],
             'methods'      => [],
-            'condition'    => ''
+            'condition'    => '',
+            'name'         => null
         ], $options);
 
         if ($annotation = $this->getAnnotationReader()->getClassAnnotation($class, $this->routeAnnotation)) {
-
-            if ($annotation->getPath() !== null) {
-                $options['path'] = $annotation->getPath();
-            }
-
-            if ($annotation->getName() !== null) {
-                $options['name'] = $annotation->getName();
-            }
-
-            if ($annotation->getRequirements() !== null) {
-                $options['requirements'] = $annotation->getRequirements();
-            }
-
-            if ($annotation->getOptions() !== null) {
-                $options['options'] = $annotation->getOptions();
-            }
-
-            if ($annotation->getDefaults() !== null) {
-                $options['defaults'] = $annotation->getDefaults();
-            }
-
-            if ($annotation->getHost() !== null) {
-                $options['host'] = $annotation->getHost();
-            }
-
-            if ($annotation->getSchemes() !== null) {
-                $options['schemes'] = $annotation->getSchemes();
-            }
-
-            if ($annotation->getMethods() !== null) {
-                $options['methods'] = $annotation->getMethods();
-            }
-
-            if ($annotation->getCondition() !== null) {
-                $options['condition'] = $annotation->getCondition();
+            foreach(array_keys($options) as $option) {
+                $method = 'get'.ucfirst($option);
+                if (null !== $value = $annotation->$method()) {
+                    $options[$option] = $value;
+                }
             }
         }
 
@@ -178,62 +154,42 @@ class ControllerReader implements ControllerReaderInterface
      */
     protected function addRoute(ReflectionClass $class, ReflectionMethod $method, array $options, $annotation = null)
     {
+        $path = $options['path'];
+        $options['name'] = $this->getDefaultRouteName($class, $method, $options);
+        $options['path'] = $this->getDefaultRoutePath($class, $method, $options);
+
         if ($annotation) {
-
-            $name = $annotation->getName();
-            $path = $annotation->getPath();
-
+            $options['path']         = null !== $annotation->getPath() ? $annotation->getPath() : $options['path'];
+            $options['defaults']     = array_merge($options['defaults'], $annotation->getDefaults());
             $options['requirements'] = array_merge($options['requirements'], $annotation->getRequirements());
             $options['options']      = array_merge($options['options'], $annotation->getOptions());
-            $options['defaults']     = array_merge($options['defaults'], $annotation->getDefaults());
+            $options['host']         = null !== $annotation->getHost() ? $annotation->getHost() : $options['host'];
             $options['schemes']      = array_merge($options['schemes'], $annotation->getSchemes());
             $options['methods']      = array_merge($options['methods'], $annotation->getMethods());
-
-            if ($annotation->getHost() !== null) {
-                $options['host'] = $annotation->getHost();
-            }
-
-            if ($annotation->getCondition() !== null) {
-                $options['condition'] = $annotation->getCondition();
-            }
+            $options['condition']    = null !== $annotation->getCondition() ? $annotation->getCondition() : $options['condition'];
+            $options['name']         = null !== $annotation->getName() ? $annotation->getName() : $options['name'];
         }
 
-        if (empty($name)) {
-            $name = $this->getDefaultRouteName($class, $method, $options);
+        $options['path'] = rtrim($path.$options['path'], '/');
+
+        if ($route = $this->configureRoute($this->route->newInstanceArgs($options), $class, $method, $options)) {
+            $this->routes->add($options['name'], $route);
         }
-
-        if (empty($path)) {
-            $path = $this->getDefaultRoutePath($class, $method, $options);
-        }
-
-        $route = new Route(
-            rtrim($options['path'].$path, '/'),
-            $options['defaults'],
-            $options['requirements'],
-            $options['options'],
-            $options['host'],
-            $options['schemes'],
-            $options['methods'],
-            $options['condition']
-        );
-
-        $this->configureRoute($route, $class, $method, $options);
-
-        $this->routes->add($name, $route);
     }
 
     /**
      * Configure the route, should be overridden in subclasses.
      *
-     * @param Route            $route
-     * @param ReflectionClass  $class
-     * @param ReflectionMethod $method
-     * @param array            $options
+     * @param  Route            $route
+     * @param  ReflectionClass  $class
+     * @param  ReflectionMethod $method
+     * @param  array            $options
+     * @return Route|null
      */
     protected function configureRoute(Route $route, ReflectionClass $class, ReflectionMethod $method, array $options)
     {
         $route->setDefault('_controller', $class->name.'::'.$method->name);
-        $this->events->dispatch('route.configure', new ConfigureRouteEvent($route, $class, $method, $options));
+        return $this->events->dispatch('route.configure', new ConfigureRouteEvent($route, $class, $method, $options))->getRoute();
     }
 
     /**

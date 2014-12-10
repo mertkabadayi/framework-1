@@ -168,7 +168,7 @@ class Router implements RouterInterface, UrlGeneratorInterface
 
             $this->routes = $this->controllers->getRoutes();
 
-            $this->events->dispatch('route.collection', new Event(['router' => $this, 'collection' => $this->routes]));
+            $this->events->dispatch('route.collection', new Event(['router' => $this, 'routes' => $this->routes]));
 
             foreach ($this->aliases as $source => $alias) {
 

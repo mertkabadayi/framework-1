@@ -28,11 +28,16 @@ class ConfigureRouteEvent extends Event
     /**
      * Returns the route for this event.
      *
-     * @return Route
+     * @return Route|null
      */
     public function getRoute()
     {
         return $this->route;
+    }
+
+    public function setRoute(Route $route = null)
+    {
+        $this->route = $route;
     }
 
     /**
