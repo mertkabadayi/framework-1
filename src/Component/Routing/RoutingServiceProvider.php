@@ -3,6 +3,8 @@
 namespace Pagekit\Component\Routing;
 
 use Pagekit\Component\Filter\FilterManager;
+use Pagekit\Component\Routing\Controller\Routes;
+use Pagekit\Component\Routing\Controller\RoutesResolver;
 use Pagekit\Component\Routing\Controller\ControllerCollection;
 use Pagekit\Component\Routing\Controller\ControllerReader;
 use Pagekit\Component\Routing\Event\ConfigureRouteListener;
@@ -11,11 +13,9 @@ use Pagekit\Component\Routing\Event\StringResponseListener;
 use Pagekit\Component\Routing\Loader\RouteLoader;
 use Pagekit\Component\Routing\Request\Event\ParamFetcherListener;
 use Pagekit\Component\Routing\Request\ParamFetcher;
-use Pagekit\Component\Routing\Request\ParamReader;
 use Pagekit\Framework\Application;
 use Pagekit\Framework\ServiceProviderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\EventListener\ResponseListener;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpKernel\HttpKernel;
@@ -32,7 +32,7 @@ class RoutingServiceProvider implements ServiceProviderInterface
         };
 
         $app['kernel'] = function($app) {
-            return new HttpKernel($app['events'], $app['controllers'], $app['request_stack']);
+            return new HttpKernel($app['events'], $app['resolver'], $app['request_stack']);
         };
 
         $app['request_stack'] = function () {
@@ -43,16 +43,16 @@ class RoutingServiceProvider implements ServiceProviderInterface
             return new Response($app['url']);
         };
 
-        $app['resolver'] = function() {
-            return new ControllerResolver;
+        $app['resolver'] = function($app) {
+            return new RoutesResolver($app['routes']);
+        };
+
+        $app['routes'] = function() {
+            return new Routes;
         };
 
         $app['controllers'] = function($app) {
-
-            $reader = new ControllerReader($app['events']);
-            $loader = new RouteLoader($reader);
-
-            return new ControllerCollection($loader, $app['resolver']);
+            return new ControllerCollection(new ControllerReader($app['events']), $app['autoloader']);
         };
 
         $app['url'] = function($app) {
@@ -71,5 +71,7 @@ class RoutingServiceProvider implements ServiceProviderInterface
         $app['events']->addSubscriber(new ResponseListener('UTF-8'));
         $app['events']->addSubscriber(new JsonResponseListener);
         $app['events']->addSubscriber(new StringResponseListener);
+
+        $app['controllers']->addCollection($app['routes']);
     }
 }

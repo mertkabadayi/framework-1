@@ -15,7 +15,7 @@ class RoutingServiceProvider extends BaseRoutingServiceProvider
         parent::register($app);
 
         $app['resolver'] = function($app) {
-            return new ControllerResolver($app);
+            return new ControllerResolver($app['routes']);
         };
     }
 

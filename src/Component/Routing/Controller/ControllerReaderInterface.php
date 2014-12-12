@@ -10,17 +10,8 @@ interface ControllerReaderInterface
     /**
      * Reads controller routes.
      *
-     * @param  ReflectionClass $class
-     * @param  array           $options
+     * @param  string $class
      * @return RouteCollection
      */
-    public function read(ReflectionClass $class, array $options = []);
-
-    /**
-     * Returns true if this reader supports the given controller.
-     *
-     * @param  ReflectionClass $class
-     * @return bool
-     */
-    public function supports(ReflectionClass $class);
+    public function read($class);
 }

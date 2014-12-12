@@ -2,179 +2,196 @@
 
 namespace Pagekit\Component\Routing\Controller;
 
+use Composer\Autoload\ClassLoader;
+use Pagekit\Component\Routing\Exception\ControllerFrozenException;
 use Pagekit\Component\Routing\Exception\LoaderException;
-use Pagekit\Component\Routing\Loader\LoaderInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
-use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-class ControllerCollection implements ControllerResolverInterface
+class ControllerCollection implements ControllerCollectionInterface
 {
-    /**
-     * @var LoaderInterface
-     */
+    protected $reader;
     protected $loader;
-
-    /**
-     * @var ControllerResolverInterface
-     */
-    protected $resolver;
-
-    /**
-     * @var RouteCollection
-     */
-    protected $collection;
-
-    /**
-     * @var RouteCollection
-     */
-    protected $routes;
-
-    /**
-     * @var array
-     */
-    protected $callbacks = [];
-
-    /**
-     * @var array
-     */
+    protected $prefix = '';
+    protected $namespace = '';
+    protected $defaults = [];
+    protected $requirements = [];
     protected $controllers = [];
+    protected $isFrozen = false;
 
     /**
      * Constructor.
      *
-     * @param LoaderInterface             $loader
-     * @param ControllerResolverInterface $resolver
+     * @param ControllerReaderInterface $reader
+     * @param ClassLoader $loader
      */
-    public function __construct(LoaderInterface $loader, ControllerResolverInterface $resolver)
+    public function __construct(ControllerReaderInterface $reader, ClassLoader $loader)
     {
-        $this->loader   = $loader;
-        $this->resolver = $resolver;
-        $this->routes   = new RouteCollection;
+        $this->reader = $reader;
+        $this->loader = $loader;
     }
 
     /**
-     * Maps a GET request to a callable.
-     *
-     * @param  string $path
-     * @param  string $name
-     * @param  mixed  $callback
-     * @return Route
+     * @return string
      */
-    public function get($path, $name, $callback)
+    public function getPrefix()
     {
-        $route = $this->map($path, $name, $callback);
-        $route->setMethods('GET');
-
-        return $route;
+        return $this->prefix;
     }
 
     /**
-     * Maps a POST request to a callable.
-     *
-     * @param  string $path
-     * @param  string $name
-     * @param  mixed  $callback
-     * @return Route
+     * @param  string $prefix
+     * @return self
      */
-    public function post($path, $name, $callback)
+    public function setPrefix($prefix)
     {
-        $route = $this->map($path, $name, $callback);
-        $route->setMethods('POST');
-
-        return $route;
+        $this->prefix = $prefix;
+        return $this;
     }
 
     /**
-     * Maps a path to a callable.
-     *
-     * @param  string $path
-     * @param  string $name
-     * @param  mixed  $callback
-     * @return Route
+     * @return string
      */
-    public function map($path, $name, $callback)
+    public function getNamespace()
     {
-        $route = new Route($path);
-        $route->setDefault('_controller', '::'.$name);
+        return $this->namespace;
+    }
 
-        $this->routes->add($name, $route);
-        $this->callbacks[$name] = $callback;
+    /**
+     * @param  string $namespace
+     * @return self
+     */
+    public function setNamespace($namespace)
+    {
+        $this->namespace = $namespace;
+        return $this;
+    }
 
-        return $route;
+    /**
+     * @return array
+     */
+    public function getDefaults()
+    {
+        return $this->defaults;
+    }
+
+    /**
+     * @param  array $defaults
+     * @return self
+     */
+    public function setDefaults($defaults)
+    {
+        $this->defaults = $defaults;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRequirements()
+    {
+        return $this->requirements;
+    }
+
+    /**
+     * @param  array $requirements
+     * @return self
+     */
+    public function setRequirements($requirements)
+    {
+        $this->requirements = $requirements;
+        return $this;
     }
 
     /**
      * Adds a controller.
      *
-     * @param string $controller
-     * @param array  $options
+     * @param  string $controller
+     * @return ControllerCollection
      */
-    public function add($controller, array $options = [])
+    public function add($controller)
     {
-        $this->controllers[$controller] = $options;
+        return $this->controllers[] = $controller;
     }
 
     /**
-     * Gets the route collection.
+     * Adds controllers.
      *
-     * @return RouteCollection
+     * @param  string|string[]|ControllerCollection $controllers
+     * @return ControllerCollection
      */
-    public function getRoutes()
+    public function addCollection($controllers)
     {
-        if (!$this->collection) {
-
-            $this->collection = new RouteCollection;
-
-            foreach ($this->controllers as $controller => $options) {
-                try {
-                    $this->collection->addCollection($this->loader->load($controller, $options));
-                } catch (LoaderException $e) {}
+        if (!$controllers instanceof ControllerCollectionInterface) {
+            $collection = new ControllerCollection($this->reader, $this->loader);
+            foreach ((array) $controllers as $controller) {
+                $collection->add($controller);
             }
-
-            $this->collection->addCollection($this->routes);
+            $controllers = $collection;
         }
 
-        return $this->collection;
+        return $this->controllers[] = $controllers;
     }
 
     /**
-     * Returns an array of resources of this collection.
+     * Mounts controllers under given prefix and namespace
      *
-     * @return array
+     * @param string $prefix
+     * @param string|string[]|ControllerCollection $controllers
+     * @param string $namespace
+     * @param array  $defaults
+     * @param array  $requirements
+     */
+    public function mount($prefix, $controllers, $namespace, array $defaults = [], array $requirements = [])
+    {
+        $this->addCollection($controllers)
+            ->setPrefix($prefix)
+            ->setNamespace($namespace)
+            ->setDefaults($defaults)
+            ->setRequirements($requirements);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function flush()
+    {
+        if ($this->isFrozen) {
+            throw new ControllerFrozenException(sprintf('Calling %s on frozen %s instance.', __METHOD__, __CLASS__));
+        }
+
+        $routes = new RouteCollection;
+        foreach ($this->controllers as $controller) {
+
+            try {
+
+                foreach (is_string($controller) ? $this->reader->read($controller) : $controller->flush() as $name => $route) {
+                    $routes->add($this->namespace.$name, $route);
+                }
+
+            } catch (LoaderException $e) {}
+
+        }
+        $routes->addPrefix($this->prefix, $this->defaults, $this->requirements);
+
+        $this->isFrozen = true;
+
+        return $routes;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getResources()
     {
-        $callbacks = [];
-        $controllers = array_keys($this->controllers);
-
-        foreach ($this->routes as $name => $route) {
-            $callbacks[] = $name.$route->getPath();
+        $resources = [];
+        foreach ($this->controllers as $controller) {
+            if (is_string($controller)) {
+                $resources['controllers'][] = $this->loader->findFile($controller);
+            } else {
+                $resources = array_merge_recursive($resources, $controller->getResources());
+            }
         }
 
-        return compact('callbacks', 'controllers');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getController(Request $request)
-    {
-        $controller = $request->attributes->get('_controller', '');
-
-        if (0 === strpos($controller, '::') && $name = substr($controller, 2) and isset($this->callbacks[$name])) {
-            return $this->callbacks[$name];
-        }
-
-        return $this->resolver->getController($request);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getArguments(Request $request, $controller)
-    {
-        return $this->resolver->getArguments($request, $controller);
+        return $resources;
     }
 }

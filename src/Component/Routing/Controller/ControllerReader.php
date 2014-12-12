@@ -7,6 +7,7 @@ use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Annotations\SimpleAnnotationReader;
 use Pagekit\Component\Routing\Annotation\Route as RouteAnnotation;
 use Pagekit\Component\Routing\Event\ConfigureRouteEvent;
+use Pagekit\Component\Routing\Exception\LoaderException;
 use ReflectionClass;
 use ReflectionMethod;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -61,40 +62,19 @@ class ControllerReader implements ControllerReaderInterface
     /**
      * {@inheritdoc}
      */
-    public function read(ReflectionClass $class, array $options = [])
+    public function read($class)
     {
+        if (!class_exists($class)) {
+            throw new LoaderException(sprintf('Controller class "%s" does not exist.', $class));
+        }
+
+        $class = new \ReflectionClass($class);
+
         if ($class->isAbstract()) {
             throw new \InvalidArgumentException(sprintf('Annotations from class "%s" cannot be read as it is abstract.', $class));
         }
 
-        $options = array_replace([
-            'path'         => null,
-            'defaults'     => [],
-            'requirements' => [],
-            'options'      => [],
-            'host'         => '',
-            'schemes'      => [],
-            'methods'      => [],
-            'condition'    => '',
-            'name'         => null
-        ], $options);
-
-        if ($annotation = $this->getAnnotationReader()->getClassAnnotation($class, $this->routeAnnotation)) {
-            foreach(array_keys($options) as $option) {
-                $method = 'get'.ucfirst($option);
-                if (null !== $value = $annotation->$method()) {
-                    $options[$option] = $value;
-                }
-            }
-        }
-
-        if ($options['path'] === null) {
-            $options['path'] = strtolower($this->parseControllerName($class));
-        }
-
-        if ($options['name'] === null) {
-            $options['name'] = '@'.strtolower($this->parseControllerName($class));
-        }
+        $globals = $this->getGlobals($class);
 
         $this->routes = new RouteCollection;
 
@@ -108,25 +88,17 @@ class ControllerReader implements ControllerReaderInterface
 
                 foreach ($this->getAnnotationReader()->getMethodAnnotations($method) as $annotation) {
                     if ($annotation instanceof $this->routeAnnotation) {
-                        $this->addRoute($class, $method, $options, $annotation);
+                        $this->addRoute($class, $method, $globals, $annotation);
                     }
                 }
 
                 if ($count == $this->routes->count()) {
-                    $this->addRoute($class, $method, $options);
+                    $this->addRoute($class, $method, $globals, new $this->routeAnnotation([]));
                 }
             }
         }
 
         return $this->routes;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supports(ReflectionClass $class)
-    {
-        return true;
     }
 
     /**
@@ -149,28 +121,20 @@ class ControllerReader implements ControllerReaderInterface
      *
      * @param ReflectionClass  $class
      * @param ReflectionMethod $method
-     * @param array            $options
+     * @param array            $globals
      * @param RouteAnnotation  $annotation
      */
-    protected function addRoute(ReflectionClass $class, ReflectionMethod $method, array $options, $annotation = null)
+    protected function addRoute(ReflectionClass $class, ReflectionMethod $method, array $globals, $annotation)
     {
-        $path = $options['path'];
-        $options['name'] = $this->getDefaultRouteName($class, $method, $options);
-        $options['path'] = $this->getDefaultRoutePath($class, $method, $options);
-
-        if ($annotation) {
-            $options['path']         = null !== $annotation->getPath() ? $annotation->getPath() : $options['path'];
-            $options['defaults']     = array_merge($options['defaults'], $annotation->getDefaults());
-            $options['requirements'] = array_merge($options['requirements'], $annotation->getRequirements());
-            $options['options']      = array_merge($options['options'], $annotation->getOptions());
-            $options['host']         = null !== $annotation->getHost() ? $annotation->getHost() : $options['host'];
-            $options['schemes']      = array_merge($options['schemes'], $annotation->getSchemes());
-            $options['methods']      = array_merge($options['methods'], $annotation->getMethods());
-            $options['condition']    = null !== $annotation->getCondition() ? $annotation->getCondition() : $options['condition'];
-            $options['name']         = null !== $annotation->getName() ? $annotation->getName() : $options['name'];
-        }
-
-        $options['path'] = rtrim($path.$options['path'], '/');
+        $options['path']         = rtrim($globals['path'].(null !== $annotation->getPath() ? $annotation->getPath() : $this->getDefaultRoutePath($class, $method, $globals)), '/');
+        $options['defaults']     = array_merge($globals['defaults'], $annotation->getDefaults());
+        $options['requirements'] = array_merge($globals['requirements'], $annotation->getRequirements());
+        $options['options']      = array_merge($globals['options'], $annotation->getOptions());
+        $options['host']         = null !== $annotation->getHost() ? $annotation->getHost() : $globals['host'];
+        $options['schemes']      = array_merge($globals['schemes'], $annotation->getSchemes());
+        $options['methods']      = array_merge($globals['methods'], $annotation->getMethods());
+        $options['condition']    = null !== $annotation->getCondition() ? $annotation->getCondition() : $globals['condition'];
+        $options['name']         = $annotation->getName() ?: $this->getDefaultRouteName($class, $method, $globals);
 
         if ($route = $this->configureRoute($this->route->newInstanceArgs($options), $class, $method, $options)) {
             $this->routes->add($options['name'], $route);
@@ -197,10 +161,10 @@ class ControllerReader implements ControllerReaderInterface
      *
      * @param  ReflectionClass  $class
      * @param  ReflectionMethod $method
-     * @param  array            $options
+     * @param  array            $globals
      * @return string
      */
-    protected function getDefaultRoutePath(ReflectionClass $class, ReflectionMethod $method, array $options)
+    protected function getDefaultRoutePath(ReflectionClass $class, ReflectionMethod $method, array $globals)
     {
         $action = strtolower('/'.$this->parseControllerActionName($method));
 
@@ -216,10 +180,10 @@ class ControllerReader implements ControllerReaderInterface
      *
      * @param  ReflectionClass  $class
      * @param  ReflectionMethod $method
-     * @param  array            $options
+     * @param  array            $globals
      * @return string
      */
-    protected function getDefaultRouteName(ReflectionClass $class, ReflectionMethod $method, array $options)
+    protected function getDefaultRouteName(ReflectionClass $class, ReflectionMethod $method, array $globals)
     {
         $action = strtolower('/'.$this->parseControllerActionName($method));
 
@@ -227,7 +191,7 @@ class ControllerReader implements ControllerReaderInterface
             $action = '';
         }
 
-        $name = $options['name'].$action;
+        $name = $globals['name'].$action;
 
         if ($this->routeIndex > 0) {
             $name .= '_'.$this->routeIndex;
@@ -268,5 +232,43 @@ class ControllerReader implements ControllerReaderInterface
         }
 
         return $matches[1];
+    }
+
+    /**
+     * @param  ReflectionClass $class
+     * @return array
+     */
+    protected function getGlobals(ReflectionClass $class)
+    {
+        $globals = [
+            'path'         => null,
+            'defaults'     => [],
+            'requirements' => [],
+            'options'      => [],
+            'host'         => '',
+            'schemes'      => [],
+            'methods'      => [],
+            'condition'    => '',
+            'name'         => null
+        ];
+
+        if ($annotation = $this->getAnnotationReader()->getClassAnnotation($class, $this->routeAnnotation)) {
+            foreach(array_keys($globals) as $option) {
+                $method = 'get'.ucfirst($option);
+                if (null !== $value = $annotation->$method()) {
+                    $globals[$option] = $value;
+                }
+            }
+        }
+
+        if ($globals['path'] === null) {
+            $globals['path'] = strtolower($this->parseControllerName($class));
+        }
+
+        if ($globals['name'] === null) {
+            $globals['name'] = strtolower($this->parseControllerName($class));
+        }
+
+        return $globals;
     }
 }

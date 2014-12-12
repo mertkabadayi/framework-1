@@ -2,29 +2,12 @@
 
 namespace Pagekit\Framework\Controller;
 
-use Pagekit\Framework\Application;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Controller\ControllerResolver as BaseControllerResolver;
+use Pagekit\Component\Routing\Controller\RoutesResolver;
+use Pagekit\Framework\ApplicationTrait;
 
-class ControllerResolver extends BaseControllerResolver
+class ControllerResolver extends RoutesResolver implements \ArrayAccess
 {
-    /**
-     * @var Application
-     */
-    protected $app;
-
-    /**
-     * Constructor.
-     *
-     * @param Application     $app
-     * @param LoggerInterface $logger
-     */
-    public function __construct(Application $app, LoggerInterface $logger = null)
-    {
-        parent::__construct($logger);
-
-        $this->app = $app;
-    }
+    use ApplicationTrait;
 
     /**
      * @{inheritdoc}
@@ -50,9 +33,9 @@ class ControllerResolver extends BaseControllerResolver
             foreach ($constructor->getParameters() as $param) {
                 if ($class = $param->getClass()) {
 
-                    if ($class->isInstance($this->app)) {
-                        $args[] = $this->app;
-                    } elseif ($extension = $this->app['extensions']->get($class->getName())) {
+                    if ($class->isInstance(self::$app)) {
+                        $args[] = self::$app;
+                    } elseif ($extension = $this['extensions']->get($class->getName())) {
                         $args[] = $extension;
                     }
 

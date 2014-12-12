@@ -2,12 +2,12 @@
 
 namespace Pagekit\Component\Routing;
 
-use Pagekit\Component\Routing\Controller\ControllerCollection;
+use Pagekit\Component\Routing\Controller\ControllerCollectionInterface;
+use Pagekit\Component\Routing\Event\RouteCollectionEvent;
 use Pagekit\Component\Routing\Generator\UrlGenerator;
 use Pagekit\Component\Routing\Generator\UrlGeneratorDumper;
 use Pagekit\Component\Routing\Generator\UrlGeneratorInterface;
 use Pagekit\Component\Routing\RequestContext as ExtendedRequestContext;
-use Pagekit\Framework\Event\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -59,7 +59,7 @@ class Router implements RouterInterface, UrlGeneratorInterface
     protected $routes;
 
     /**
-     * @var ControllerCollection
+     * @var ControllerCollectionInterface
      */
     protected $controllers;
 
@@ -79,18 +79,18 @@ class Router implements RouterInterface, UrlGeneratorInterface
     protected $cache;
 
     /**
-     * @var UrlResolverInterface[]
+     * @var ParamsResolverInterface[]
      */
     protected $resolver = [];
 
     /**
      * Constructor.
      *
-     * @param HttpKernelInterface  $kernel
-     * @param ControllerCollection $controllers
-     * @param array                $options
+     * @param HttpKernelInterface           $kernel
+     * @param ControllerCollectionInterface $controllers
+     * @param array                         $options
      */
-    public function __construct(EventDispatcherInterface $events, HttpKernelInterface $kernel, ControllerCollection $controllers, array $options = [])
+    public function __construct(EventDispatcherInterface $events, HttpKernelInterface $kernel, ControllerCollectionInterface $controllers, array $options = [])
     {
         $this->events      = $events;
         $this->kernel      = $kernel;
@@ -166,9 +166,9 @@ class Router implements RouterInterface, UrlGeneratorInterface
     {
         if (!$this->routes) {
 
-            $this->routes = $this->controllers->getRoutes();
+            $this->routes = $this->controllers->flush();
 
-            $this->events->dispatch('route.collection', new Event(['router' => $this, 'routes' => $this->routes]));
+            $this->events->dispatch('route.collection', new RouteCollectionEvent($this, $this->routes));
 
             foreach ($this->aliases as $source => $alias) {
 
@@ -448,7 +448,7 @@ class Router implements RouterInterface, UrlGeneratorInterface
      * Gets resolver instance from parameters.
      *
      * @param  array $parameters
-     * @return UrlResolverInterface|null
+     * @return ParamsResolverInterface|null
      */
     protected function getResolver(array $parameters = [])
     {
@@ -456,7 +456,7 @@ class Router implements RouterInterface, UrlGeneratorInterface
 
         if (!isset($this->resolver[$resolver])) {
 
-            if (!is_subclass_of($resolver, 'Pagekit\Component\Routing\UrlResolverInterface')) {
+            if (!is_subclass_of($resolver, 'Pagekit\Component\Routing\ParamsResolverInterface')) {
                 return null;
             }
 

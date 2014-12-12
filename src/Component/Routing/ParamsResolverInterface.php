@@ -2,7 +2,7 @@
 
 namespace Pagekit\Component\Routing;
 
-interface UrlResolverInterface
+interface ParamsResolverInterface
 {
     /**
      * Callback to modify parameters after route matching.

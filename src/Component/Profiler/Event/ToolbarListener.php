@@ -2,7 +2,7 @@
 
 namespace Pagekit\Component\Profiler\Event;
 
-use Pagekit\Component\Routing\Controller\ControllerCollection;
+use Pagekit\Component\Routing\Controller\Routes;
 use Pagekit\Component\Routing\UrlProvider;
 use Pagekit\Component\View\ViewInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -29,29 +29,29 @@ class ToolbarListener implements EventSubscriberInterface
     protected $view;
 
     /**
-     * @var ControllerCollection
+     * @var Routes
      */
-    protected $controllers;
+    protected $routes;
 
     /**
      * Constructor.
      *
-     * @param Profiler             $profiler
-     * @param ViewInterface        $view
-     * @param UrlProvider          $url
-     * @param ControllerCollection $controllers
+     * @param Profiler      $profiler
+     * @param ViewInterface $view
+     * @param UrlProvider   $url
+     * @param Routes        $routes
      */
-    public function __construct(Profiler $profiler, ViewInterface $view, UrlProvider $url, ControllerCollection $controllers)
+    public function __construct(Profiler $profiler, ViewInterface $view, UrlProvider $url, Routes $routes)
     {
-        $this->profiler    = $profiler;
-        $this->view        = $view;
-        $this->url         = $url;
-        $this->controllers = $controllers;
+        $this->profiler = $profiler;
+        $this->view     = $view;
+        $this->url      = $url;
+        $this->routes   = $routes;
     }
 
     public function onKernelRequest()
     {
-        $this->controllers->get('_profiler/{token}', '_profiler', function($token) {
+        $this->routes->get('_profiler/{token}', '_profiler', function ($token) {
 
             if (!$profile = $this->profiler->loadProfile($token)) {
                 return new Response;
@@ -76,10 +76,10 @@ class ToolbarListener implements EventSubscriberInterface
         }
 
         if ($request->attributes->get('_disable_profiler_toolbar')
-                || !$response->headers->has('X-Debug-Token')
-                || $response->isRedirection()
-                || ($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))
-                || 'html' !== $request->getRequestFormat()
+            || !$response->headers->has('X-Debug-Token')
+            || $response->isRedirection()
+            || ($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))
+            || 'html' !== $request->getRequestFormat()
         ) {
             return;
         }
@@ -121,7 +121,7 @@ class ToolbarListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::REQUEST => ['onKernelRequest', 100],
+            KernelEvents::REQUEST  => ['onKernelRequest', 100],
             KernelEvents::RESPONSE => ['onKernelResponse', -100]
         ];
     }
