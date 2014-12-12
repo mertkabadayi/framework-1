@@ -26,7 +26,7 @@ class RoutesResolver extends ControllerResolver
 
         $this->routes = $routes->flush();
     }
-    
+
     /**
      * {@inheritdoc}
      */

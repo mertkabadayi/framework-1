@@ -168,7 +168,7 @@ class ControllerCollection implements ControllerCollectionInterface
                     $routes->add($this->namespace.$name, $route);
                 }
 
-            } catch (LoaderException $e) {}
+            } catch (\InvalidArgumentException $e) {}
 
         }
         $routes->addPrefix($this->prefix, $this->defaults, $this->requirements);
@@ -185,9 +185,9 @@ class ControllerCollection implements ControllerCollectionInterface
     {
         $resources = [];
         foreach ($this->controllers as $controller) {
-            if (is_string($controller)) {
-                $resources['controllers'][] = $this->loader->findFile($controller);
-            } else {
+            if (is_string($controller) && $file = $this->loader->findFile($controller)) {
+                $resources['controllers'][] = $file;
+            } elseif ($controller instanceof ControllerCollectionInterface) {
                 $resources = array_merge_recursive($resources, $controller->getResources());
             }
         }

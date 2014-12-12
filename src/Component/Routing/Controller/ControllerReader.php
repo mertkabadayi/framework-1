@@ -65,7 +65,7 @@ class ControllerReader implements ControllerReaderInterface
     public function read($class)
     {
         if (!class_exists($class)) {
-            throw new LoaderException(sprintf('Controller class "%s" does not exist.', $class));
+            throw new \InvalidArgumentException(sprintf('Controller class "%s" does not exist.', $class));
         }
 
         $class = new \ReflectionClass($class);

@@ -399,7 +399,7 @@ class Router implements RouterInterface, UrlGeneratorInterface
             }
 
             foreach ($resources['controllers'] as $controller) {
-                if (file_exists($controller) && ($time = filemtime($controller)) > $modified) {
+                if (($time = filemtime($controller)) > $modified) {
                     $modified = $time;
                 }
             }
