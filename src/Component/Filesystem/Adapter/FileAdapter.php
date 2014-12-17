@@ -20,10 +20,10 @@ class FileAdapter implements AdapterInterface
      * @param string $baseUrl;
      * @param string $basePath;
      */
-    public function __construct($baseUrl = null, $basePath = null)
+    public function __construct($baseUrl = '', $basePath = '')
     {
         $this->baseUrl  = $baseUrl;
-        $this->basePath = $basePath;
+        $this->basePath = strtr($basePath, '\\', '/');
     }
 
     /**
@@ -39,11 +39,22 @@ class FileAdapter implements AdapterInterface
      */
     public function getPathInfo(array $info)
     {
-        $info['realpath'] = $info['pathname'];
+        $info['localpath'] = $info['pathname'];
 
-        if ($this->baseUrl and $this->basePath and $info['pathname'] and file_exists($info['pathname'])) {
-            if (strpos($info['pathname'], $this->basePath) === 0) {
-                $info['url'] = $this->baseUrl.substr($info['pathname'], strlen($this->basePath));
+        if ($info['root'] === '') {
+
+            $root = $this->basePath;
+
+            if (substr($root, -1) != '/') {
+                $root .= '/';
+            }
+
+            $info['localpath'] = $root.$info['localpath'];
+        }
+
+        if ($this->baseUrl and $this->basePath and $info['localpath'] and file_exists($info['localpath'])) {
+            if (strpos($info['localpath'], $this->basePath) === 0) {
+                $info['url'] = $this->baseUrl.substr($info['localpath'], strlen($this->basePath));
             }
         }
 

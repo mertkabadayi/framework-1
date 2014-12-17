@@ -39,7 +39,7 @@ class PathAdapter implements AdapterInterface
      */
     public function getPathInfo(array $info)
     {
-        $info['realpath'] = $this->path.rtrim('/'.$info['path'], '/');
+        $info['localpath'] = $this->path.rtrim('/'.$info['path'], '/');
 
         return $info;
     }

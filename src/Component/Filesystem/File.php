@@ -31,15 +31,15 @@ class File
     }
 
     /**
-     * Gets canonicalized file path or realpath.
+     * Gets canonicalized file path or localpath.
      *
      * @param  string $file
-     * @param  bool   $realpath
+     * @param  bool   $local
      * @return string|false
      */
-    public static function getPath($file, $realpath = false)
+    public static function getPath($file, $local = false)
     {
-        return self::getPathInfo($file, $realpath ? 'realpath' : 'pathname') ?: false;
+        return self::getPathInfo($file, $local ? 'localpath' : 'pathname') ?: false;
     }
 
     /**
