@@ -2,7 +2,7 @@
 
 namespace Pagekit\Component\Profiler\Event;
 
-use Pagekit\Component\Routing\Controller\Routes;
+use Pagekit\Component\Routing\Controller\CallbackCollection;
 use Pagekit\Component\Routing\UrlProvider;
 use Pagekit\Component\View\ViewInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -29,29 +29,29 @@ class ToolbarListener implements EventSubscriberInterface
     protected $view;
 
     /**
-     * @var Routes
+     * @var CallbackCollection
      */
-    protected $routes;
+    protected $callbacks;
 
     /**
      * Constructor.
      *
-     * @param Profiler      $profiler
-     * @param ViewInterface $view
-     * @param UrlProvider   $url
-     * @param Routes        $routes
+     * @param Profiler           $profiler
+     * @param ViewInterface      $view
+     * @param UrlProvider        $url
+     * @param CallbackCollection $callbacks
      */
-    public function __construct(Profiler $profiler, ViewInterface $view, UrlProvider $url, Routes $routes)
+    public function __construct(Profiler $profiler, ViewInterface $view, UrlProvider $url, CallbackCollection $callbacks)
     {
-        $this->profiler = $profiler;
-        $this->view     = $view;
-        $this->url      = $url;
-        $this->routes   = $routes;
+        $this->profiler  = $profiler;
+        $this->view      = $view;
+        $this->url       = $url;
+        $this->callbacks = $callbacks;
     }
 
     public function onKernelRequest()
     {
-        $this->routes->get('_profiler/{token}', '_profiler', function ($token) {
+        $this->callbacks->get('_profiler/{token}', '_profiler', function ($token) {
 
             if (!$profile = $this->profiler->loadProfile($token)) {
                 return new Response;

@@ -2,32 +2,19 @@
 
 namespace Pagekit\Component\Routing\Event;
 
-use Pagekit\Component\Routing\Router;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Routing\RouteCollection;
 
 class RouteCollectionEvent extends Event
 {
-    protected $router;
     protected $routes;
 
     /**
      * Constructs an event.
      */
-    public function __construct(Router $router, RouteCollection $routes)
+    public function __construct()
     {
-        $this->router = $router;
-        $this->routes = $routes;
-    }
-
-    /**
-     * Returns the router.
-     *
-     * @return Router
-     */
-    public function getRouter()
-    {
-        return $this->router;
+        $this->routes = new RouteCollection;
     }
 
     /**
@@ -38,5 +25,15 @@ class RouteCollectionEvent extends Event
     public function getRoutes()
     {
         return $this->routes;
+    }
+
+    /**
+     * Adds routes.
+     *
+     * @param RouteCollection $routes
+     */
+    public function addRoutes(RouteCollection $routes)
+    {
+        $this->routes->addCollection($routes);
     }
 }

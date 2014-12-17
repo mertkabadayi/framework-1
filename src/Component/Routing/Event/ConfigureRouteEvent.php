@@ -16,6 +16,11 @@ class ConfigureRouteEvent extends Event
 
     /**
      * Constructs an event.
+     *
+     * @param Route            $route
+     * @param ReflectionClass  $class
+     * @param ReflectionMethod $method
+     * @param array            $options
      */
     public function __construct(Route $route, ReflectionClass $class, ReflectionMethod $method, array $options)
     {

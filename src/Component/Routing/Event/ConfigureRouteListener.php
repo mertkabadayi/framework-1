@@ -53,7 +53,7 @@ class ConfigureRouteListener implements EventSubscriberInterface
      *
      * @param  mixed  $from
      * @param  string $name
-     * @return Annotation
+     * @return object|null
      */
     protected function getAnnotation($from, $name)
     {

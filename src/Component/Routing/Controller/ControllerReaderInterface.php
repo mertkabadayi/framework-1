@@ -2,7 +2,6 @@
 
 namespace Pagekit\Component\Routing\Controller;
 
-use ReflectionClass;
 use Symfony\Component\Routing\RouteCollection;
 
 interface ControllerReaderInterface

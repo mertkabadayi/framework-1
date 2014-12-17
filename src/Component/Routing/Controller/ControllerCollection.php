@@ -3,26 +3,23 @@
 namespace Pagekit\Component\Routing\Controller;
 
 use Composer\Autoload\ClassLoader;
-use Pagekit\Component\Routing\Exception\ControllerFrozenException;
-use Pagekit\Component\Routing\Exception\LoaderException;
+use Pagekit\Component\Routing\Event\RouteCollectionEvent;
+use Pagekit\Component\Routing\Event\RouteResourcesEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
-class ControllerCollection implements ControllerCollectionInterface
+class ControllerCollection implements EventSubscriberInterface
 {
     protected $reader;
     protected $loader;
-    protected $prefix = '';
-    protected $namespace = '';
-    protected $defaults = [];
-    protected $requirements = [];
-    protected $controllers = [];
-    protected $isFrozen = false;
+    protected $routes = [];
 
     /**
      * Constructor.
      *
      * @param ControllerReaderInterface $reader
-     * @param ClassLoader $loader
+     * @param ClassLoader               $loader
      */
     public function __construct(ControllerReaderInterface $reader, ClassLoader $loader)
     {
@@ -31,167 +28,69 @@ class ControllerCollection implements ControllerCollectionInterface
     }
 
     /**
-     * @return string
-     */
-    public function getPrefix()
-    {
-        return $this->prefix;
-    }
-
-    /**
-     * @param  string $prefix
-     * @return self
-     */
-    public function setPrefix($prefix)
-    {
-        $this->prefix = $prefix;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getNamespace()
-    {
-        return $this->namespace;
-    }
-
-    /**
-     * @param  string $namespace
-     * @return self
-     */
-    public function setNamespace($namespace)
-    {
-        $this->namespace = $namespace;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getDefaults()
-    {
-        return $this->defaults;
-    }
-
-    /**
-     * @param  array $defaults
-     * @return self
-     */
-    public function setDefaults($defaults)
-    {
-        $this->defaults = $defaults;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getRequirements()
-    {
-        return $this->requirements;
-    }
-
-    /**
-     * @param  array $requirements
-     * @return self
-     */
-    public function setRequirements($requirements)
-    {
-        $this->requirements = $requirements;
-        return $this;
-    }
-
-    /**
-     * Adds a controller.
-     *
-     * @param  string $controller
-     * @return ControllerCollection
-     */
-    public function add($controller)
-    {
-        return $this->controllers[] = $controller;
-    }
-
-    /**
-     * Adds controllers.
-     *
-     * @param  string|string[]|ControllerCollection $controllers
-     * @return ControllerCollection
-     */
-    public function addCollection($controllers)
-    {
-        if (!$controllers instanceof ControllerCollectionInterface) {
-            $collection = new ControllerCollection($this->reader, $this->loader);
-            foreach ((array) $controllers as $controller) {
-                $collection->add($controller);
-            }
-            $controllers = $collection;
-        }
-
-        return $this->controllers[] = $controllers;
-    }
-
-    /**
      * Mounts controllers under given prefix and namespace
      *
-     * @param string $prefix
-     * @param string|string[]|ControllerCollection $controllers
-     * @param string $namespace
-     * @param array  $defaults
-     * @param array  $requirements
+     * @param string          $prefix
+     * @param string|string[] $controllers
+     * @param string          $namespace
+     * @param array           $defaults
+     * @param array           $requirements
      */
     public function mount($prefix, $controllers, $namespace, array $defaults = [], array $requirements = [])
     {
-        $this->addCollection($controllers)
-            ->setPrefix($prefix)
-            ->setNamespace($namespace)
-            ->setDefaults($defaults)
-            ->setRequirements($requirements);
+        $this->routes[] = new Route($prefix, $defaults, $requirements, compact('namespace', 'controllers'));
     }
 
     /**
-     * {@inheritdoc}
+     * Adds this instances routes to the collection.
+     *
+     * @param RouteCollectionEvent $event
      */
-    public function flush()
+    public function getRoutes(RouteCollectionEvent $event)
     {
-        if ($this->isFrozen) {
-            throw new ControllerFrozenException(sprintf('Calling %s on frozen %s instance.', __METHOD__, __CLASS__));
+        foreach ($this->routes as $route) {
+            $routes  = new RouteCollection;
+            $namespace = $route->getOption('namespace');
+            foreach ((array) $route->getOption('controllers') as $controller)
+                try {
+
+                    foreach ($this->reader->read($controller) as $name => $r) {
+                        $routes->add($namespace.$name, $r);
+                    }
+
+                } catch (\InvalidArgumentException $e) {
+            }
+            $routes->addPrefix($route->getPath(), $route->getDefaults(), $route->getRequirements());
+            $event->addRoutes($routes);
         }
-
-        $routes = new RouteCollection;
-        foreach ($this->controllers as $controller) {
-
-            try {
-
-                foreach (is_string($controller) ? $this->reader->read($controller) : $controller->flush() as $name => $route) {
-                    $routes->add($this->namespace.$name, $route);
-                }
-
-            } catch (\InvalidArgumentException $e) {}
-
-        }
-        $routes->addPrefix($this->prefix, $this->defaults, $this->requirements);
-
-        $this->isFrozen = true;
-
-        return $routes;
     }
 
     /**
-     * {@inheritdoc}
+     * Adds this instances resources to the collection
+     *
+     * @param RouteResourcesEvent $event
      */
-    public function getResources()
+    public function getResources(RouteResourcesEvent $event)
     {
         $resources = [];
-        foreach ($this->controllers as $controller) {
-            if (is_string($controller) && $file = $this->loader->findFile($controller)) {
-                $resources['controllers'][] = $file;
-            } elseif ($controller instanceof ControllerCollectionInterface) {
-                $resources = array_merge_recursive($resources, $controller->getResources());
+        foreach ($this->routes as $route) {
+            foreach ((array) $route->getOption('controllers') as $controller) {
+                if (is_string($controller) && $file = $this->loader->findFile($controller)) {
+                    $resources[] = compact('file');
+                }
             }
         }
+        $event->addResources($resources);
+    }
 
-        return $resources;
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return [
+            'route.collection' => ['getRoutes', 8],
+            'route.resources' => 'getResources'
+        ];
     }
 }

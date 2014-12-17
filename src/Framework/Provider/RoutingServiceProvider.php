@@ -4,24 +4,17 @@ namespace Pagekit\Framework\Provider;
 
 use Pagekit\Component\Routing\RoutingServiceProvider as BaseRoutingServiceProvider;
 use Pagekit\Framework\Application;
-use Pagekit\Framework\Controller\ControllerResolver;
+use Pagekit\Framework\Event\ControllerResolverListener;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 class RoutingServiceProvider extends BaseRoutingServiceProvider
 {
-    public function register(Application $app)
-    {
-        parent::register($app);
-
-        $app['resolver'] = function($app) {
-            return new ControllerResolver($app['routes']);
-        };
-    }
-
     public function boot(Application $app)
     {
         parent::boot($app);
+
+        $app['events']->addSubscriber(new ControllerResolverListener);
 
         // redirect the request if it has a trailing slash
 		if (!$app->runningInConsole()) {

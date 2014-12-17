@@ -2,8 +2,8 @@
 
 namespace Pagekit\Component\Routing;
 
-use Pagekit\Component\Routing\Controller\ControllerCollectionInterface;
 use Pagekit\Component\Routing\Event\RouteCollectionEvent;
+use Pagekit\Component\Routing\Event\RouteResourcesEvent;
 use Pagekit\Component\Routing\Generator\UrlGenerator;
 use Pagekit\Component\Routing\Generator\UrlGeneratorDumper;
 use Pagekit\Component\Routing\Generator\UrlGeneratorInterface;
@@ -18,7 +18,6 @@ use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
 class Router implements RouterInterface, UrlGeneratorInterface
@@ -54,21 +53,6 @@ class Router implements RouterInterface, UrlGeneratorInterface
     protected $generator;
 
     /**
-     * @var RouteCollection
-     */
-    protected $routes;
-
-    /**
-     * @var ControllerCollectionInterface
-     */
-    protected $controllers;
-
-    /**
-     * @var array
-     */
-    protected $aliases;
-
-    /**
      * @var array
      */
     protected $options;
@@ -86,17 +70,15 @@ class Router implements RouterInterface, UrlGeneratorInterface
     /**
      * Constructor.
      *
-     * @param HttpKernelInterface           $kernel
-     * @param ControllerCollectionInterface $controllers
-     * @param array                         $options
+     * @param EventDispatcherInterface $events
+     * @param HttpKernelInterface      $kernel
+     * @param array                    $options
      */
-    public function __construct(EventDispatcherInterface $events, HttpKernelInterface $kernel, ControllerCollectionInterface $controllers, array $options = [])
+    public function __construct(EventDispatcherInterface $events, HttpKernelInterface $kernel, array $options = [])
     {
-        $this->events      = $events;
-        $this->kernel      = $kernel;
-        $this->controllers = $controllers;
-        $this->aliases     = [];
-        $this->context     = new ExtendedRequestContext;
+        $this->events  = $events;
+        $this->kernel  = $kernel;
+        $this->context = new ExtendedRequestContext;
 
         $this->options = array_replace([
             'cache'     => null,
@@ -132,6 +114,8 @@ class Router implements RouterInterface, UrlGeneratorInterface
     }
 
     /**
+     * Gets the router's options.
+     *
      * @return array
      */
     public function getOptions()
@@ -140,11 +124,24 @@ class Router implements RouterInterface, UrlGeneratorInterface
     }
 
     /**
+     * Sets router's the options.
+     *
      * @param array $options
      */
     public function setOptions($options)
     {
         $this->options = $options;
+    }
+
+    /**
+     * Set an router's option.
+     *
+     * @param string $name
+     * @param mixed  $value
+     */
+    public function setOption($name, $value)
+    {
+        $this->options[$name] = $value;
     }
 
     /**
@@ -164,26 +161,7 @@ class Router implements RouterInterface, UrlGeneratorInterface
      */
     public function getRouteCollection()
     {
-        if (!$this->routes) {
-
-            $this->routes = $this->controllers->flush();
-
-            $this->events->dispatch('route.collection', new RouteCollectionEvent($this, $this->routes));
-
-            foreach ($this->aliases as $source => $alias) {
-
-                $name   = $source;
-                $params = ['_resolver' => $alias[1]];
-
-                $this->parseParams($name, $params);
-
-                if ($route = $this->routes->get($name)) {
-                    $this->routes->add($source, new Route($alias[0], array_merge($route->getDefaults(), $params, ['_variables' => $route->compile()->getPathVariables()])));
-                }
-            }
-        }
-
-        return $this->routes;
+        return $this->events->dispatch('route.collection', new RouteCollectionEvent)->getRoutes();
     }
 
     /**
@@ -248,31 +226,6 @@ class Router implements RouterInterface, UrlGeneratorInterface
         }
 
         return $this->generator;
-    }
-
-    /**
-     * Gets an alias.
-     *
-     * @param  string $name
-     * @return array
-     */
-    public function getAlias($name)
-    {
-        return isset($this->aliases[$name]) || isset($this->aliases[$name = strtok($name, '?')]) ? $this->aliases[$name] : false;
-    }
-
-    /**
-     * Adds an alias.
-     *
-     * @param string $path
-     * @param string $name
-     * @param string $resolver
-     */
-    public function addAlias($path, $name, $resolver = null)
-    {
-        $path = preg_replace('/^[^\/]/', '/$0', $path);
-
-        $this->aliases[$name] = [$path, $resolver];
     }
 
     /**
@@ -364,7 +317,11 @@ class Router implements RouterInterface, UrlGeneratorInterface
             $name = strstr($name, '#', true);
         }
 
-        $this->parseParams($name, $parameters);
+        if ($query = substr(strstr($name, '?'), 1)) {
+            parse_str($query, $params);
+            $name       = strstr($name, '?', true);
+            $parameters = array_replace($parameters, $params);
+        }
 
         $generator = $this->getGenerator();
         if ($referenceType !== self::LINK_URL
@@ -392,14 +349,10 @@ class Router implements RouterInterface, UrlGeneratorInterface
         if (!$this->cache) {
 
             $modified  = 0;
-            $resources = $this->controllers->getResources();
+            $resources = $this->events->dispatch('route.resources', new RouteResourcesEvent)->getResources();
 
-            foreach ($this->aliases as $name => $alias) {
-                $resources['aliases'][] = $name.$alias[0];
-            }
-
-            foreach ($resources['controllers'] as $controller) {
-                if (($time = filemtime($controller)) > $modified) {
+            foreach ($resources as $controller) {
+                if (isset($controller['file']) && ($time = filemtime($controller['file'])) > $modified) {
                     $modified = $time;
                 }
             }
@@ -426,21 +379,6 @@ class Router implements RouterInterface, UrlGeneratorInterface
     {
         if (!file_put_contents($file, $content)) {
             throw new \RuntimeException("Failed to write cache file ($file).");
-        }
-    }
-
-    /**
-     * Separates internal links into $name and $parameters.
-     *
-     * @param string $name
-     * @param array  $parameters
-     */
-    protected function parseParams(&$name, array &$parameters)
-    {
-        if ($query = substr(strstr($name, '?'), 1)) {
-            parse_str($query, $params);
-            $name       = strstr($name, '?', true);
-            $parameters = array_replace($parameters, $params);
         }
     }
 

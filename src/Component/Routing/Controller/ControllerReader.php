@@ -7,7 +7,6 @@ use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Annotations\SimpleAnnotationReader;
 use Pagekit\Component\Routing\Annotation\Route as RouteAnnotation;
 use Pagekit\Component\Routing\Event\ConfigureRouteEvent;
-use Pagekit\Component\Routing\Exception\LoaderException;
 use ReflectionClass;
 use ReflectionMethod;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -253,7 +252,7 @@ class ControllerReader implements ControllerReaderInterface
         ];
 
         if ($annotation = $this->getAnnotationReader()->getClassAnnotation($class, $this->routeAnnotation)) {
-            foreach(array_keys($globals) as $option) {
+            foreach (array_keys($globals) as $option) {
                 $method = 'get'.ucfirst($option);
                 if (null !== $value = $annotation->$method()) {
                     $globals[$option] = $value;

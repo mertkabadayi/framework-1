@@ -1,19 +1,22 @@
 <?php
 
-namespace Pagekit\Framework\Controller;
+namespace Pagekit\Framework\Event;
 
-use Pagekit\Component\Routing\Controller\RoutesResolver;
-use Pagekit\Framework\ApplicationTrait;
+use Pagekit\Component\Routing\Event\GetControllerEvent;
 
-class ControllerResolver extends RoutesResolver implements \ArrayAccess
+class ControllerResolverListener extends EventSubscriber
 {
-    use ApplicationTrait;
-
     /**
-     * @{inheritdoc}
+     * Sets the Controller instance associated with a Request.
+     *
+     * @param GetControllerEvent $event
      */
-    protected function createController($controller)
+    public function getController(GetControllerEvent $event)
     {
+        if (!$controller = $event->getRequest()->attributes->get('_controller')) {
+            return;
+        }
+
         if (strpos($controller, '::') === false) {
             throw new \InvalidArgumentException(sprintf('Unable to find controller "%s".', $controller));
         }
@@ -47,6 +50,16 @@ class ControllerResolver extends RoutesResolver implements \ArrayAccess
             $instance = $reflection->newInstanceArgs($args);
         }
 
-        return [isset($instance) ? $instance : new $class, $method];
+        $event->setController([isset($instance) ? $instance : new $class, $method]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return [
+            'controller.resolve' => 'getController'
+        ];
     }
 }
