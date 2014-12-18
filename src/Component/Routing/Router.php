@@ -287,7 +287,7 @@ class Router implements RouterInterface, UrlGeneratorInterface
             throw new \RuntimeException('No Request set.');
         }
 
-        return $this->kernel->handle(Request::create($this->generate($name, $parameters, true)), HttpKernelInterface::SUB_REQUEST);
+        return $this->kernel->handle(Request::create($this->generate($name, $parameters), 'GET', [], $this->request->cookies->all(), [], $this->request->server->all()), HttpKernelInterface::SUB_REQUEST);
     }
 
     /**
