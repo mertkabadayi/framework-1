@@ -18,6 +18,7 @@ use Symfony\Component\Routing\Matcher\Dumper\PhpMatcherDumper;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
 class Router implements RouterInterface, UrlGeneratorInterface
@@ -51,6 +52,11 @@ class Router implements RouterInterface, UrlGeneratorInterface
      * @var UrlGenerator
      */
     protected $generator;
+
+    /**
+     * @var RouteCollection
+     */
+    protected $routes;
 
     /**
      * @var array
@@ -161,7 +167,11 @@ class Router implements RouterInterface, UrlGeneratorInterface
      */
     public function getRouteCollection()
     {
-        return $this->events->dispatch('route.collection', new RouteCollectionEvent)->getRoutes();
+        if (!$this->routes) {
+            $this->routes = $this->events->dispatch('route.collection', new RouteCollectionEvent)->getRoutes();
+        }
+
+        return $this->routes;
     }
 
     /**
@@ -287,7 +297,12 @@ class Router implements RouterInterface, UrlGeneratorInterface
             throw new \RuntimeException('No Request set.');
         }
 
-        return $this->kernel->handle(Request::create($this->generate($name, $parameters), 'GET', [], $this->request->cookies->all(), [], $this->request->server->all()), HttpKernelInterface::SUB_REQUEST);
+        return $this->kernel->handle(
+            Request::create(
+                $this->generate($name, $parameters), 'GET', [],
+                $this->request->cookies->all(), [],
+                $this->request->server->all()
+            ), HttpKernelInterface::SUB_REQUEST);
     }
 
     /**

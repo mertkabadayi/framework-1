@@ -7,7 +7,6 @@ use Pagekit\Component\Routing\Event\RouteCollectionEvent;
 use Pagekit\Component\Routing\Event\RouteResourcesEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
 
 class ControllerCollection implements EventSubscriberInterface
 {
@@ -48,23 +47,37 @@ class ControllerCollection implements EventSubscriberInterface
      */
     public function getRoutes(RouteCollectionEvent $event)
     {
+        $routes = $event->getRoutes();
+        $loaded = [];
         foreach ($this->routes as $route) {
-            $routes  = new RouteCollection;
-            $namespace = $route->getOption('namespace');
-            foreach ((array) $route->getOption('controllers') as $controller)
-                try {
+            foreach ((array) $route->getOption('controllers') as $controller) {
 
-                    foreach ($this->reader->read($controller) as $name => $r) {
-                        $routes->add($namespace.$name, $r);
+                if (!isset($loaded[$controller])) {
+
+                    try {
+                        $loaded[$controller] = $this->reader->read($controller);
+                    } catch (\InvalidArgumentException $e) {
+                        continue;
                     }
 
-                } catch (\InvalidArgumentException $e) {
+                }
+
+                foreach (clone $loaded[$controller] as $name => $r) {
+
+                    $i    = 2;
+                    $name = $orig = $route->getOption('namespace').$name;
+                    while ($routes->get($name)) {
+                        $name = "{$orig}_{$i}";
+                        $i++;
+                    }
+
+                    $routes->add($name, $r
+                        ->setPath(rtrim($route->getPath().$r->getPath(), '/'))
+                        ->addDefaults($route->getDefaults())
+                        ->addRequirements($route->getRequirements()
+                        ));
+                }
             }
-            $routes->addPrefix($route->getPath(), $route->getDefaults(), $route->getRequirements());
-            foreach ($routes as $route) {
-                $route->setPath(rtrim($route->getPath(), '/'));
-            }
-            $event->addRoutes($routes);
         }
     }
 
@@ -93,7 +106,7 @@ class ControllerCollection implements EventSubscriberInterface
     {
         return [
             'route.collection' => ['getRoutes', 8],
-            'route.resources' => 'getResources'
+            'route.resources'  => 'getResources'
         ];
     }
 }
