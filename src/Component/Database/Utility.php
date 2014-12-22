@@ -46,7 +46,7 @@ class Utility
      */
     public function tableExists($table)
     {
-        return $this->manager->tablesExist($this->replacePrefix($table));
+        return $this->tablesExist($table);
     }
 
     /**

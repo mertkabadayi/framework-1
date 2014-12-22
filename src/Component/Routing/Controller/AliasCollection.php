@@ -28,13 +28,13 @@ class AliasCollection implements EventSubscriberInterface
      *
      * @param string $path
      * @param string $name
-     * @param string $resolver
+     * @param array  $defaults
      */
-    public function add($path, $name, $resolver = null)
+    public function add($path, $name, array $defaults = [])
     {
         $path = preg_replace('/^[^\/]/', '/$0', $path);
 
-        $this->aliases[$name] = [$path, $resolver];
+        $this->aliases[$name] = [$path, $defaults];
     }
 
     /**
@@ -59,7 +59,7 @@ class AliasCollection implements EventSubscriberInterface
         foreach ($this->aliases as $source => $alias) {
 
             $name   = $source;
-            $params = [];
+            $params = $alias[1];
 
             if ($query = substr(strstr($name, '?'), 1)) {
                 parse_str($query, $params);
@@ -67,7 +67,7 @@ class AliasCollection implements EventSubscriberInterface
             }
 
             if ($route = $routes->get($name)) {
-                $routes->add($source, new Route($alias[0], array_merge($route->getDefaults(), $params, ['_variables' => $route->compile()->getPathVariables(), '_resolver' => $alias[1]])));
+                $routes->add($source, new Route($alias[0], array_merge($route->getDefaults(), $params, ['_variables' => $route->compile()->getPathVariables()])));
             }
         }
     }

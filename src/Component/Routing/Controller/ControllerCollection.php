@@ -48,34 +48,20 @@ class ControllerCollection implements EventSubscriberInterface
     public function getRoutes(RouteCollectionEvent $event)
     {
         $routes = $event->getRoutes();
-        $loaded = [];
         foreach ($this->routes as $route) {
             foreach ((array) $route->getOption('controllers') as $controller) {
-
-                if (!isset($loaded[$controller])) {
+                foreach ($this->reader->read($controller) as $name => $r) {
 
                     try {
-                        $loaded[$controller] = $this->reader->read($controller);
+
+                        $routes->add($route->getOption('namespace').$name, $r
+                            ->setPath(rtrim($route->getPath().$r->getPath(), '/'))
+                            ->addDefaults($route->getDefaults())
+                            ->addRequirements($route->getRequirements()
+                            ));
+
                     } catch (\InvalidArgumentException $e) {
-                        continue;
                     }
-
-                }
-
-                foreach (clone $loaded[$controller] as $name => $r) {
-
-                    $i    = 2;
-                    $name = $orig = $route->getOption('namespace').$name;
-                    while ($routes->get($name)) {
-                        $name = "{$orig}_{$i}";
-                        $i++;
-                    }
-
-                    $routes->add($name, $r
-                        ->setPath(rtrim($route->getPath().$r->getPath(), '/'))
-                        ->addDefaults($route->getDefaults())
-                        ->addRequirements($route->getRequirements()
-                        ));
                 }
             }
         }
