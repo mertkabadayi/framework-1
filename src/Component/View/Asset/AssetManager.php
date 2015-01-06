@@ -2,15 +2,8 @@
 
 namespace Pagekit\Component\View\Asset;
 
-use Pagekit\Component\Routing\UrlProvider;
-
 class AssetManager implements \IteratorAggregate
 {
-    /**
-     * @var UrlProvider
-     */
-    protected $url;
-
     /**
      * @var string
      */
@@ -32,9 +25,8 @@ class AssetManager implements \IteratorAggregate
      * @param UrlProvider $url
      * @param string       $version
      */
-    public function __construct(UrlProvider $url, $version = null)
+    public function __construct($version = null)
     {
-        $this->url = $url;
         $this->version = $version;
         $this->registered = new AssetCollection;
     }
@@ -79,7 +71,7 @@ class AssetManager implements \IteratorAggregate
 
             $options['path'] = $asset;
 
-            return new FileAsset($name, $this->url->to($options['path'], $ver ? compact('ver') : []), $options);
+            return new FileAsset($name, $options['path'], $options);
         }
 
         throw new \InvalidArgumentException('Unable to determine asset type.');

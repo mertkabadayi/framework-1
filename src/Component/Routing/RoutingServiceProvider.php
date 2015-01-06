@@ -60,7 +60,7 @@ class RoutingServiceProvider implements ServiceProviderInterface
         };
 
         $app['url'] = function($app) {
-            return new UrlProvider($app['router'], $app['locator']);
+            return new UrlProvider($app['router']);
         };
     }
 
