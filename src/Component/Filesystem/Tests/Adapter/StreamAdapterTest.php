@@ -3,7 +3,7 @@
 namespace Pagekit\Component\Filesystem\Tests\Adapter;
 
 use Pagekit\Component\Filesystem\File;
-use Pagekit\Component\Filesystem\Adapter\PathAdapter;
+use Pagekit\Component\Filesystem\Adapter\StreamAdapter;
 
 class TempAdapterTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,7 +17,7 @@ class TempAdapterTest extends \PHPUnit_Framework_TestCase
         $this->fixtures  = dirname(__DIR__).'/Fixtures';
         $this->workspace = $this->getTempDir('filesystem_');
 
-        File::registerAdapter('temp', new PathAdapter($this->workspace));
+        File::registerAdapter('temp', new StreamAdapter($this->workspace));
     }
 
     public function tearDown()

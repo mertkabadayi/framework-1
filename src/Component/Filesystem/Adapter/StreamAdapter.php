@@ -2,13 +2,8 @@
 
 namespace Pagekit\Component\Filesystem\Adapter;
 
-class PathAdapter implements AdapterInterface
+class StreamAdapter extends FileAdapter
 {
-    /**
-     * @var string
-     */
-    protected $path;
-
     /**
      * @var string
      */
@@ -18,12 +13,14 @@ class PathAdapter implements AdapterInterface
      * Constructor.
      *
      * @param string $path;
+     * @param string $url;
      * @param string $wrapper;
      */
-    public function __construct($path, $wrapper = null)
+    public function __construct($path, $url = '', $wrapper = 'Pagekit\Component\Filesystem\StreamWrapper')
     {
-        $this->path    = $path;
-        $this->wrapper = $wrapper ?: 'Pagekit\Component\Filesystem\StreamWrapper';
+        parent::__construct($path, $url);
+
+        $this->wrapper = $wrapper;
     }
 
     /**
@@ -39,8 +36,8 @@ class PathAdapter implements AdapterInterface
      */
     public function getPathInfo(array $info)
     {
-        $info['localpath'] = $this->path.rtrim('/'.$info['path'], '/');
+        $info['root'] = '';
 
-        return $info;
+        return parent::getPathInfo($info);
     }
 }

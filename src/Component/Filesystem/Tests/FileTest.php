@@ -17,7 +17,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
         $this->fixtures = __DIR__.'/Fixtures';
         $this->workspace = $this->getTempDir('filesystem_');
 
-        File::registerAdapter('file', new FileAdapter('http://localhost', __DIR__));
+        File::registerAdapter('file', new FileAdapter(__DIR__, 'http://localhost'));
     }
 
     public function tearDown()

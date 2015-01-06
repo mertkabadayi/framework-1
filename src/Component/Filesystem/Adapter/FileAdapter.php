@@ -7,23 +7,23 @@ class FileAdapter implements AdapterInterface
     /**
      * @var string
      */
-    protected $baseUrl;
+    protected $path;
 
     /**
      * @var string
      */
-    protected $basePath;
+    protected $url;
 
     /**
      * Constructor.
      *
-     * @param string $baseUrl;
-     * @param string $basePath;
+     * @param string $path;
+     * @param string $url;
      */
-    public function __construct($baseUrl = '', $basePath = '')
+    public function __construct($path, $url = '')
     {
-        $this->baseUrl  = $baseUrl;
-        $this->basePath = strtr($basePath, '\\', '/');
+        $this->path = strtr($path, '\\', '/');
+        $this->url  = $url;
     }
 
     /**
@@ -43,18 +43,18 @@ class FileAdapter implements AdapterInterface
 
         if ($info['root'] === '') {
 
-            $root = $this->basePath;
+            $path = $this->path;
 
-            if (substr($root, -1) != '/') {
-                $root .= '/';
+            if (substr($path, -1) != '/') {
+                $path .= '/';
             }
 
-            $info['localpath'] = $root.$info['localpath'];
+            $info['localpath'] = $path.$info['path'];
         }
 
-        if ($this->baseUrl and $this->basePath and $info['localpath'] and file_exists($info['localpath'])) {
-            if (strpos($info['localpath'], $this->basePath) === 0) {
-                $info['url'] = $this->baseUrl.substr($info['localpath'], strlen($this->basePath));
+        if ($info['localpath'] and file_exists($info['localpath'])) {
+            if (strpos($info['localpath'], $this->path) === 0) {
+                $info['url'] = $this->url.substr($info['localpath'], strlen($this->path));
             }
         }
 
