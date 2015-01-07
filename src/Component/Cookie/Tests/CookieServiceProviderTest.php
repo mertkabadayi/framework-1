@@ -12,32 +12,20 @@ class CookieServiceProviderTest extends \PHPUnit_Framework_TestCase
 {
 	public function testCookieServiceProvider()
 	{
-		$app = $this->getApplication($this->getCookieConfig());
+		$config = new Config;
+		$config->set('cookie.path', 'path/to/cookie');
+		$config->set('cookie.domain', 'localhost');
+
+		$app = new Application;
+		$app['session'] = new Session(new MockArraySessionStorage);
+		$app['request'] = $this->getMock('Symfony\Component\HttpFoundation\Request');
+		$app['config'] = $config;
+		$app['path.cache'] = null;
+
 		$provider = new CookieServiceProvider;
 		$provider->register($app);
 		$provider->boot($app);
 
 		$this->assertInstanceOf('Pagekit\Component\Cookie\CookieJar', $app['cookie']);
-	}
-
-	protected function getApplication($config)
-	{
-		$this->request = $this->getMock('Symfony\Component\HttpFoundation\Request');
-		$app = new Application;
-		$app['session'] = new Session(new MockArraySessionStorage);
-		$app['request'] = $this->request;
-		$app['config'] = $config;
-		$app['path.cache'] = null;
-		$app->boot();
-
-		return $app;
-	}
-
-	protected function getCookieConfig()
-	{
-		$config = new Config;
-		$config->set('cookie.path', 'path/to/cookie');
-		$config->set('cookie.domain', 'localhost');
-		return $config;
 	}
 }

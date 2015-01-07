@@ -16,7 +16,6 @@ class AuthServiceProviderTest extends ServiceProviderTestCase
 		parent::setUp();
 		$this->user = $this->getMockBuilder('Pagekit\Component\Auth\UserInterface')->disableOriginalConstructor()->getMock();
 		$this->provider = new AuthServiceProvider;
-		$this->app->boot();
 	}
 
 	public function testRegister()

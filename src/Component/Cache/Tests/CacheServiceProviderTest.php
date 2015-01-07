@@ -28,7 +28,6 @@ class CacheServiceProviderTest extends ServiceProviderTestCase
         ];
 
 		$this->app['config'] = $this->getConfig($config);
-		$this->app->boot();
 
 		if ($storage == 'apc') {
 			if (!extension_loaded('apc') || false === @apc_cache_info()) {

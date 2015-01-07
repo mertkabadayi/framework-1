@@ -14,23 +14,15 @@ class FilesystemServiceProviderTest extends \PHPUnit_Framework_TestCase
 {
 	public function testFilesystemServiceProvider()
 	{
-		$app = $this->getApplication();
+		$app = new Application;
+		$app['session'] = new Session(new MockArraySessionStorage);
+		$app['request'] = $this->getMock('Symfony\Component\HttpFoundation\Request');
+		$app['path.cache'] = null;
+
 		$provider = new FilesystemServiceProvider;
 		$provider->register($app);
 		$provider->boot($app);
 
 		$this->assertInstanceOf('Pagekit\Component\File\Filesystem', $app['files']);
-	}
-
-	protected function getApplication()
-	{
-		$this->request = $this->getMock('Symfony\Component\HttpFoundation\Request');
-		$app = new Application;
-		$app['session'] = new Session(new MockArraySessionStorage);
-		$app['request'] = $this->request;
-		$app['path.cache'] = null;
-		$app->boot();
-
-		return $app;
 	}
 }
