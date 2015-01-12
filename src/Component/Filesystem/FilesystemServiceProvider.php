@@ -1,6 +1,6 @@
 <?php
 
-namespace Pagekit\Component\File;
+namespace Pagekit\Component\Filesystem;
 
 use Pagekit\Framework\Application;
 use Pagekit\Framework\ServiceProviderInterface;
@@ -9,12 +9,13 @@ class FilesystemServiceProvider implements ServiceProviderInterface
 {
     public function register(Application $app)
     {
-        $app['files'] = function() {
-            return new Filesystem;
+        $app['file'] = function () {
+            return new File;
         };
     }
 
     public function boot(Application $app)
     {
+        StreamWrapper::setFile($app['file']);
     }
 }

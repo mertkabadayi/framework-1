@@ -6,9 +6,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\TransferException;
-use Pagekit\Component\File\Archive\Zip;
-use Pagekit\Component\File\Filesystem;
-use Pagekit\Component\File\FilesystemInterface;
+use Pagekit\Component\Filesystem\Archive\Zip;
+use Pagekit\Component\Filesystem\File;
 use Pagekit\Component\Package\Exception\ArchiveExtractionException;
 use Pagekit\Component\Package\Exception\ChecksumVerificationException;
 use Pagekit\Component\Package\Exception\DownloadErrorException;
@@ -25,20 +24,20 @@ class PackageDownloader implements DownloaderInterface
     protected $client;
 
     /**
-     * @var FilesystemInterface
+     * @var File
      */
-    protected $files;
+    protected $file;
 
     /**
      * Constructor.
      *
-     * @param FilesystemInterface $files
-     * @param ClientInterface     $client
+     * @param File            $file
+     * @param ClientInterface $client
      */
-    public function __construct(ClientInterface $client = null, FilesystemInterface $files = null)
+    public function __construct(ClientInterface $client = null, File $file = null)
     {
         $this->client = $client ?: new Client;
-        $this->files  = $files  ?: new Filesystem;
+        $this->file   = $file  ?: new File;
     }
 
     /**
@@ -56,9 +55,10 @@ class PackageDownloader implements DownloaderInterface
     /**
      * Download a package file.
      *
-     * @param string $path
-     * @param string $url
-     * @param string $shasum
+     * @param  string $path
+     * @param  string $url
+     * @param  string $shasum
+     * @throws \Exception
      */
     public function downloadFile($path, $url, $shasum = '')
     {
@@ -72,7 +72,7 @@ class PackageDownloader implements DownloaderInterface
                 throw new ChecksumVerificationException("The file checksum verification failed");
             }
 
-            if (!$this->files->makeDir($path) || !$this->files->putContents($file, $data)) {
+            if (!$this->file->makeDir($path) || !file_put_contents($file, $data)) {
                 throw new NotWritableException("The path is not writable ($path)");
             }
 
@@ -80,11 +80,11 @@ class PackageDownloader implements DownloaderInterface
                 throw new ArchiveExtractionException("The file extraction failed");
             }
 
-            $this->files->delete($file);
+            $this->file->delete($file);
 
         } catch (\Exception $e) {
 
-            $this->files->delete($path);
+            $this->file->delete($path);
 
             if ($e instanceof TransferException) {
 

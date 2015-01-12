@@ -1,6 +1,6 @@
 <?php
 
-namespace Pagekit\Component\File\Archive;
+namespace Pagekit\Component\Filesystem\Archive;
 
 interface ArchiveInterface
 {

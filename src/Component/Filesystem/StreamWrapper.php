@@ -10,6 +10,19 @@ class StreamWrapper
     protected $handle;
 
     /**
+     * @var File
+     */
+    protected static $file;
+
+    /**
+     * @param File $file
+     */
+    public static function setFile(File $file)
+    {
+        self::$file = $file;
+    }
+
+    /**
      * Close directory handle.
      *
      * @return bool
@@ -30,7 +43,7 @@ class StreamWrapper
      */
     public function dir_opendir($path, $options)
     {
-        $this->handle = opendir(File::getPath($path, true));
+        $this->handle = opendir(self::$file->getPath($path, true));
 
         return (bool) $this->handle;
     }
@@ -67,7 +80,7 @@ class StreamWrapper
      */
     public function mkdir($path, $mode, $options)
     {
-        return mkdir(File::getPath($path, true), $mode, $options & STREAM_MKDIR_RECURSIVE);
+        return mkdir(self::$file->getPath($path, true), $mode, $options & STREAM_MKDIR_RECURSIVE);
     }
 
     /**
@@ -79,7 +92,7 @@ class StreamWrapper
      */
     public function rename($pathFrom, $pathTo)
     {
-        return rename(File::getPath($pathFrom, true), File::getPath($pathTo, true));
+        return rename(self::$file->getPath($pathFrom, true), self::$file->getPath($pathTo, true));
     }
 
     /**
@@ -91,7 +104,7 @@ class StreamWrapper
      */
     public function rmdir($path, $options)
     {
-        return rmdir(File::getPath($path, true));
+        return rmdir(self::$file->getPath($path, true));
     }
 
     /**
@@ -102,7 +115,7 @@ class StreamWrapper
      */
     public function unlink($path)
     {
-        return unlink(File::getPath($path, true));
+        return unlink(self::$file->getPath($path, true));
     }
 
     /**
@@ -114,7 +127,7 @@ class StreamWrapper
      */
     public function url_stat($path, $flags)
     {
-        $path = File::getPath($path, true);
+        $path = self::$file->getPath($path, true);
 
         if ($flags & STREAM_URL_STAT_QUIET || !file_exists($path)) {
             return @stat($path);
@@ -188,7 +201,7 @@ class StreamWrapper
      */
     public function stream_open($path, $mode, $options, &$openedPath)
     {
-        $this->handle = fopen(File::getPath($path, true), $mode);
+        $this->handle = fopen(self::$file->getPath($path, true), $mode);
 
         return (bool) $this->handle;
     }

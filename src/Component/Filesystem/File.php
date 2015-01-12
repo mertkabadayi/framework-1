@@ -6,7 +6,10 @@ use Pagekit\Component\Filesystem\Adapter\AdapterInterface;
 
 class File
 {
-    protected static $adapters = [];
+    /**
+     * @var AdapterInterface[]
+     */
+    protected $adapters = [];
 
     /**
      * Gets file path URL.
@@ -15,9 +18,9 @@ class File
      * @param  mixed  $referenceType
      * @return string|false
      */
-    public static function getUrl($file, $referenceType = false)
+    public function getUrl($file, $referenceType = false)
     {
-        if (!$url = self::getPathInfo($file, 'url')) {
+        if (!$url = $this->getPathInfo($file, 'url')) {
             return false;
         }
 
@@ -37,9 +40,9 @@ class File
      * @param  bool   $local
      * @return string|false
      */
-    public static function getPath($file, $local = false)
+    public function getPath($file, $local = false)
     {
-        return self::getPathInfo($file, $local ? 'localpath' : 'pathname') ?: false;
+        return $this->getPathInfo($file, $local ? 'localpath' : 'pathname') ?: false;
     }
 
     /**
@@ -49,7 +52,7 @@ class File
      * @param  string $option
      * @return string|array
      */
-    public static function getPathInfo($file, $option = null)
+    public function getPathInfo($file, $option = null)
     {
         $info = Path::parse($file);
 
@@ -57,7 +60,7 @@ class File
             $info['url'] = $info['pathname'];
         }
 
-        if ($adapter = self::getAdapter($info['protocol'])) {
+        if ($adapter = $this->getAdapter($info['protocol'])) {
             $info = $adapter->getPathInfo($info);
         }
 
@@ -74,13 +77,13 @@ class File
      * @param  string|array $files
      * @return bool
      */
-    public static function exists($files)
+    public function exists($files)
     {
         $files = (array) $files;
 
         foreach ($files as $file) {
 
-            $file = self::getPathInfo($file, 'pathname');
+            $file = $this->getPathInfo($file, 'pathname');
 
             if (!file_exists($file)) {
                 return false;
@@ -97,12 +100,12 @@ class File
      * @param  string $target
      * @return bool
      */
-    public static function copy($source, $target)
+    public function copy($source, $target)
     {
-        $source = self::getPathInfo($source, 'pathname');
-        $target = self::getPathInfo($target);
+        $source = $this->getPathInfo($source, 'pathname');
+        $target = $this->getPathInfo($target);
 
-        if (!is_file($source) || !self::makeDir($target['dirname'])) {
+        if (!is_file($source) || !$this->makeDir($target['dirname'])) {
             return false;
         }
 
@@ -115,13 +118,13 @@ class File
      * @param  string|array $files
      * @return bool
      */
-    public static function delete($files)
+    public function delete($files)
     {
         $files = (array) $files;
 
         foreach ($files as $file) {
 
-            $file = self::getPathInfo($file, 'pathname');
+            $file = $this->getPathInfo($file, 'pathname');
 
             if (is_dir($file)) {
 
@@ -129,8 +132,8 @@ class File
                     $file .= '/';
                 }
 
-                foreach (self::listDir($file) as $name) {
-                    if (!self::delete($file.$name)) {
+                foreach ($this->listDir($file) as $name) {
+                    if (!$this->delete($file.$name)) {
                         return false;
                     }
                 }
@@ -153,9 +156,9 @@ class File
      * @param  string $dir
      * @return array
      */
-    public static function listDir($dir)
+    public function listDir($dir)
     {
-        $dir = self::getPathInfo($dir, 'pathname');
+        $dir = $this->getPathInfo($dir, 'pathname');
 
         return array_diff(scandir($dir) ?: [], ['..', '.']);
     }
@@ -168,9 +171,9 @@ class File
      * @param  bool   $recursive
      * @return bool
      */
-    public static function makeDir($dir, $mode = 0777, $recursive = true)
+    public function makeDir($dir, $mode = 0777, $recursive = true)
     {
-        $dir = self::getPathInfo($dir, 'pathname');
+        $dir = $this->getPathInfo($dir, 'pathname');
 
         return is_dir($dir) ? true : @mkdir($dir, $mode, $recursive);
     }
@@ -182,12 +185,12 @@ class File
      * @param  string $target
      * @return bool
      */
-    public static function copyDir($source, $target)
+    public function copyDir($source, $target)
     {
-        $source = self::getPathInfo($source, 'pathname');
-        $target = self::getPathInfo($target, 'pathname');
+        $source = $this->getPathInfo($source, 'pathname');
+        $target = $this->getPathInfo($target, 'pathname');
 
-        if (!is_dir($source) || !self::makeDir($target)) {
+        if (!is_dir($source) || !$this->makeDir($target)) {
             return false;
         }
 
@@ -199,14 +202,14 @@ class File
             $target .= '/';
         }
 
-        foreach (self::listDir($source) as $file) {
+        foreach ($this->listDir($source) as $file) {
             if (is_dir($source.$file)) {
 
-                if (!self::copyDir($source.$file, $target.$file)) {
+                if (!$this->copyDir($source.$file, $target.$file)) {
                     return false;
                 }
 
-            } elseif (!self::copy($source.$file, $target.$file)) {
+            } elseif (!$this->copy($source.$file, $target.$file)) {
                 return false;
             }
         }
@@ -217,11 +220,12 @@ class File
     /**
      * Gets a adapter.
      *
-     * @param string $protocol
+     * @param  string $protocol
+     * @return AdapterInterface|null
      */
-    public static function getAdapter($protocol)
+    public function getAdapter($protocol)
     {
-        return isset(self::$adapters[$protocol]) ? self::$adapters[$protocol] : null;
+        return isset($this->adapters[$protocol]) ? $this->adapters[$protocol] : null;
     }
 
     /**
@@ -230,9 +234,9 @@ class File
      * @param string           $protocol
      * @param AdapterInterface $adapter
      */
-    public static function registerAdapter($protocol, AdapterInterface $adapter)
+    public function registerAdapter($protocol, AdapterInterface $adapter)
     {
-        self::$adapters[$protocol] = $adapter;
+        $this->adapters[$protocol] = $adapter;
 
         if ($wrapper = $adapter->getStreamWrapper()) {
             stream_wrapper_register($protocol, $wrapper);

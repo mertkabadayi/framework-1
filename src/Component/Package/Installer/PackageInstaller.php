@@ -2,8 +2,7 @@
 
 namespace Pagekit\Component\Package\Installer;
 
-use Pagekit\Component\File\Filesystem;
-use Pagekit\Component\File\FilesystemInterface;
+use Pagekit\Component\Filesystem\File;
 use Pagekit\Component\Package\Exception\LogicException;
 use Pagekit\Component\Package\Loader\JsonLoader;
 use Pagekit\Component\Package\Loader\LoaderInterface;
@@ -26,22 +25,22 @@ class PackageInstaller implements InstallerInterface
     protected $loader;
 
     /**
-     * @var FilesystemInterface
+     * @var File
      */
-    protected $filesystem;
+    protected $file;
 
     /**
      * Initializes the installer.
      *
      * @param InstalledRepositoryInterface $repository
      * @param LoaderInterface              $loader
-     * @param FilesystemInterface          $filesystem
+     * @param File                         $file
      */
-    public function __construct(InstalledRepositoryInterface $repository, LoaderInterface $loader = null, FilesystemInterface $filesystem = null)
+    public function __construct(InstalledRepositoryInterface $repository, LoaderInterface $loader = null, File $file = null)
     {
         $this->repository = $repository;
         $this->loader     = $loader ?: new JsonLoader;
-        $this->filesystem = $filesystem ?: new Filesystem;
+        $this->file       = $file ?: new File;
     }
 
     /**
@@ -55,7 +54,7 @@ class PackageInstaller implements InstallerInterface
             throw new LogicException('Package is already installed: ' . $package);
         }
 
-        $this->filesystem->copyDir(dirname($packageFile), $this->repository->getInstallPath($package));
+        $this->file->copyDir(dirname($packageFile), $this->repository->getInstallPath($package));
         $this->repository->addPackage(clone $package);
     }
 
@@ -72,9 +71,9 @@ class PackageInstaller implements InstallerInterface
 
         $installPath = $this->repository->getInstallPath($initial);
 
-        $this->filesystem->delete($installPath);
+        $this->file->delete($installPath);
         $this->repository->removePackage($initial);
-        $this->filesystem->copyDir(dirname($packageFile), $installPath);
+        $this->file->copyDir(dirname($packageFile), $installPath);
 
         if (!$this->repository->hasPackage($update)) {
             $this->repository->addPackage(clone $update);
@@ -90,7 +89,7 @@ class PackageInstaller implements InstallerInterface
             throw new LogicException('Package is not installed: ' . $package);
         }
 
-        $this->filesystem->delete($this->repository->getInstallPath($package));
+        $this->file->delete($this->repository->getInstallPath($package));
         $this->repository->removePackage($package);
     }
 
