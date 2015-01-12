@@ -7,10 +7,12 @@ use Pagekit\Component\Filesystem\FileLocator;
 
 class FileLocatorTest extends \PHPUnit_Framework_TestCase
 {
+    protected $file;
     protected $locator;
 
     public function setUp()
     {
+        $this->file    = new File;
         $this->locator = new FileLocator(__DIR__);
     }
 
@@ -19,7 +21,7 @@ class FileLocatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testGet($path, $result, $exists)
     {
-        $this->assertSame($exists, File::exists($result));
+        $this->assertSame($exists, $this->file->exists($result));
         $this->assertSame($result, $this->locator->get($path));
     }
 

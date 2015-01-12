@@ -9,15 +9,17 @@ class FileTest extends \PHPUnit_Framework_TestCase
 {
     use \Pagekit\Tests\FileUtil;
 
+    protected $file;
     protected $fixtures;
     protected $workspace;
 
     public function setUp()
     {
-        $this->fixtures = __DIR__.'/Fixtures';
+        $this->file      = new File;
+        $this->fixtures  = __DIR__.'/Fixtures';
         $this->workspace = $this->getTempDir('filesystem_');
 
-        File::registerAdapter('file', new FileAdapter(__DIR__, 'http://localhost'));
+        $this->file->registerAdapter('file', new FileAdapter(__DIR__, 'http://localhost'));
     }
 
     public function tearDown()
@@ -27,9 +29,9 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
     public function testGetUrlLocal()
     {
-        $this->assertSame('/Fixtures', File::getUrl($this->fixtures));
-        $this->assertSame('//localhost/Fixtures', File::getUrl($this->fixtures, 'network'));
-        $this->assertSame('http://localhost/Fixtures', File::getUrl($this->fixtures, true));
+        $this->assertSame('/Fixtures', $this->file->getUrl($this->fixtures));
+        $this->assertSame('//localhost/Fixtures', $this->file->getUrl($this->fixtures, 'network'));
+        $this->assertSame('http://localhost/Fixtures', $this->file->getUrl($this->fixtures, true));
     }
 
     public function testGetUrlExternal()
@@ -37,25 +39,25 @@ class FileTest extends \PHPUnit_Framework_TestCase
         $ftp  = 'ftp://example.com';
         $http = 'http://username:password@example.com/path?arg=value#anchor';
 
-        $this->assertSame('/', File::getUrl($ftp));
-        $this->assertSame('//example.com', File::getUrl($ftp, 'network'));
-        $this->assertSame($ftp, File::getUrl($ftp, true));
+        $this->assertSame('/', $this->file->getUrl($ftp));
+        $this->assertSame('//example.com', $this->file->getUrl($ftp, 'network'));
+        $this->assertSame($ftp, $this->file->getUrl($ftp, true));
 
-        $this->assertSame('/path?arg=value#anchor', File::getUrl($http));
-        $this->assertSame('//username:password@example.com/path?arg=value#anchor', File::getUrl($http, 'network'));
-        $this->assertSame($http, File::getUrl($http, true));
+        $this->assertSame('/path?arg=value#anchor', $this->file->getUrl($http));
+        $this->assertSame('//username:password@example.com/path?arg=value#anchor', $this->file->getUrl($http, 'network'));
+        $this->assertSame($http, $this->file->getUrl($http, true));
     }
 
     public function testGetUrlNotFound()
     {
         $dir = __DIR__.'/Directory';
 
-        $this->assertFalse(File::getUrl($dir));
+        $this->assertFalse($this->file->getUrl($dir));
     }
 
     public function testGetPath()
     {
-        $this->assertSame('/file1.txt', File::getPath('/file1.txt'));
+        $this->assertSame('/file1.txt', $this->file->getPath('/file1.txt'));
     }
 
     public function testExists()
@@ -64,73 +66,73 @@ class FileTest extends \PHPUnit_Framework_TestCase
         $file2 = $this->fixtures.'/file2.txt';
         $file3 = $this->fixtures.'/file3.txt';
 
-        $this->assertTrue(File::exists($file1));
-        $this->assertTrue(File::exists($file2));
-        $this->assertTrue(File::exists([$file1, $file2]));
-        $this->assertFalse(File::exists($file3));
-        $this->assertFalse(File::exists([$file1, $file2, $file3]));
+        $this->assertTrue($this->file->exists($file1));
+        $this->assertTrue($this->file->exists($file2));
+        $this->assertTrue($this->file->exists([$file1, $file2]));
+        $this->assertFalse($this->file->exists($file3));
+        $this->assertFalse($this->file->exists([$file1, $file2, $file3]));
     }
 
     public function testCopyFile()
     {
         $file1 = $this->fixtures.'/file1.txt';
 
-        $this->assertTrue(File::copy($file1, $this->workspace.'/file1.txt'));
-        $this->assertTrue(File::exists($this->workspace.'/file1.txt'));
+        $this->assertTrue($this->file->copy($file1, $this->workspace.'/file1.txt'));
+        $this->assertTrue($this->file->exists($this->workspace.'/file1.txt'));
     }
 
     public function testCopyFileNotFound()
     {
         $file3 = $this->fixtures.'/file3.txt';
 
-        $this->assertFalse(File::exists($file3));
-        $this->assertFalse(File::copy($file3, $this->workspace.'/file3.txt'));
+        $this->assertFalse($this->file->exists($file3));
+        $this->assertFalse($this->file->copy($file3, $this->workspace.'/file3.txt'));
     }
 
     public function testCopyDir()
     {
-        $this->assertTrue(File::copyDir($this->fixtures, $this->workspace));
-        $this->assertTrue(File::exists($this->workspace.'/file1.txt'));
-        $this->assertTrue(File::exists($this->workspace.'/file2.txt'));
+        $this->assertTrue($this->file->copyDir($this->fixtures, $this->workspace));
+        $this->assertTrue($this->file->exists($this->workspace.'/file1.txt'));
+        $this->assertTrue($this->file->exists($this->workspace.'/file2.txt'));
     }
 
     public function testCopyDirNotFound()
     {
         $dir = __DIR__.'/Directory';
 
-        $this->assertFalse(File::exists($dir));
-        $this->assertFalse(File::copyDir($dir, $this->workspace));
+        $this->assertFalse($this->file->exists($dir));
+        $this->assertFalse($this->file->copyDir($dir, $this->workspace));
     }
 
     public function testDeleteFile()
     {
         $file1 = $this->fixtures.'/file1.txt';
 
-        $this->assertTrue(File::copy($file1, $this->workspace.'/file1.txt'));
-        $this->assertTrue(File::delete($this->workspace.'/file1.txt'));
-        $this->assertFalse(File::exists($this->workspace.'/file1.txt'));
+        $this->assertTrue($this->file->copy($file1, $this->workspace.'/file1.txt'));
+        $this->assertTrue($this->file->delete($this->workspace.'/file1.txt'));
+        $this->assertFalse($this->file->exists($this->workspace.'/file1.txt'));
     }
 
     public function testDeleteFileNotFound()
     {
         $file3 = $this->workspace.'/file3.txt';
 
-        $this->assertFalse(File::exists($file3));
-        $this->assertFalse(File::delete($file3));
+        $this->assertFalse($this->file->exists($file3));
+        $this->assertFalse($this->file->delete($file3));
     }
 
     public function testDeleteDir()
     {
         $dir = $this->workspace.'/Directory';
 
-        $this->assertTrue(File::copyDir($this->fixtures, $dir));
-        $this->assertTrue(File::delete($dir));
-        $this->assertFalse(File::exists($dir));
+        $this->assertTrue($this->file->copyDir($this->fixtures, $dir));
+        $this->assertTrue($this->file->delete($dir));
+        $this->assertFalse($this->file->exists($dir));
     }
 
     public function testListDir()
     {
-        $this->assertContains('file1.txt', File::listDir($this->fixtures));
-        $this->assertContains('file2.txt', File::listDir($this->fixtures));
+        $this->assertContains('file1.txt', $this->file->listDir($this->fixtures));
+        $this->assertContains('file2.txt', $this->file->listDir($this->fixtures));
     }
 }
