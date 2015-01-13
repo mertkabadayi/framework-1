@@ -88,7 +88,7 @@ class MigrationTest extends \PHPUnit_Framework_TestCase
 
         $reflectionObject = new ReflectionObject($migration);
         $loadMethod = $reflectionObject->getMethod('load');
-        $loadMethod->setAccessible('true');
+        $loadMethod->setAccessible(true);
         $files = $loadMethod->invokeArgs($migration, []);
         $this->assertCount(6, $files);
 
@@ -96,7 +96,7 @@ class MigrationTest extends \PHPUnit_Framework_TestCase
 
         $reflectionObject = new ReflectionObject($migration);
         $loadMethod = $reflectionObject->getMethod('load');
-        $loadMethod->setAccessible('true');
+        $loadMethod->setAccessible(true);
         $files = $loadMethod->invokeArgs($migration, ['0000_00_00_000004_test4', null]);
         $this->assertCount(1, $files);
     }
