@@ -8,18 +8,26 @@ use Pagekit\Component\Routing\DataCollector\RoutesDataCollector;
 use Pagekit\Framework\Application;
 use Pagekit\Framework\ServiceProviderInterface;
 use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\EventDataCollector;
 use Symfony\Component\HttpKernel\DataCollector\MemoryDataCollector;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 use Symfony\Component\HttpKernel\DataCollector\TimeDataCollector;
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Profiler\SqliteProfilerStorage;
 use Symfony\Component\Stopwatch\Stopwatch;
 
-class ProfilerServiceProvider implements ServiceProviderInterface
+class ProfilerServiceProvider implements ServiceProviderInterface, EventSubscriberInterface
 {
+    protected $app;
+
     public function register(Application $app)
     {
+        $this->app = $app;
+
         if (!$app['config']['profiler.enabled']) {
             return;
         }
@@ -80,6 +88,69 @@ class ProfilerServiceProvider implements ServiceProviderInterface
 
         $app['events']->addSubscriber($request);
         $app['events']->addSubscriber(new ProfilerListener($app['profiler']));
-        $app['events']->addSubscriber(new ToolbarListener($app['profiler'], $app['view'], $app['url'], $app['callbacks']));
+        $app['events']->addSubscriber($this);
+    }
+
+    public function onKernelRequest()
+    {
+        $this->app['callbacks']->get('_profiler/{token}', '_profiler', function ($token) {
+
+            if (!$profile = $this->app['profiler']->loadProfile($token)) {
+                return new Response;
+            }
+
+            return new Response($this->app['view']->render(__DIR__.'/views/toolbar.php', ['profiler' => $this->app['profiler'], 'profile' => $profile, 'token' => $token]));
+
+        })->setDefault('_maintenance', true);
+    }
+
+    public function onKernelResponse(FilterResponseEvent $event)
+    {
+        $response = $event->getResponse();
+        $request  = $event->getRequest();
+
+        if ($event->isMasterRequest()
+            && !$request->isXmlHttpRequest()
+            && !$request->attributes->get('_disable_profiler_toolbar')
+            && $response->headers->has('X-Debug-Token')
+            && !$response->isRedirection()
+            && !($response->headers->has('Content-Type') && false === strpos($response->headers->get('Content-Type'), 'html'))
+            && 'html' === $request->getRequestFormat()
+        ) {
+            $this->injectToolbar($response);
+        }
+    }
+
+    /**
+     * Injects the web debug toolbar into the given Response.
+     *
+     * @param Response $response A Response instance
+     */
+    protected function injectToolbar(Response $response)
+    {
+        $content  = $response->getContent();
+
+        if (false === $pos = strripos($content, '</body>')) {
+            return;
+        }
+
+        $token    = $response->headers->get('X-Debug-Token');
+        $route    = $this->app['url']->route('_profiler', compact('token'));
+        $url      = $this->app['file']->getUrl(__DIR__.'/assets');
+        $markup[] = "<div id=\"profiler\" data-url=\"{$url}\" data-route=\"{$route}\" style=\"display: none;\"></div>";
+        $markup[] = "<script src=\"{$url}/js/profiler.js\"></script>";
+
+        $response->setContent(substr_replace($content, implode("\n", $markup), $pos));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedEvents()
+    {
+        return [
+            KernelEvents::REQUEST  => ['onKernelRequest', 100],
+            KernelEvents::RESPONSE => ['onKernelResponse', -100]
+        ];
     }
 }

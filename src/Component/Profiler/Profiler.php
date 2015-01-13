@@ -10,7 +10,7 @@ class Profiler extends BaseProfiler
     /**
      * @var string[]
      */
-    protected $viewCollectorMap = [];
+    protected $views = [];
 
     /**
      * @var array
@@ -27,8 +27,8 @@ class Profiler extends BaseProfiler
      */
     public function add(DataCollectorInterface $collector, $toolbar = null, $panel = null, $priority = 0)
     {
-        $this->viewCollectorMap[$collector->getName()] = compact('toolbar', 'panel');
-        $this->order[$collector->getName()]            = $priority;
+        $this->views[$collector->getName()] = compact('toolbar', 'panel');
+        $this->order[$collector->getName()] = $priority;
 
         parent::add($collector);
     }
@@ -41,7 +41,7 @@ class Profiler extends BaseProfiler
      */
     public function getToolbarView($name)
     {
-        return isset($this->viewCollectorMap[$name]) ? $this->viewCollectorMap[$name]['toolbar'] : null;
+        return isset($this->views[$name]) ? $this->views[$name]['toolbar'] : null;
     }
 
     /**
@@ -52,13 +52,13 @@ class Profiler extends BaseProfiler
      */
     public function getPanelView($name)
     {
-        return isset($this->viewCollectorMap[$name]) ? $this->viewCollectorMap[$name]['panel'] : null;
+        return isset($this->views[$name]) ? $this->views[$name]['panel'] : null;
     }
 
     /**
      * Gets the Collectors ordered by priority.
      *
-     * @return array An array of collectors
+     * @return array
      */
     public function all()
     {

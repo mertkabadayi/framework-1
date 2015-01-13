@@ -94,6 +94,11 @@ class UrlProvider
             return $this->route($path, $parameters, $referenceType);
         }
 
+        if ($this->isAbsolutePath($path)) {
+            $path = str_replace('\\', '/', $path);
+            $path = strpos($path, $base = $this->context->getScriptPath()) === 0 ? substr($path, strlen($base)) : $path;
+        }
+
         if ($query = http_build_query($parameters, '', '&')) {
             $query = '?'.$query;
         }
@@ -122,5 +127,16 @@ class UrlProvider
         } catch (RouteNotFoundException $e) {}
 
         return false;
+    }
+
+    /**
+     * Returns whether the file path is an absolute path.
+     *
+     * @param  string $file
+     * @return bool
+     */
+    protected function isAbsolutePath($file)
+    {
+        return $file && ($file[0] == '/' || $file[0] == '\\' || (strlen($file) > 3 && ctype_alpha($file[0]) && $file[1] == ':' && ($file[2] == '\\' || $file[2] == '/')));
     }
 }
