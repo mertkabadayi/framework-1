@@ -13,8 +13,8 @@ class Profiler extends BaseProfiler
     protected $viewCollectorMap = [];
 
     /**
-    * @var Array
-    */
+     * @var array
+     */
     protected $order = [];
 
     /**
@@ -28,7 +28,7 @@ class Profiler extends BaseProfiler
     public function add(DataCollectorInterface $collector, $toolbar = null, $panel = null, $priority = 0)
     {
         $this->viewCollectorMap[$collector->getName()] = compact('toolbar', 'panel');
-        $this->order[$collector->getName()] = $priority;
+        $this->order[$collector->getName()]            = $priority;
 
         parent::add($collector);
     }
@@ -60,7 +60,8 @@ class Profiler extends BaseProfiler
      *
      * @return array An array of collectors
      */
-    public function all() {
+    public function all()
+    {
         arsort($this->order);
         $collectors = [];
 
