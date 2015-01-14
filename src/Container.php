@@ -42,7 +42,9 @@ class Container extends \Pimple
      */
     public static function get($id)
     {
-        return static::getInstance()[$id];
+        $instance = static::getInstance();
+
+        return $instance[$id];
     }
 
     /**
@@ -54,10 +56,14 @@ class Container extends \Pimple
      */
     public static function set($id, $value)
     {
-        return static::getInstance()[$id] = $value;
+        $instance = static::getInstance();
+
+        return $instance[$id] = $value;
     }
 
     /**
+     * Gets a container instance.
+     *
      * @return Container
      */
     public static function getInstance()
@@ -68,24 +74,14 @@ class Container extends \Pimple
     /**
      * Magic method to access the container in a static context.
      *
-     * @param  string $name
-     * @param  array  $arguments
+     * @param  string $id
+     * @param  array  $args
      * @return mixed
      */
-    public static function __callStatic($name, $arguments)
+    public static function __callStatic($id, $args)
     {
-        static $methods;
-
         $instance = static::getInstance();
 
-        if (!$methods) {
-            $methods = array_flip(get_class_methods($instance));
-        }
-
-        if (isset($methods[$name])) {
-            return call_user_func_array([$instance, $name], $arguments);
-        }
-
-        return $instance[$name];
+        return $args ? call_user_func_array($instance[$id], $args) : $instance[$id];
     }
 }
