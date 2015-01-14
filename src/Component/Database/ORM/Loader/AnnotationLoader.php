@@ -4,6 +4,8 @@ namespace Pagekit\Component\Database\ORM\Loader;
 
 use Doctrine\Common\Annotations\SimpleAnnotationReader;
 use Pagekit\Component\Database\ORM\Annotation\Annotation;
+use Pagekit\Component\Database\ORM\Annotation\Column;
+use Pagekit\Component\Database\ORM\Annotation\Entity;
 
 class AnnotationLoader implements LoaderInterface
 {
@@ -22,7 +24,7 @@ class AnnotationLoader implements LoaderInterface
      */
     public function load(\ReflectionClass $class, array $config = [])
     {
-        // @Entity
+        /* @var $annotation Entity */
         if ($annotation = $this->getAnnotation($class, 'Entity')) {
 
             $config['table']           = $annotation->tableClass ?: strtolower($class->getShortName());
@@ -45,7 +47,7 @@ class AnnotationLoader implements LoaderInterface
                 continue;
             }
 
-            // @Column
+            /* @var $annotation Column */
             if ($annotation = $this->getAnnotation($property, 'Column')) {
 
                 $field = compact('name');

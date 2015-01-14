@@ -141,11 +141,15 @@ class EntityManager
     }
 
     /**
-     * {@see EntityMap::get}
+     * Gets an entity.
+     *
+     * @param  int|string $id
+     * @param  string     $class
+     * @return mixed|false
      */
     public function getById($id, $class)
     {
-        $this->entities->get($id, $class);
+        return $this->entities->get($id, $class);
     }
 
     /**
