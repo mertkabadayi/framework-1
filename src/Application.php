@@ -1,6 +1,6 @@
 <?php
 
-namespace Pagekit\Framework;
+namespace Pagekit;
 
 use Pagekit\Framework\Exception\ExceptionListenerWrapper;
 use Pagekit\Framework\Provider\EventServiceProvider;

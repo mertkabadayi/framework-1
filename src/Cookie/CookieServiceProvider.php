@@ -3,7 +3,7 @@
 namespace Pagekit\Cookie;
 
 use Pagekit\Application;
-use Pagekit\Framework\ServiceProviderInterface;
+use Pagekit\ServiceProviderInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 
 class CookieServiceProvider implements ServiceProviderInterface

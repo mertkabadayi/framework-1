@@ -3,7 +3,7 @@
 namespace Pagekit\Migration;
 
 use Pagekit\Application;
-use Pagekit\Framework\ServiceProviderInterface;
+use Pagekit\ServiceProviderInterface;
 
 class MigrationServiceProvider implements ServiceProviderInterface
 {

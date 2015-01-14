@@ -3,7 +3,7 @@
 namespace Pagekit\Markdown;
 
 use Pagekit\Application;
-use Pagekit\Framework\ServiceProviderInterface;
+use Pagekit\ServiceProviderInterface;
 
 /**
  * @copyright Copyright (c) Pagekit, http://pagekit.com

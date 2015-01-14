@@ -4,7 +4,7 @@ namespace Pagekit\Mail;
 
 use InvalidArgumentException;
 use Pagekit\Application;
-use Pagekit\Framework\ServiceProviderInterface;
+use Pagekit\ServiceProviderInterface;
 use Swift_Events_SimpleEventDispatcher;
 use Swift_MailTransport;
 use Swift_MemorySpool;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Pagekit\Framework;
+namespace Pagekit;
 
 class Container extends \Pimple
 {

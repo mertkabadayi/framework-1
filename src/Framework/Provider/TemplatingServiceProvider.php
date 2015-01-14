@@ -3,7 +3,7 @@
 namespace Pagekit\Framework\Provider;
 
 use Pagekit\Application;
-use Pagekit\Framework\ServiceProviderInterface;
+use Pagekit\ServiceProviderInterface;
 use Pagekit\Framework\Templating\Helper\GravatarHelper;
 use Pagekit\Framework\Templating\Helper\MarkdownHelper;
 use Pagekit\Framework\Templating\Helper\ScriptHelper;

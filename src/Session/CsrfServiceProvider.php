@@ -5,7 +5,7 @@ namespace Pagekit\Session;
 use Pagekit\Session\Csrf\Event\CsrfListener;
 use Pagekit\Session\Csrf\Provider\SessionCsrfProvider;
 use Pagekit\Application;
-use Pagekit\Framework\ServiceProviderInterface;
+use Pagekit\ServiceProviderInterface;
 
 class CsrfServiceProvider implements ServiceProviderInterface
 {

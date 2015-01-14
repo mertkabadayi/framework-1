@@ -3,7 +3,7 @@
 namespace Pagekit\Framework\Provider;
 
 use Pagekit\Application;
-use Pagekit\Framework\ServiceProviderInterface;
+use Pagekit\ServiceProviderInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class EventServiceProvider implements ServiceProviderInterface

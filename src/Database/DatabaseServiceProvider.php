@@ -9,7 +9,7 @@ use Pagekit\Database\ORM\MetadataManager;
 use Pagekit\Database\ORM\ModelTrait;
 use Pagekit\Application;
 use Pagekit\Framework\Database\Event\EntityEvent;
-use Pagekit\Framework\ServiceProviderInterface;
+use Pagekit\ServiceProviderInterface;
 
 class DatabaseServiceProvider implements ServiceProviderInterface
 {

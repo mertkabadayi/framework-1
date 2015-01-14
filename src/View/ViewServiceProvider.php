@@ -5,7 +5,7 @@ namespace Pagekit\View;
 use Pagekit\View\Event\ViewListener;
 use Pagekit\View\Section\SectionManager;
 use Pagekit\Application;
-use Pagekit\Framework\ServiceProviderInterface;
+use Pagekit\ServiceProviderInterface;
 
 class ViewServiceProvider implements ServiceProviderInterface
 {
