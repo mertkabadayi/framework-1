@@ -2,7 +2,7 @@
 
 namespace Pagekit\Framework\Controller;
 
-use Pagekit\Framework\Application as App;
+use Pagekit\Application as App;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class Controller

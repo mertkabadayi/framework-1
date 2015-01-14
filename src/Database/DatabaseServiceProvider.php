@@ -7,7 +7,7 @@ use Pagekit\Database\ORM\EntityManager;
 use Pagekit\Database\ORM\Loader\AnnotationLoader;
 use Pagekit\Database\ORM\MetadataManager;
 use Pagekit\Database\ORM\ModelTrait;
-use Pagekit\Framework\Application;
+use Pagekit\Application;
 use Pagekit\Framework\Database\Event\EntityEvent;
 use Pagekit\Framework\ServiceProviderInterface;
 

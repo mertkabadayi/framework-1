@@ -2,7 +2,7 @@
 
 namespace Pagekit\Framework\Event;
 
-use Pagekit\Framework\Application as App;
+use Pagekit\Application as App;
 use Pagekit\Routing\Event\GetControllerEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

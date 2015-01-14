@@ -4,7 +4,7 @@ namespace Pagekit\Cookie\Tests;
 
 use Pagekit\Config\Config;
 use Pagekit\Cookie\CookieServiceProvider;
-use Pagekit\Framework\Application;
+use Pagekit\Application;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 

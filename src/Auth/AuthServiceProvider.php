@@ -5,7 +5,7 @@ namespace Pagekit\Auth;
 use Pagekit\Auth\Encoder\NativePasswordEncoder;
 use Pagekit\Auth\Event\LoginEvent;
 use Pagekit\Auth\Event\LogoutEvent;
-use Pagekit\Framework\Application;
+use Pagekit\Application;
 use Pagekit\Framework\ServiceProviderInterface;
 use RandomLib\Factory;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

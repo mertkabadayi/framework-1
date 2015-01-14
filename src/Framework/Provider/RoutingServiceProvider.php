@@ -3,7 +3,7 @@
 namespace Pagekit\Framework\Provider;
 
 use Pagekit\Routing\RoutingServiceProvider as BaseRoutingServiceProvider;
-use Pagekit\Framework\Application;
+use Pagekit\Application;
 use Pagekit\Framework\Event\ControllerResolverListener;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;

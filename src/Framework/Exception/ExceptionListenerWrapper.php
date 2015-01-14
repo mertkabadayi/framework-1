@@ -2,7 +2,7 @@
 
 namespace Pagekit\Framework\Exception;
 
-use Pagekit\Framework\Application;
+use Pagekit\Application;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;

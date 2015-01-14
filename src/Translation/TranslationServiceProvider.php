@@ -5,7 +5,7 @@ namespace Pagekit\Translation;
 use Pagekit\Translation\Loader\MoFileLoader;
 use Pagekit\Translation\Loader\PhpFileLoader;
 use Pagekit\Translation\Loader\PoFileLoader;
-use Pagekit\Framework\Application;
+use Pagekit\Application;
 use Pagekit\Framework\ServiceProviderInterface;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Translator;

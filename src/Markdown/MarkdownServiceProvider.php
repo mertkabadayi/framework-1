@@ -2,7 +2,7 @@
 
 namespace Pagekit\Markdown;
 
-use Pagekit\Framework\Application;
+use Pagekit\Application;
 use Pagekit\Framework\ServiceProviderInterface;
 
 /**

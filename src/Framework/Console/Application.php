@@ -2,7 +2,7 @@
 
 namespace Pagekit\Framework\Console;
 
-use Pagekit\Framework\Application as Container;
+use Pagekit\Application as Container;
 use Pagekit\Framework\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command as BaseCommand;

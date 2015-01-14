@@ -3,7 +3,7 @@
 namespace Pagekit\Framework\Database\Event;
 
 use Pagekit\Database\Event\EntityEvent as BaseEvent;
-use Pagekit\Framework\Application;
+use Pagekit\Application;
 
 class EntityEvent extends BaseEvent
 {

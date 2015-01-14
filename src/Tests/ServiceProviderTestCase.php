@@ -3,7 +3,7 @@
 namespace Pagekit\Tests;
 
 use Pagekit\Config\Config;
-use Pagekit\Framework\Application;
+use Pagekit\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;

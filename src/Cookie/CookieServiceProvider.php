@@ -2,7 +2,7 @@
 
 namespace Pagekit\Cookie;
 
-use Pagekit\Framework\Application;
+use Pagekit\Application;
 use Pagekit\Framework\ServiceProviderInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 

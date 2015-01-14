@@ -5,7 +5,7 @@ namespace Pagekit\Profiler;
 use Pagekit\Database\DataCollector\DatabaseDataCollector;
 use Pagekit\Profiler\Event\ToolbarListener;
 use Pagekit\Routing\DataCollector\RoutesDataCollector;
-use Pagekit\Framework\Application;
+use Pagekit\Application;
 use Pagekit\Framework\ServiceProviderInterface;
 use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

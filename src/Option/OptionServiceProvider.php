@@ -2,7 +2,7 @@
 
 namespace Pagekit\Option;
 
-use Pagekit\Framework\Application;
+use Pagekit\Application;
 use Pagekit\Framework\ServiceProviderInterface;
 
 class OptionServiceProvider implements ServiceProviderInterface
