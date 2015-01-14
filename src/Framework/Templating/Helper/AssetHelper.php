@@ -2,7 +2,7 @@
 
 namespace Pagekit\Framework\Templating\Helper;
 
-use Pagekit\Component\View\Asset\AssetManager;
+use Pagekit\View\Asset\AssetManager;
 use Symfony\Component\Templating\Helper\Helper;
 
 abstract class AssetHelper extends Helper

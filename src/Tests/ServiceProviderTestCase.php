@@ -2,7 +2,7 @@
 
 namespace Pagekit\Tests;
 
-use Pagekit\Component\Config\Config;
+use Pagekit\Config\Config;
 use Pagekit\Framework\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;

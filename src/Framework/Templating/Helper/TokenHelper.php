@@ -2,7 +2,7 @@
 
 namespace Pagekit\Framework\Templating\Helper;
 
-use Pagekit\Component\Session\Csrf\Provider\CsrfProviderInterface;
+use Pagekit\Session\Csrf\Provider\CsrfProviderInterface;
 use Symfony\Component\Templating\Helper\Helper;
 
 class TokenHelper extends Helper

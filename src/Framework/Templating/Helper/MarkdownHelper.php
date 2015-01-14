@@ -2,7 +2,7 @@
 
 namespace Pagekit\Framework\Templating\Helper;
 
-use Pagekit\Component\Markdown\Markdown;
+use Pagekit\Markdown\Markdown;
 use Symfony\Component\Templating\Helper\Helper;
 
 class MarkdownHelper extends Helper

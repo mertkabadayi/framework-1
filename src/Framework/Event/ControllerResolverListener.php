@@ -3,7 +3,7 @@
 namespace Pagekit\Framework\Event;
 
 use Pagekit\Framework\Application as App;
-use Pagekit\Component\Routing\Event\GetControllerEvent;
+use Pagekit\Routing\Event\GetControllerEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ControllerResolverListener implements EventSubscriberInterface

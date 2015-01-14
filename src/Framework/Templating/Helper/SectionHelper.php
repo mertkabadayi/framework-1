@@ -2,7 +2,7 @@
 
 namespace Pagekit\Framework\Templating\Helper;
 
-use Pagekit\Component\View\Section\SectionManager;
+use Pagekit\View\Section\SectionManager;
 use Symfony\Component\Templating\Helper\Helper;
 
 class SectionHelper extends Helper

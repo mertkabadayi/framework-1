@@ -22,8 +22,7 @@
         <whitelist>
             <directory>./src/</directory>
             <exclude>
-                <directory>./src/Component/*/Tests/</directory>
-                <directory>./src/Framework/Tests/</directory>
+                <directory>./src/*/Tests/</directory>
                 <directory>./src/Tests</directory>
             </exclude>
         </whitelist>
