@@ -4,8 +4,13 @@ namespace Pagekit\Component\Database\ORM\Loader;
 
 use Doctrine\Common\Annotations\SimpleAnnotationReader;
 use Pagekit\Component\Database\ORM\Annotation\Annotation;
+use Pagekit\Component\Database\ORM\Annotation\BelongsTo;
 use Pagekit\Component\Database\ORM\Annotation\Column;
 use Pagekit\Component\Database\ORM\Annotation\Entity;
+use Pagekit\Component\Database\ORM\Annotation\HasOne;
+use Pagekit\Component\Database\ORM\Annotation\OrderBy;
+use Pagekit\Component\Database\ORM\Relation\HasMany;
+use Pagekit\Component\Database\ORM\Relation\ManyToMany;
 
 class AnnotationLoader implements LoaderInterface
 {
@@ -72,7 +77,7 @@ class AnnotationLoader implements LoaderInterface
 
             } else {
 
-                // @BelongsTo, @HasOne, @HasMany, @ManyToMany
+                /* @var $annotation BelongsTo|HasMany|HasOne|ManyToMany */
                 foreach (['BelongsTo', 'HasOne', 'HasMany', 'ManyToMany'] as $type) {
                     if ($annotation = $this->getAnnotation($property, $type)) {
 
@@ -80,10 +85,9 @@ class AnnotationLoader implements LoaderInterface
                             throw new \Exception(sprintf('Duplicate relation mapping detected, "%s" already exists.', $name));
                         }
 
-                        if ($annot = $this->getAnnotation($property, 'OrderBy') and strpos($type, 'Many') !== false) {
-                            $annotation->orderBy = $annot->value;
-                        } else {
-                            $annotation->orderBy = [];
+                        /* @var $order OrderBy */
+                        if (property_exists($annotation, 'orderBy') && $order = $this->getAnnotation($property, 'OrderBy')) {
+                            $annotation->orderBy = $order->value;
                         }
 
                         $config['relations'][$name] = array_merge(compact('name', 'type'), (array) $annotation);

@@ -16,4 +16,7 @@ final class HasMany implements Annotation
 
     /** @var string */
     public $keyTo;
+
+    /** @var array */
+    public $orderBy = [];
 }

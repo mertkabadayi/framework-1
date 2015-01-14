@@ -741,6 +741,9 @@ class QueryBuilder
 
     /**
      * Tries to guess param types
+     *
+     * @param  array $params
+     * @return array
      */
     protected function guessParamTypes(array $params = [])
     {

@@ -25,4 +25,7 @@ final class ManyToMany implements Annotation
 
     /** @var string */
     public $keyThroughTo;
+
+    /** @var array */
+    public $orderBy = [];
 }

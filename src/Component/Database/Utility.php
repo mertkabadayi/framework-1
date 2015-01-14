@@ -130,7 +130,7 @@ class Utility
     */
     public function dropAndCreateTable(Table $table)
     {
-        $this->manager->dropAndCreateTable($this->replacePrefix($table));
+        $this->manager->dropAndCreateTable($table);
     }
 
     /**
