@@ -21,8 +21,6 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
     protected $providers = [];
     protected $booted = false;
 
-    protected static $instance;
-
     /**
      * Constructor.
      *
@@ -34,11 +32,10 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 
         $this['app'] = $this;
 
-        $this->register(new EventServiceProvider);
-        $this->register(new RoutingServiceProvider);
+        $this->register(new EventServiceProvider)
+            ->register(new RoutingServiceProvider);
 
         ApplicationTrait::setApplication($this);
-        static::$instance = $this;
     }
 
     /**
@@ -95,9 +92,9 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
      * @param mixed  $callback
      * @param int    $priority
      */
-    public function on($event, $callback, $priority = 0)
+    public static function on($event, $callback, $priority = 0)
     {
-        $this['events']->addListener($event, $callback, $priority);
+        self::events()->addListener($event, $callback, $priority);
     }
 
     /**
@@ -109,9 +106,9 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
      * @throws HttpException
      * @throws NotFoundHttpException
      */
-    public function abort($code, $message = '', array $headers = [])
+    public static function abort($code, $message = '', array $headers = [])
     {
-        $this['router']->abort($code, $message, $headers);
+        self::router()->abort($code, $message, $headers);
     }
 
     /**
@@ -120,9 +117,9 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
      * @param mixed   $callback
      * @param integer $priority
      */
-    public function error($callback, $priority = -8)
+    public static function error($callback, $priority = -8)
     {
-        $this->on(KernelEvents::EXCEPTION, new ExceptionListenerWrapper($this, $callback), $priority);
+        self::on(KernelEvents::EXCEPTION, new ExceptionListenerWrapper(static::getInstance(), $callback), $priority);
     }
 
     /**

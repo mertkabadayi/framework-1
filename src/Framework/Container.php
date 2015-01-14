@@ -5,7 +5,7 @@ namespace Pagekit\Framework;
 class Container extends \Pimple
 {
     /**
-     * @var array
+     * @var Container[]
      */
     protected static $instances = [];
 
@@ -27,9 +27,11 @@ class Container extends \Pimple
      * @param  string $id
      * @return bool
      */
-    public function has($id)
+    public static function has($id)
     {
-        return isset($this[$id]);
+        $instance = static::getInstance();
+
+        return isset($instance[$id]);
     }
 
     /**
@@ -38,9 +40,9 @@ class Container extends \Pimple
      * @param  string $id
      * @return mixed
      */
-    public function get($id)
+    public static function get($id)
     {
-        return $this[$id];
+        return static::getInstance()[$id];
     }
 
     /**
@@ -50,9 +52,17 @@ class Container extends \Pimple
      * @param  mixed  $value
      * @return mixed
      */
-    public function set($id, $value)
+    public static function set($id, $value)
     {
-        return $this[$id] = $value;
+        return static::getInstance()[$id] = $value;
+    }
+
+    /**
+     * @return Container
+     */
+    public static function getInstance()
+    {
+        return static::$instances[get_called_class()];
     }
 
     /**
@@ -66,16 +76,16 @@ class Container extends \Pimple
     {
         static $methods;
 
-        $class = get_called_class();
+        $instance = static::getInstance();
 
         if (!$methods) {
-            $methods = array_flip(get_class_methods($class));
+            $methods = array_flip(get_class_methods($instance));
         }
 
         if (isset($methods[$name])) {
-            return call_user_func_array([static::$instances[$class], $name], $arguments);
+            return call_user_func_array([$instance, $name], $arguments);
         }
 
-        return static::$instances[$class][$name];
+        return $instance[$name];
     }
 }
