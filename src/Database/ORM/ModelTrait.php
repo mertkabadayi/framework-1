@@ -107,23 +107,20 @@ trait ModelTrait
     }
 
     /**
-     * Saves an entity.
+     * Saves the entity.
      *
-     * @param object $entity
-     * @param array  $data
+     * @param array $data
      */
-    public static function save($entity, array $data = [])
+    public function save(array $data = [])
     {
-        self::$manager->save($entity, $data);
+        self::$manager->save($this, $data);
     }
 
     /**
-     * Deletes an entity.
-     *
-     * @param object $entity
+     * Deletes the entity.
      */
-    public static function delete($entity)
+    public function delete()
     {
-        self::$manager->delete($entity);
+        self::$manager->delete($this);
     }
 }
