@@ -2,9 +2,11 @@
 
 namespace Pagekit\Framework\Event;
 
+use Pagekit\Framework\Application as App;
 use Pagekit\Component\Routing\Event\GetControllerEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ControllerResolverListener extends EventSubscriber
+class ControllerResolverListener implements EventSubscriberInterface
 {
     /**
      * Sets the Controller instance associated with a Request.
@@ -36,8 +38,8 @@ class ControllerResolverListener extends EventSubscriber
             foreach ($constructor->getParameters() as $param) {
                 if ($class = $param->getClass()) {
 
-                    if ($class->isInstance(self::$app)) {
-                        $args[] = self::$app;
+                    if ($class->isInstance(App::getInstance())) {
+                        $args[] = App::getInstance();
                     } elseif ($extension = $this['extensions']->get($class->getName())) {
                         $args[] = $extension;
                     }

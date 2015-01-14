@@ -2,13 +2,11 @@
 
 namespace Pagekit\Framework\Controller;
 
-use Pagekit\Framework\ApplicationTrait;
+use Pagekit\Framework\Application as App;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
-class Controller implements \ArrayAccess
+class Controller
 {
-    use ApplicationTrait;
-
     /**
      * Returns a redirect response.
      *
@@ -20,6 +18,6 @@ class Controller implements \ArrayAccess
      */
     public function redirect($url = '', $parameters = [], $status = 302, $headers = [])
     {
-        return new RedirectResponse($this['url']->to($url, $parameters), $status, $headers);
+        return new RedirectResponse(App::url()->to($url, $parameters), $status, $headers);
     }
 }

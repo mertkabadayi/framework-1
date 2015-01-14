@@ -30,12 +30,8 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
     {
         parent::__construct($values);
 
-        $this['app'] = $this;
-
         $this->register(new EventServiceProvider)
             ->register(new RoutingServiceProvider);
-
-        ApplicationTrait::setApplication($this);
     }
 
     /**
