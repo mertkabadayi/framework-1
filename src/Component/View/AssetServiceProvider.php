@@ -17,11 +17,11 @@ class AssetServiceProvider implements ServiceProviderInterface
         $this->app = $app;
 
         $app['view.styles'] = function($app) {
-            return new AssetManager($app['url'], $app['config']['app.version']);
+            return new AssetManager($app['config']['app.version']);
         };
 
         $app['view.scripts'] = function($app) {
-            return new AssetManager($app['url'], $app['config']['app.version']);
+            return new AssetManager($app['config']['app.version']);
         };
     }
 

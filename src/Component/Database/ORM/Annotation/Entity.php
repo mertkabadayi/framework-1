@@ -9,9 +9,6 @@ namespace Pagekit\Component\Database\ORM\Annotation;
 final class Entity implements Annotation
 {
     /** @var string */
-    public $repositoryClass;
-
-    /** @var string */
     public $tableClass;
 
     /** @var string */

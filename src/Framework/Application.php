@@ -21,6 +21,8 @@ class Application extends \Pimple implements HttpKernelInterface, TerminableInte
     protected $providers = [];
     protected $booted = false;
 
+    protected static $instance;
+
     /**
      * Constructor.
      *
@@ -36,6 +38,7 @@ class Application extends \Pimple implements HttpKernelInterface, TerminableInte
         $this->register(new RoutingServiceProvider);
 
         ApplicationTrait::setApplication($this);
+        static::$instance = $this;
     }
 
     /**
@@ -169,5 +172,14 @@ class Application extends \Pimple implements HttpKernelInterface, TerminableInte
     public function runningInConsole()
     {
         return PHP_SAPI == 'cli';
+    }
+
+    public static function __callStatic($name, $arguments)
+    {
+        if (method_exists(static::$instance, $name)) {
+            return call_user_func_array([static::$instance, $name], $arguments);
+        }
+
+        return static::$instance[$name];
     }
 }

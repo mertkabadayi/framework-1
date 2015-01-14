@@ -27,13 +27,11 @@ class AnnotationLoader implements LoaderInterface
 
             $config['table']           = $annotation->tableClass ?: strtolower($class->getShortName());
             $config['eventPrefix']     = $annotation->eventPrefix;
-            $config['repositoryClass'] = $annotation->repositoryClass;
 
         // @MappedSuperclass
         } elseif ($annotation = $this->getAnnotation($class, 'MappedSuperclass')) {
 
             $config['isMappedSuperclass'] = true;
-            $config['repositoryClass']    = $annotation->repositoryClass;
 
         } else {
             throw new \Exception(sprintf('No @Entity annotation found for class %s', $class->getName()));

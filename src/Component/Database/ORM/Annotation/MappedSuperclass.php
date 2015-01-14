@@ -8,6 +8,4 @@ namespace Pagekit\Component\Database\ORM\Annotation;
  */
 final class MappedSuperclass implements Annotation
 {
-    /** @var string */
-    public $repositoryClass;
 }

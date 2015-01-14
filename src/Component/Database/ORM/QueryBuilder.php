@@ -5,11 +5,6 @@ namespace Pagekit\Component\Database\ORM;
 class QueryBuilder
 {
     /**
-     * @var Repository
-     */
-    protected $repository;
-
-    /**
      * @var EntityManager
      */
     protected $manager;
@@ -32,14 +27,14 @@ class QueryBuilder
     /**
      * Constructor.
      *
-     * @param Repository $repository
+     * @param EntityManager $manager
+     * @param Metadata      $metadata
      */
-    public function __construct(Repository $repository)
+    public function __construct(EntityManager $manager, Metadata $metadata)
     {
-        $this->repository = $repository;
-        $this->manager    = $repository->getManager();
-        $this->metadata   = $repository->getMetadata();
-        $this->query      = $this->manager->getConnection()->createQueryBuilder()->from($this->metadata->getTable());
+        $this->manager  = $manager;
+        $this->metadata = $metadata;
+        $this->query    = $manager->getConnection()->createQueryBuilder()->from($metadata->getTable());
     }
 
     /**
@@ -95,7 +90,7 @@ class QueryBuilder
 
             // no constrains
             if (is_numeric($name)) {
-                list($name, $constraints) = [$constraints, function() {}];
+                list($name, $constraints) = [$constraints, function () {}];
             }
 
             // is nested ?
@@ -108,7 +103,7 @@ class QueryBuilder
                     $progress[] = $part;
 
                     if (!isset($relations[$last = implode('.', $progress)])) {
-                        $relations[$last] = function() {};
+                        $relations[$last] = function () {};
                     }
                 }
             }
@@ -131,10 +126,10 @@ class QueryBuilder
         $relations = [];
 
         foreach ($this->relations as $name => $constraints) {
-           if (strpos($name, '.') === false) {
+            if (strpos($name, '.') === false) {
 
                 $mapping = $this->metadata->getRelationMapping($name);
-                $query   = $this->manager->getRepository($mapping['targetEntity'])->query();
+                $query   = call_user_func("{$mapping['targetEntity']}::query");
 
                 if ($nested = $this->getNestedRelations($name)) {
                     $query->related($nested);
@@ -143,7 +138,7 @@ class QueryBuilder
                 call_user_func($constraints, $query);
 
                 $relations[$name] = $query;
-           }
+            }
         }
 
         return $relations;
@@ -173,7 +168,7 @@ class QueryBuilder
      * Proxy method call to query builder.
      *
      * @param  string $method
-     * @param  array $args
+     * @param  array  $args
      * @throws \BadMethodCallException
      * @return mixed
      */

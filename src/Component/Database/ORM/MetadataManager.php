@@ -88,7 +88,7 @@ class MetadataManager
     /**
      * Checks if the metadata for a class is already loaded.
      *
-     * @param  string  $class
+     * @param  string $class
      * @return bool
      */
     public function has($class)
@@ -172,11 +172,7 @@ class MetadataManager
                     $config['identifier'] = $identifier;
                 }
 
-                $config['events']     = $parent->getEvents();
-
-                if ($parent->isMappedSuperclass()) {
-                    $config['repositoryClass'] = $parent->getRepositoryClass();
-                }
+                $config['events'] = $parent->getEvents();
             }
 
             $this->metadata[$name] = $parent = new Metadata($this, $name, $this->loader->load($class, $config));

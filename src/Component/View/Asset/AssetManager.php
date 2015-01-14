@@ -22,12 +22,11 @@ class AssetManager implements \IteratorAggregate
     /**
      * Constructor.
      *
-     * @param UrlProvider $url
-     * @param string       $version
+     * @param string $version
      */
     public function __construct($version = null)
     {
-        $this->version = $version;
+        $this->version    = $version;
         $this->registered = new AssetCollection;
     }
 
@@ -35,9 +34,9 @@ class AssetManager implements \IteratorAggregate
      * Create a asset instance.
      *
      * @param  string $name
-     * @param  mixed $asset
-     * @param  array $dependencies
-     * @param  array $options
+     * @param  mixed  $asset
+     * @param  array  $dependencies
+     * @param  array  $options
      * @throws \InvalidArgumentException
      * @return AssetInterface
      */
@@ -61,12 +60,8 @@ class AssetManager implements \IteratorAggregate
 
         if ('file' == $options['type']) {
 
-            if (isset($options['version'])) {
-                $ver = $options['version'];
-            } elseif ($this->version) {
-                $ver = $options['version'] = $this->version;
-            } else {
-                $ver = null;
+            if (!isset($options['version'])) {
+                $options['version'] = $this->version;
             }
 
             $options['path'] = $asset;

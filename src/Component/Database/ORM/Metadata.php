@@ -19,11 +19,6 @@ class Metadata
     /**
      * @var string
      */
-    protected $repositoryClass;
-
-    /**
-     * @var string
-     */
     protected $table;
 
     /**
@@ -101,16 +96,6 @@ class Metadata
     public function getClass()
     {
         return $this->class;
-    }
-
-    /**
-     * Gets the repository class for a custom repository.
-     *
-     * @return string
-     */
-    public function getRepositoryClass()
-    {
-        return $this->repositoryClass;
     }
 
     /**
@@ -334,7 +319,6 @@ class Metadata
             'fields'             => $this->fields,
             'isMappedSuperclass' => $this->isMappedSuperclass,
             'relations'          => $this->relations,
-            'repositoryClass'    => $this->repositoryClass,
             'table'              => $this->table
         ];
     }

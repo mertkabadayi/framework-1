@@ -5,7 +5,6 @@ namespace Pagekit\Component\Database\ORM\Relation;
 use Pagekit\Component\Database\ORM\EntityManager;
 use Pagekit\Component\Database\ORM\Metadata;
 use Pagekit\Component\Database\ORM\QueryBuilder;
-use Pagekit\Component\Database\ORM\Repository;
 
 /**
  * The Relation class handles relations between entities.
@@ -55,13 +54,6 @@ abstract class Relation
     protected $keyTo;
 
     /**
-     * The target repository
-     *
-     * @var  Repository
-     */
-    protected $targetRepository;
-
-    /**
      * The target metadata
      *
      * @var  Metadata
@@ -83,10 +75,8 @@ abstract class Relation
         if (!$this->name = $mapping['name']) {
             throw new \InvalidArgumentException('The parameter "name" may not be omitted in relations.');
         }
-        $this->targetEntity = $mapping['targetEntity'];
-
-        $this->targetRepository = $manager->getRepository($this->targetEntity);
-        $this->targetMetadata = $this->targetRepository->getMetadata();
+        $this->targetEntity   = $mapping['targetEntity'];
+        $this->targetMetadata = $manager->getMetadata($mapping['targetEntity']);
     }
 
     /**

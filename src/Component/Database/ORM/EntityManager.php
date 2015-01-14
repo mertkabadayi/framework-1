@@ -23,11 +23,6 @@ class EntityManager
     protected $metadata;
 
     /**
-     * @var Repository[]
-     */
-    protected $repositories = [];
-
-    /**
      * @var EntityMap
      */
     protected $entities;
@@ -90,27 +85,6 @@ class EntityManager
     }
 
     /**
-     * Returns the repository for an entity class.
-     *
-     * @param  string $entity
-     * @return Repository
-     */
-    public function getRepository($entity)
-    {
-        $entity = ltrim($entity, '\\');
-
-        if (!isset($this->repositories[$entity])) {
-
-            $metadata   = $this->getMetadata($entity);
-            $repository = $metadata->getRepositoryClass() ?: 'Pagekit\Component\Database\ORM\Repository';
-
-            $this->repositories[$entity] = new $repository($this, $metadata);
-        }
-
-        return $this->repositories[$entity];
-    }
-
-    /**
      * Retrieve an entity by its identifier.
      *
      * @param  string $entity
@@ -119,7 +93,10 @@ class EntityManager
      */
     public function find($entity, $identifier)
     {
-        return $this->getRepository($entity)->find($identifier);
+        $callable = "{$entity}::find";
+        if (is_callable($callable)) {
+            return call_user_func("{$entity}::find", $identifier);
+        }
     }
 
     /**
