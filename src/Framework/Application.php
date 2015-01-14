@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\TerminableInterface;
 
-class Application extends \Pimple implements HttpKernelInterface, TerminableInterface
+class Application extends Container implements HttpKernelInterface, TerminableInterface
 {
     const EARLY_EVENT = 512;
     const LATE_EVENT  = -512;
@@ -172,14 +172,5 @@ class Application extends \Pimple implements HttpKernelInterface, TerminableInte
     public function runningInConsole()
     {
         return PHP_SAPI == 'cli';
-    }
-
-    public static function __callStatic($name, $arguments)
-    {
-        if (method_exists(static::$instance, $name)) {
-            return call_user_func_array([static::$instance, $name], $arguments);
-        }
-
-        return static::$instance[$name];
     }
 }
