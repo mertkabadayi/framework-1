@@ -2,19 +2,11 @@
 
 namespace Pagekit;
 
-/**
- * Container implementation based on Pimple, http://pimple.sensiolabs.org
- *
- * @copyright (c) Fabien Potencier <fabien@symfony.com>
- */
 class Container implements \ArrayAccess
 {
-    protected $values = [];
-    protected $factories;
-    protected $protected;
-    protected $frozen = [];
-    protected $raw    = [];
-    protected $keys   = [];
+    protected $values    = [];
+    protected $factories = [];
+    protected $raw       = [];
 
     /**
      * Constructor.
@@ -23,11 +15,8 @@ class Container implements \ArrayAccess
      */
     protected function __construct(array $values = [])
     {
-        $this->factories = new \SplObjectStorage();
-        $this->protected = new \SplObjectStorage();
-
-        foreach ($values as $key => $value) {
-            $this->offsetSet($key, $value);
+        foreach ($values as $name => $value) {
+            $this->offsetSet($name, $value);
         }
     }
 
@@ -52,114 +41,103 @@ class Container implements \ArrayAccess
     /**
      * Checks if a parameter or an object is set.
      *
-     * @param  string $id
+     * @param  string $name
      * @return bool
      */
-    public static function has($id)
+    public static function has($name)
     {
-        return static::getInstance()->offsetExists($id);
+        return static::getInstance()->offsetExists($name);
     }
 
     /**
      * Gets a parameter or an object.
      *
-     * @param  string $id
+     * @param  string $name
      * @return mixed
      */
-    public static function get($id)
+    public static function get($name)
     {
-        return static::getInstance()->offsetGet($id);
+        return static::getInstance()->offsetGet($name);
     }
 
     /**
      * Sets a parameter or an object.
      *
-     * @param string $id
+     * @param string $name
      * @param mixed  $value
      */
-    public static function set($id, $value)
+    public static function set($name, $value)
     {
-        static::getInstance()->offsetSet($id, $value);
+        static::getInstance()->offsetSet($name, $value);
     }
 
     /**
      * Unsets a parameter or an object.
      *
-     * @param string $id
+     * @param string $name
      */
-    public static function remove($id)
+    public static function remove($name)
     {
-        static::getInstance()->offsetUnset($id);
+        static::getInstance()->offsetUnset($name);
     }
 
     /**
-     * Sets a callable as a factory service.
+     * Sets a closure as a factory service.
      *
-     * @param string   $id
-     * @param callable $callable
+     * @param string  $name
+     * @param closure $closure
      */
-    public static function factory($id, $callable)
+    public static function factory($name, \Closure $closure)
     {
-        if (!is_object($callable) || !method_exists($callable, '__invoke')) {
-            throw new \InvalidArgumentException('Service definition is not a Closure or invokable object.');
-        }
-
         $instance = static::getInstance();
-        $instance->offsetSet($id, $callable);
-        $instance->factories->attach($callable);
+        $instance->offsetSet($name, $closure);
+        $instance->factories[$name] = true;
     }
 
     /**
-     * Sets a protected callable from being interpreted as a service.
+     * Extends an existing service definition.
      *
-     * @param string   $id
-     * @param callable $callable
+     * @param string  $name
+     * @param closure $closure
+     *
+     * @throws \InvalidArgumentException
      */
-    public static function protect($id, $callable)
+    public static function extend($name, \Closure $closure)
     {
-        if (!is_object($callable) || !method_exists($callable, '__invoke')) {
-            throw new \InvalidArgumentException('Callable is not a Closure or invokable object.');
+        $instance = static::getInstance();
+
+        if (!array_key_exists($name, $instance->values)) {
+            throw new \InvalidArgumentException(sprintf('"%s" is not defined.', $name));
         }
 
-        $instance = static::getInstance();
-        $instance->offsetSet($id, $callable);
-        $instance->factories->attach($callable);
+        if (!($instance->values[$name] instanceof \Closure)) {
+            throw new \InvalidArgumentException(sprintf('"%s" service definition is not a Closure.', $name));
+        }
+
+        $factory = $instance->values[$name];
+
+        $instance->offsetSet($name, function ($c) use ($closure, $factory) {
+            return $closure($factory($c), $c);
+        });
     }
 
     /**
-     * Extends an object definition.
+     * Gets a value or the closure defining a service.
      *
-     * @param  string   $id
-     * @param  callable $callable
-     * @return callable
+     * @param  string $name
+     * @return mixed
+     *
+     * @throws \InvalidArgumentException
      */
-    public static function extend($id, $callable)
+    public static function raw($name)
     {
         $instance = static::getInstance();
 
-        if (!isset($instance->keys[$id])) {
-            throw new \InvalidArgumentException(sprintf('Identifier "%s" is not defined.', $id));
+        if (!array_key_exists($name, $instance->values)) {
+            throw new \InvalidArgumentException(sprintf('"%s" is not defined.', $name));
         }
 
-        if (!is_object($instance->values[$id]) || !method_exists($instance->values[$id], '__invoke')) {
-            throw new \InvalidArgumentException(sprintf('Identifier "%s" does not contain an object definition.', $id));
-        }
-
-        if (!is_object($callable) || !method_exists($callable, '__invoke')) {
-            throw new \InvalidArgumentException('Extension service definition is not a Closure or invokable object.');
-        }
-
-        $factory  = $instance->values[$id];
-        $extended = function ($c) use ($callable, $factory) {
-            return $callable($factory($c), $c);
-        };
-
-        if (isset($instance->factories[$factory])) {
-            $instance->factories->detach($factory);
-            $instance->factories->attach($extended);
-        }
-
-        return $instance[$id] = $extended;
+        return isset($instance->raw[$name]) ? $instance->raw[$name] : $instance->values[$name];
     }
 
     /**
@@ -177,83 +155,81 @@ class Container implements \ArrayAccess
     /**
      * Magic method to access the container in a static context.
      *
-     * @param  string $id
+     * @param  string $name
      * @param  array  $args
      * @return mixed
      */
-    public static function __callStatic($id, $args)
+    public static function __callStatic($name, $args)
     {
         $instance = static::getInstance();
 
-        return $args ? call_user_func_array($instance[$id], $args) : $instance[$id];
+        return $args ? call_user_func_array($instance[$name], $args) : $instance[$name];
     }
 
     /**
      * Checks if a parameter or an object is set.
      *
-     * @param  string $id
+     * @param  string $name
      * @return bool
      */
-    public function offsetExists($id)
+    public function offsetExists($name)
     {
-        return array_key_exists($id, $this->values);
+        return array_key_exists($name, $this->values);
     }
 
     /**
      * Gets a parameter or an object.
      *
-     * @param  string $id
+     * @param  string $name
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
      */
-    public function offsetGet($id)
+    public function offsetGet($name)
     {
-        if (!isset($this->keys[$id])) {
-            throw new \InvalidArgumentException(sprintf('Identifier "%s" is not defined.', $id));
+        if (!array_key_exists($name, $this->values)) {
+            throw new \InvalidArgumentException(sprintf('"%s" is not defined.', $name));
         }
 
-        if (!is_object($this->values[$id]) || isset($this->raw[$id]) || isset($this->protected[$this->values[$id]]) || !($this->values[$id] instanceof \Closure)) {
-            return $this->values[$id];
+        if (array_key_exists($name, $this->raw) || !($this->values[$name] instanceof \Closure)) {
+            return $this->values[$name];
         }
 
-        if (isset($this->factories[$this->values[$id]])) {
-            return $this->values[$id]($this);
+        if (isset($this->factories[$name])) {
+            return $this->values[$name]($this);
         }
 
-        $this->frozen[$id] = true;
-        $this->raw[$id]    = $this->values[$id];
+        $this->raw[$name] = $this->values[$name];
 
-        return $this->values[$id] = $this->values[$id]($this);
+        return $this->values[$name] = $this->values[$name]($this);
     }
 
     /**
      * Sets a parameter or an object.
      *
-     * @param string $id
+     * @param string $name
      * @param mixed  $value
+     *
+     * @throws \RuntimeException
      */
-    public function offsetSet($id, $value)
+    public function offsetSet($name, $value)
     {
-        if (isset($this->frozen[$id])) {
-            throw new \RuntimeException(sprintf('Cannot override frozen service "%s".', $id));
+        if (array_key_exists($name, $this->raw)) {
+            throw new \RuntimeException(sprintf('Cannot override service definition "%s".', $name));
         }
 
-        $this->values[$id] = $value;
-        $this->keys[$id]   = true;
+        $this->values[$name] = $value;
     }
 
     /**
      * Unsets a parameter or an object.
      *
-     * @param string $id
+     * @param string $name
      */
-    public function offsetUnset($id)
+    public function offsetUnset($name)
     {
-        if (isset($this->keys[$id])) {
-            if (is_object($this->values[$id])) {
-                unset($this->factories[$this->values[$id]], $this->protected[$this->values[$id]]);
-            }
-
-            unset($this->values[$id], $this->frozen[$id], $this->raw[$id], $this->keys[$id]);
+        if (array_key_exists($name, $this->values)) {
+            unset($this->values[$name], $this->factories[$name], $this->raw[$name]);
         }
     }
 }
