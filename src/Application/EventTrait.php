@@ -11,7 +11,8 @@ trait EventTrait
     /**
      * @see EventDispatcherInterface::dispatch
      */
-    public static function trigger($eventName, Event $event = null) {
+    public static function trigger($eventName, Event $event = null)
+    {
         return App::events()->dispatch($eventName, $event);
     }
 
@@ -26,7 +27,12 @@ trait EventTrait
     /**
      * @see EventDispatcherInterface::addSubscriber
      */
-    public static function subscribe(EventSubscriberInterface $subscriber) {
-        App::events()->addSubscriber($subscriber);
+    public static function subscribe(EventSubscriberInterface $subscriber)
+    {
+        $subscribers = func_num_args() > 1 ? func_get_args() : [$subscriber];
+
+        foreach ($subscribers as $sub) {
+            App::events()->addSubscriber($sub);
+        }
     }
 }
