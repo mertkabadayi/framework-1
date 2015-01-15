@@ -16,7 +16,7 @@ class CookieServiceProviderTest extends \PHPUnit_Framework_TestCase
 		$config->set('cookie.path', 'path/to/cookie');
 		$config->set('cookie.domain', 'localhost');
 
-		$app = new Application;
+		$app = Application::getInstance();
 		$app['session'] = new Session(new MockArraySessionStorage);
 		$app['request'] = $this->getMock('Symfony\Component\HttpFoundation\Request');
 		$app['config'] = $config;
