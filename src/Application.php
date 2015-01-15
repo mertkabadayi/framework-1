@@ -5,6 +5,7 @@ namespace Pagekit;
 use Pagekit\Framework\Exception\ExceptionListenerWrapper;
 use Pagekit\Framework\Provider\EventServiceProvider;
 use Pagekit\Framework\Provider\RoutingServiceProvider;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -30,8 +31,11 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
     {
         parent::__construct($values);
 
-        $this->register(new EventServiceProvider)
-             ->register(new RoutingServiceProvider);
+        $this['events'] = function() {
+            return new EventDispatcher;
+        };
+
+        $this->register(new RoutingServiceProvider);
     }
 
     /**

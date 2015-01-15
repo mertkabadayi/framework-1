@@ -3,7 +3,7 @@
 namespace Pagekit\Framework\Console\Event;
 
 use Pagekit\Framework\Console\Application;
-use Pagekit\Framework\Event\Event;
+use Symfony\Component\EventDispatcher\Event;
 
 class ConsoleEvent extends Event
 {
