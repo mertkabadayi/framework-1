@@ -129,8 +129,9 @@ class Container implements \ArrayAccess
     /**
      * Extends an object definition.
      *
-     * @param string   $id
-     * @param callable $callable
+     * @param  string   $id
+     * @param  callable $callable
+     * @return callable
      */
     public static function extend($id, $callable)
     {
