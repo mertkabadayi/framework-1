@@ -18,7 +18,7 @@ class Container extends \Pimple
     {
         parent::__construct($values);
 
-        static::$instances[get_class($this)] = $this;
+        static::$instances[get_called_class()] = $this;
     }
 
     /**
