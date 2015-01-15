@@ -27,7 +27,7 @@ class RememberMeServiceProvider implements ServiceProviderInterface, EventSubscr
 
     public function boot(Application $app)
     {
-        $app['events']->addSubscriber($this);
+        $app->subscribe($this);
     }
 
     public function onKernelRequest($event, $name, $dispatcher)

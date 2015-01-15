@@ -26,7 +26,7 @@ class ViewServiceProvider implements ServiceProviderInterface
 
     public function boot(Application $app)
     {
-        $app['events']->addSubscriber(new ViewListener($view = $app['view']));
+        $app->subscribe(new ViewListener($view = $app['view']));
 
         $app['view.sections']->prepend('head', function() use ($view) {
 

@@ -2,8 +2,8 @@
 
 namespace Pagekit;
 
+use Pagekit\Application\EventTrait;
 use Pagekit\Framework\Exception\ExceptionListenerWrapper;
-use Pagekit\Framework\Provider\EventServiceProvider;
 use Pagekit\Framework\Provider\RoutingServiceProvider;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +16,8 @@ use Symfony\Component\HttpKernel\TerminableInterface;
 
 class Application extends Container implements HttpKernelInterface, TerminableInterface
 {
+    use EventTrait;
+
     const EARLY_EVENT = 512;
     const LATE_EVENT  = -512;
 
@@ -83,18 +85,6 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 
             $this->booted = true;
         }
-    }
-
-    /**
-     * Adds an event listener that listens on the specified events.
-     *
-     * @param string $event
-     * @param mixed  $callback
-     * @param int    $priority
-     */
-    public static function on($event, $callback, $priority = 0)
-    {
-        self::events()->addListener($event, $callback, $priority);
     }
 
     /**

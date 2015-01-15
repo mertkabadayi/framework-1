@@ -86,9 +86,9 @@ class ProfilerServiceProvider implements ServiceProviderInterface, EventSubscrib
             $app['db']->getConfiguration()->setSQLLogger($app['db.debug_stack']);
         }
 
-        $app['events']->addSubscriber($request);
-        $app['events']->addSubscriber(new ProfilerListener($app['profiler']));
-        $app['events']->addSubscriber($this);
+        $app->subscribe($request);
+        $app->subscribe(new ProfilerListener($app['profiler']));
+        $app->subscribe($this);
     }
 
     public function onKernelRequest()

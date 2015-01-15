@@ -34,7 +34,7 @@ class AuthServiceProvider implements ServiceProviderInterface, EventSubscriberIn
 
     public function boot(Application $app)
     {
-        $app['events']->addSubscriber($this);
+        $app->subscribe($this);
     }
 
     /**

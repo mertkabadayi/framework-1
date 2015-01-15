@@ -69,14 +69,14 @@ class RoutingServiceProvider implements ServiceProviderInterface
      */
     public function boot(Application $app)
     {
-        $app['events']->addSubscriber(new ConfigureRouteListener);
-        $app['events']->addSubscriber(new ParamFetcherListener(new ParamFetcher(new FilterManager)));
-        $app['events']->addSubscriber(new RouterListener($app['router'], null, null, $app['request_stack']));
-        $app['events']->addSubscriber(new ResponseListener('UTF-8'));
-        $app['events']->addSubscriber(new JsonResponseListener);
-        $app['events']->addSubscriber(new StringResponseListener);
-        $app['events']->addSubscriber($app['aliases']);
-        $app['events']->addSubscriber($app['callbacks']);
-        $app['events']->addSubscriber($app['controllers']);
+        $app->subscribe(new ConfigureRouteListener);
+        $app->subscribe(new ParamFetcherListener(new ParamFetcher(new FilterManager)));
+        $app->subscribe(new RouterListener($app['router'], null, null, $app['request_stack']));
+        $app->subscribe(new ResponseListener('UTF-8'));
+        $app->subscribe(new JsonResponseListener);
+        $app->subscribe(new StringResponseListener);
+        $app->subscribe($app['aliases']);
+        $app->subscribe($app['callbacks']);
+        $app->subscribe($app['controllers']);
     }
 }

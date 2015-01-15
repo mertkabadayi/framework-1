@@ -18,6 +18,6 @@ class CsrfServiceProvider implements ServiceProviderInterface
 
     public function boot(Application $app)
     {
-        $app['events']->addSubscriber(new CsrfListener($app['csrf']));
+        $app->subscribe(new CsrfListener($app['csrf']));
     }
 }
