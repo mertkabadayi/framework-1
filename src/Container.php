@@ -13,8 +13,8 @@ class Container implements \ArrayAccess
     protected $factories;
     protected $protected;
     protected $frozen = [];
-    protected $raw = [];
-    protected $keys = [];
+    protected $raw    = [];
+    protected $keys   = [];
 
     /**
      * Constructor.
@@ -34,13 +34,15 @@ class Container implements \ArrayAccess
     /**
      * Gets a container instance.
      *
+     * @param  array $values
+     * @param  bool  $new
      * @return Container
      */
-    public static function getInstance(array $values = [])
+    public static function getInstance(array $values = [], $new = false)
     {
         static $instance;
 
-        if (!$instance) {
+        if (!$instance || $new) {
             $instance = new static($values);
         }
 
@@ -217,7 +219,7 @@ class Container implements \ArrayAccess
         }
 
         $this->frozen[$id] = true;
-        $this->raw[$id] = $this->values[$id];
+        $this->raw[$id]    = $this->values[$id];
 
         return $this->values[$id] = $this->values[$id]($this);
     }
@@ -235,7 +237,7 @@ class Container implements \ArrayAccess
         }
 
         $this->values[$id] = $value;
-        $this->keys[$id] = true;
+        $this->keys[$id]   = true;
     }
 
     /**
