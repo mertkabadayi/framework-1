@@ -26,12 +26,12 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
      *
      * @param array $values
      */
-    public function __construct(array $values = [])
+    protected function __construct(array $values = [])
     {
         parent::__construct($values);
 
         $this->register(new EventServiceProvider)
-            ->register(new RoutingServiceProvider);
+             ->register(new RoutingServiceProvider);
     }
 
     /**
