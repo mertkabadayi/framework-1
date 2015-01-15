@@ -45,7 +45,7 @@ class EntityManager
         $this->connection = $connection;
         $this->metadata   = $metadata;
 
-        if (!is_subclass_of($eventClass, 'Pagekit\Database\Event\EntityEvent')) {
+        if (!is_a($eventClass, 'Pagekit\Database\Event\EntityEvent', true)) {
             throw new \RuntimeException(sprintf('The Event Class %s is not a subclass of "Pagekit\Database\Event\EntityEvent"', $eventClass));
         }
 

@@ -8,7 +8,6 @@ use Pagekit\Database\ORM\Loader\AnnotationLoader;
 use Pagekit\Database\ORM\MetadataManager;
 use Pagekit\Database\ORM\ModelTrait;
 use Pagekit\Application;
-use Pagekit\Framework\Database\Event\EntityEvent;
 use Pagekit\ServiceProviderInterface;
 
 class DatabaseServiceProvider implements ServiceProviderInterface
@@ -47,10 +46,7 @@ class DatabaseServiceProvider implements ServiceProviderInterface
         };
 
         $app['db.em'] = function($app) {
-
-            EntityEvent::setApplication($app);
-
-            return new EntityManager($app['db'], $app['db.metas'], 'Pagekit\Framework\Database\Event\EntityEvent');
+            return new EntityManager($app['db'], $app['db.metas']);
         };
 
         $app['db.metas'] = function($app) {

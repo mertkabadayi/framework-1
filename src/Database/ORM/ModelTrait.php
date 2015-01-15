@@ -35,6 +35,14 @@ trait ModelTrait
     }
 
     /**
+     * @return Connection
+     */
+    public static function getConnection()
+    {
+        return self::$connection;
+    }
+
+    /**
      * @param Connection $connection
      */
     public static function setConnection($connection)
