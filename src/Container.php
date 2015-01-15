@@ -208,12 +208,7 @@ class Container implements \ArrayAccess
             throw new \InvalidArgumentException(sprintf('Identifier "%s" is not defined.', $id));
         }
 
-        if (
-            isset($this->raw[$id])
-            || !is_object($this->values[$id])
-            || isset($this->protected[$this->values[$id]])
-            || !method_exists($this->values[$id], '__invoke')
-        ) {
+        if (!is_object($this->values[$id]) || isset($this->raw[$id]) || isset($this->protected[$this->values[$id]]) || !($this->values[$id] instanceof \Closure)) {
             return $this->values[$id];
         }
 

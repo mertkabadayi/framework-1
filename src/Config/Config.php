@@ -38,6 +38,16 @@ class Config implements \ArrayAccess
     }
 
     /**
+     * Get shortcut.
+     *
+     * @see get()
+     */
+    public function __invoke($key, $default = null)
+    {
+        return $this->get($key, $default);
+    }
+
+    /**
      * Get all configuration values.
      *
      * @return array

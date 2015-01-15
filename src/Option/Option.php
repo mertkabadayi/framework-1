@@ -72,6 +72,16 @@ class Option implements \IteratorAggregate
     }
 
     /**
+     * Get shortcut.
+     *
+     * @see get()
+     */
+    public function __invoke($name, $default = null)
+    {
+        return $this->get($name, $default);
+    }
+
+    /**
      * Gets all option values.
      *
      * @return array
