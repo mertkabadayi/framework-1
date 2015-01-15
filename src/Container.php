@@ -22,43 +22,46 @@ class Container extends \Pimple
     }
 
     /**
-     * Checks if a service exists.
+     * Checks if a parameter or an object is set.
      *
      * @param  string $id
      * @return bool
      */
     public static function has($id)
     {
-        $instance = static::getInstance();
-
-        return isset($instance[$id]);
+        return static::getInstance()->offsetExists($id);
     }
 
     /**
-     * Gets a service.
+     * Gets a parameter or an object.
      *
      * @param  string $id
      * @return mixed
      */
     public static function get($id)
     {
-        $instance = static::getInstance();
-
-        return $instance[$id];
+        return static::getInstance()->offsetGet($id);
     }
 
     /**
-     * Sets a service.
+     * Sets a parameter or an object.
      *
      * @param  string $id
      * @param  mixed  $value
-     * @return mixed
      */
     public static function set($id, $value)
     {
-        $instance = static::getInstance();
+        static::getInstance()->offsetSet($id, $value);
+    }
 
-        return $instance[$id] = $value;
+    /**
+     * Unsets a parameter or an object.
+     *
+     * @param  string $id
+     */
+    public static function remove($id)
+    {
+        static::getInstance()->offsetUnset($id);
     }
 
     /**
