@@ -2,11 +2,11 @@
 
 namespace Pagekit\View;
 
+use Pagekit\Application;
+use Pagekit\ServiceProviderInterface;
 use Pagekit\View\Asset\AssetInterface;
 use Pagekit\View\Asset\AssetManager;
 use Pagekit\View\Asset\FileAsset;
-use Pagekit\Application;
-use Pagekit\ServiceProviderInterface;
 
 class AssetServiceProvider implements ServiceProviderInterface
 {

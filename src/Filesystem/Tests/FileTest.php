@@ -2,8 +2,8 @@
 
 namespace Pagekit\Filesystem\Tests;
 
-use Pagekit\Filesystem\File;
 use Pagekit\Filesystem\Adapter\FileAdapter;
+use Pagekit\Filesystem\File;
 
 class FileTest extends \PHPUnit_Framework_TestCase
 {

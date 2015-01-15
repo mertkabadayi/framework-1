@@ -2,12 +2,12 @@
 
 namespace Pagekit\Database;
 
+use Pagekit\Application;
 use Pagekit\Database\Logging\DebugStack;
 use Pagekit\Database\ORM\EntityManager;
 use Pagekit\Database\ORM\Loader\AnnotationLoader;
 use Pagekit\Database\ORM\MetadataManager;
 use Pagekit\Database\ORM\ModelTrait;
-use Pagekit\Application;
 use Pagekit\ServiceProviderInterface;
 
 class DatabaseServiceProvider implements ServiceProviderInterface

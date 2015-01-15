@@ -2,8 +2,8 @@
 
 namespace Pagekit\Filesystem\Tests\Adapter;
 
-use Pagekit\Filesystem\File;
 use Pagekit\Filesystem\Adapter\StreamAdapter;
+use Pagekit\Filesystem\File;
 use Pagekit\Filesystem\StreamWrapper;
 
 class TempAdapterTest extends \PHPUnit_Framework_TestCase

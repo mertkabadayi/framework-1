@@ -2,9 +2,9 @@
 
 namespace Pagekit\Cookie\Tests;
 
+use Pagekit\Application;
 use Pagekit\Config\Config;
 use Pagekit\Cookie\CookieServiceProvider;
-use Pagekit\Application;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 

@@ -5,7 +5,6 @@ namespace Pagekit\Mail\Tests;
 use Pagekit\Mail\Mailer;
 use Pagekit\Mail\Message;
 use Swift_ByteStream_FileByteStream;
-use Swift_Message;
 
 class MessageTest extends \PHPUnit_Framework_TestCase
 {

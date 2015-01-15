@@ -2,18 +2,18 @@
 
 namespace Pagekit\Routing;
 
+use Pagekit\Application;
 use Pagekit\Filter\FilterManager;
 use Pagekit\Routing\Controller\AliasCollection;
+use Pagekit\Routing\Controller\CallbackCollection;
 use Pagekit\Routing\Controller\ControllerCollection;
 use Pagekit\Routing\Controller\ControllerReader;
-use Pagekit\Routing\Controller\CallbackCollection;
 use Pagekit\Routing\Controller\ControllerResolver;
 use Pagekit\Routing\Event\ConfigureRouteListener;
 use Pagekit\Routing\Event\JsonResponseListener;
 use Pagekit\Routing\Event\StringResponseListener;
 use Pagekit\Routing\Request\Event\ParamFetcherListener;
 use Pagekit\Routing\Request\ParamFetcher;
-use Pagekit\Application;
 use Pagekit\ServiceProviderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\EventListener\ResponseListener;

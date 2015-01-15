@@ -3,7 +3,6 @@
 namespace Pagekit\Framework\Provider;
 
 use Pagekit\Application;
-use Pagekit\ServiceProviderInterface;
 use Pagekit\Framework\Templating\Helper\GravatarHelper;
 use Pagekit\Framework\Templating\Helper\MarkdownHelper;
 use Pagekit\Framework\Templating\Helper\ScriptHelper;
@@ -12,6 +11,7 @@ use Pagekit\Framework\Templating\Helper\StyleHelper;
 use Pagekit\Framework\Templating\Helper\TokenHelper;
 use Pagekit\Framework\Templating\Section\DelayedRenderer;
 use Pagekit\Framework\Templating\TemplateNameParser;
+use Pagekit\ServiceProviderInterface;
 use Symfony\Component\Templating\DelegatingEngine;
 use Symfony\Component\Templating\Helper\SlotsHelper;
 use Symfony\Component\Templating\Loader\FilesystemLoader;

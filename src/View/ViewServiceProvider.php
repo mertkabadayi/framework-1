@@ -2,10 +2,10 @@
 
 namespace Pagekit\View;
 
-use Pagekit\View\Event\ViewListener;
-use Pagekit\View\Section\SectionManager;
 use Pagekit\Application;
 use Pagekit\ServiceProviderInterface;
+use Pagekit\View\Event\ViewListener;
+use Pagekit\View\Section\SectionManager;
 
 class ViewServiceProvider implements ServiceProviderInterface
 {
