@@ -28,7 +28,7 @@ class AuthServiceProviderTest extends ServiceProviderTestCase
 
 	public function testLogin()
 	{
-		$this->request->expects($this->once())
+		$this->app['request']->expects($this->once())
 					  ->method('get')
 					  ->with(Auth::REDIRECT_PARAM)
 					  ->will($this->returnValue('/'));
@@ -43,7 +43,7 @@ class AuthServiceProviderTest extends ServiceProviderTestCase
 
 	public function testLogout()
 	{
-		$this->request->expects($this->once())
+		$this->app['request']->expects($this->once())
 					  ->method('get')
 					  ->with(Auth::REDIRECT_PARAM)
 					  ->will($this->returnValue('/'));
