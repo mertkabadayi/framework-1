@@ -29,7 +29,7 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
      *
      * @param array $values
      */
-    protected function __construct(array $values = [])
+    public function __construct(array $values = [])
     {
         parent::__construct($values);
 
