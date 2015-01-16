@@ -39,10 +39,6 @@ class RoutingServiceProvider implements ServiceProviderInterface
             return new RequestStack;
         };
 
-        $app['response'] = function($app) {
-            return new Response($app['url']);
-        };
-
         $app['resolver'] = function($app) {
             return new ControllerResolver($app['events']);
         };

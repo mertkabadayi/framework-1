@@ -1,6 +1,6 @@
 <?php
 
-namespace Pagekit\Routing;
+namespace Pagekit\Framework\Routing;
 
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;

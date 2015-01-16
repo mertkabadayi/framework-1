@@ -3,6 +3,7 @@
 namespace Pagekit\Framework\Provider;
 
 use Pagekit\Application;
+use Pagekit\Framework\Routing\Response;
 use Pagekit\Framework\Routing\UrlProvider;
 use Pagekit\Routing\RoutingServiceProvider as BaseRoutingServiceProvider;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -16,6 +17,10 @@ class RoutingServiceProvider extends BaseRoutingServiceProvider
 
 		$app['url'] = function($app) {
 			return new UrlProvider($app['router'], $app['file']);
+		};
+
+		$app['response'] = function($app) {
+			return new Response($app['url']);
 		};
 	}
 
