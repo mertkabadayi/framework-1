@@ -3,6 +3,7 @@
 namespace Pagekit\Framework\Routing;
 
 use Pagekit\Filesystem\File;
+use Pagekit\Filesystem\Path;
 use Pagekit\Routing\Generator\UrlGenerator;
 use Pagekit\Routing\Router;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,14 +22,20 @@ class UrlProvider
     protected $file;
 
     /**
+     * @var string
+     */
+    protected $basePath;
+
+    /**
      * Constructor.
      *
      * @param Router $router
      */
-    public function __construct(Router $router, File $file)
+    public function __construct(Router $router, File $file, $basePath)
     {
-        $this->router = $router;
-        $this->file   = $file;
+        $this->router   = $router;
+        $this->file     = $file;
+        $this->basePath = $basePath;
     }
 
     /**
@@ -93,16 +100,27 @@ class UrlProvider
             return $this->route($path, $parameters, $referenceType);
         }
 
-        if (false === $path = $this->file->getUrl($url = $path, $referenceType)) {
-            return $url;
+        $path = $this->file->getPath($path, true) ?: $path;
+
+        if ($query = substr(strstr($path, '?'), 1)) {
+            parse_str($query, $params);
+            $path       = strstr($path, '?', true);
+            $parameters = array_replace($parameters, $params);
         }
 
         if ($query = http_build_query($parameters, '', '&')) {
             $query = '?'.$query;
         }
 
-        if ($referenceType === UrlGenerator::BASE_PATH) {
-            $path = substr($path, strlen($this->base($referenceType)));
+        if (false === filter_var($path, FILTER_VALIDATE_URL)) {
+            if (Path::isAbsolute($path)) {
+                $path = str_replace('\\', '/', $path);
+                $path = strpos($path, $base = $this->basePath) === 0 ? substr($path, strlen($base)) : $path;
+            }
+
+            if ($referenceType !== UrlGenerator::BASE_PATH) {
+                $path = $this->base($referenceType).trim($path, '/');
+            }
         }
 
         return $path.$query;

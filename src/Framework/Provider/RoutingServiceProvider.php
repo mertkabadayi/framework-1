@@ -16,7 +16,7 @@ class RoutingServiceProvider extends BaseRoutingServiceProvider
 		parent::register($app);
 
 		$app['url'] = function($app) {
-			return new UrlProvider($app['router'], $app['file']);
+			return new UrlProvider($app['router'], $app['file'], $app['path']);
 		};
 
 		$app['response'] = function($app) {
