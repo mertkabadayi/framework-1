@@ -50,7 +50,7 @@ class UrlProvider
      */
     public function current($referenceType = UrlGenerator::ABSOLUTE_PATH)
     {
-        $request = $this->getRequest();
+        $request = $this->router->getRequest();
 
         $url = $request->getBaseUrl();
 
@@ -72,7 +72,7 @@ class UrlProvider
      */
     public function previous()
     {
-        if ($referer = $this->getRequest()->headers->get('referer')) {
+        if ($referer = $this->router->getRequest()->headers->get('referer')) {
             return $this->to($referer);
         }
 
@@ -93,7 +93,7 @@ class UrlProvider
             return $this->route($path, $parameters, $referenceType);
         }
 
-        if (!$path = $this->file->getUrl($url = $path, $referenceType)) {
+        if (false === $path = $this->file->getUrl($url = $path, $referenceType)) {
             return $url;
         }
 
@@ -135,13 +135,5 @@ class UrlProvider
     public function __invoke($path = '', $parameters = [], $referenceType = UrlGenerator::ABSOLUTE_PATH)
     {
         return $this->to($path, $parameters, $referenceType);
-    }
-
-    /**
-     * @return Request
-     */
-    protected function getRequest()
-    {
-        return $this->router->getRequest();
     }
 }
