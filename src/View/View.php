@@ -149,4 +149,14 @@ class View implements ViewInterface
 
         return $this->engine->render($name, array_replace($this->parameters, $parameters));
     }
+
+    /**
+     * Render shortcut.
+     *
+     * @see render()
+     */
+    public function __invoke($name, array $parameters = [])
+    {
+        return $this->render($name, $parameters);
+    }
 }
