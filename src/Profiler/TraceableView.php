@@ -55,6 +55,16 @@ class TraceableView implements ViewInterface
     }
 
     /**
+     * Render shortcut.
+     *
+     * @see render()
+     */
+    public function __invoke($name, array $parameters = [])
+    {
+        return $this->render($name, $parameters);
+    }
+
+    /**
      * Proxies all method calls to the original view.
      *
      * @param string $method    The method name
