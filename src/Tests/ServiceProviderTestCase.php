@@ -16,7 +16,7 @@ class ServiceProviderTestCase extends \PHPUnit_Framework_TestCase
 
 	public function setUp()
 	{
-		$this->app = new Application([
+		$this->app = Application::getInstance([
 			'path.cache' => __DIR__.'/cache-ignore',
 			'session' => new Session(new MockArraySessionStorage),
 			'request' => $this->getMock('Symfony\Component\HttpFoundation\Request')
