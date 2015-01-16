@@ -58,10 +58,6 @@ class RoutingServiceProvider implements ServiceProviderInterface
         $app['controllers'] = function($app) {
             return new ControllerCollection(new ControllerReader($app['events']), $app['autoloader']);
         };
-
-        $app['url'] = function($app) {
-            return new UrlProvider($app['router']);
-        };
     }
 
     /**

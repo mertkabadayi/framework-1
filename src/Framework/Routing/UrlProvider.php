@@ -1,8 +1,11 @@
 <?php
 
-namespace Pagekit\Routing;
+namespace Pagekit\Framework\Routing;
 
+use Pagekit\Filesystem\File;
 use Pagekit\Routing\Generator\UrlGenerator;
+use Pagekit\Routing\Router;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class UrlProvider
@@ -13,19 +16,19 @@ class UrlProvider
     protected $router;
 
     /**
-     * @var RequestContext
+     * @var File
      */
-    protected $context;
+    protected $file;
 
     /**
      * Constructor.
      *
      * @param Router $router
      */
-    public function __construct(Router $router)
+    public function __construct(Router $router, File $file)
     {
-        $this->router  = $router;
-        $this->context = $router->getContext();
+        $this->router = $router;
+        $this->file   = $file;
     }
 
     /**
@@ -36,13 +39,7 @@ class UrlProvider
      */
     public function base($referenceType = UrlGenerator::ABSOLUTE_PATH)
     {
-        $url = $this->context->getBasePath();
-
-        if ($referenceType === UrlGenerator::ABSOLUTE_URL) {
-            $url = $this->context->getSchemeAndHttpHost().$url;
-        }
-
-        return $url;
+        return $this->file->getUrl('', $referenceType);
     }
 
     /**
@@ -53,17 +50,19 @@ class UrlProvider
      */
     public function current($referenceType = UrlGenerator::ABSOLUTE_PATH)
     {
-        $url = $this->context->getBaseUrl();
+        $request = $this->getRequest();
+
+        $url = $request->getBaseUrl();
 
         if ($referenceType === UrlGenerator::ABSOLUTE_URL) {
-            $url = $this->context->getSchemeAndHttpHost().$url;
+            $url = $request->getSchemeAndHttpHost().$url;
         }
 
-        if ($qs = $this->context->getQueryString()) {
+        if ($qs = $request->getQueryString()) {
             $qs = '?'.$qs;
         }
 
-        return $url.$this->context->getPathInfo().$qs;
+        return $url.$request->getPathInfo().$qs;
     }
 
     /**
@@ -73,7 +72,7 @@ class UrlProvider
      */
     public function previous()
     {
-        if ($referer = $this->context->getReferer()) {
+        if ($referer = $this->getRequest()->headers->get('referer')) {
             return $this->to($referer);
         }
 
@@ -94,17 +93,16 @@ class UrlProvider
             return $this->route($path, $parameters, $referenceType);
         }
 
-        if ($this->isAbsolutePath($path)) {
-            $path = str_replace('\\', '/', $path);
-            $path = strpos($path, $base = $this->context->getScriptPath()) === 0 ? substr($path, strlen($base)) : $path;
+        if (!$path = $this->file->getUrl($url = $path, $referenceType)) {
+            return $url;
         }
 
         if ($query = http_build_query($parameters, '', '&')) {
             $query = '?'.$query;
         }
 
-        if ($referenceType !== UrlGenerator::BASE_PATH) {
-            $path = $this->base($referenceType).'/'.trim($path, '/');
+        if ($referenceType === UrlGenerator::BASE_PATH) {
+            $path = substr($path, strlen($this->base($referenceType)));
         }
 
         return $path.$query;
@@ -130,13 +128,20 @@ class UrlProvider
     }
 
     /**
-     * Returns whether the file path is an absolute path.
+     * To shortcut.
      *
-     * @param  string $file
-     * @return bool
+     * @see to()
      */
-    protected function isAbsolutePath($file)
+    public function __invoke($path = '', $parameters = [], $referenceType = UrlGenerator::ABSOLUTE_PATH)
     {
-        return $file && ($file[0] == '/' || $file[0] == '\\' || (strlen($file) > 3 && ctype_alpha($file[0]) && $file[1] == ':' && ($file[2] == '\\' || $file[2] == '/')));
+        return $this->to($path, $parameters, $referenceType);
+    }
+
+    /**
+     * @return Request
+     */
+    protected function getRequest()
+    {
+        return $this->router->getRequest();
     }
 }

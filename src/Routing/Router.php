@@ -7,7 +7,6 @@ use Pagekit\Routing\Event\RouteResourcesEvent;
 use Pagekit\Routing\Generator\UrlGenerator;
 use Pagekit\Routing\Generator\UrlGeneratorDumper;
 use Pagekit\Routing\Generator\UrlGeneratorInterface;
-use Pagekit\Routing\RequestContext as ExtendedRequestContext;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -84,7 +83,7 @@ class Router implements RouterInterface, UrlGeneratorInterface
     {
         $this->events  = $events;
         $this->kernel  = $kernel;
-        $this->context = new ExtendedRequestContext;
+        $this->context = new RequestContext;
 
         $this->options = array_replace([
             'cache'     => null,
@@ -278,7 +277,9 @@ class Router implements RouterInterface, UrlGeneratorInterface
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
         $this->request = $request;
-        $this->context->fromRequest($request);
+        $this->context
+            ->fromRequest($request)
+            ->setBaseUrl($request->server->get('HTTP_MOD_REWRITE') == 'On' ? $request->getBasePath() : "{$request->getBasePath()}/index.php");
 
         return $this->kernel->handle($request, $type, $catch);
     }
