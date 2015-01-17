@@ -1,6 +1,6 @@
 # Pagekit Framework
 
-[![Build Status](https://travis-ci.org/pagekit/framework.svg)](https://travis-ci.org/pagekit/framework)
+[![Build Status](https://travis-ci.org/pagekit/framework.svg?branch=master)](https://travis-ci.org/pagekit/framework)
 
 * Homepage: [http://www.pagekit.com/](http://www.pagekit.com/) - Learn more about Pagekit
 * Twitter: [@pagekit](https://twitter.com/pagekit) - Get the latest news
