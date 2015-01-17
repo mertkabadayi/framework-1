@@ -49,15 +49,14 @@ class Container implements \ArrayAccess
     /**
      * Gets a container instance.
      *
-     * @param  array $values
      * @return Container
      */
-    public static function getInstance(array $values = [])
+    public static function getInstance()
     {
         $class = get_called_class();
 
         if (!isset(static::$containers[$class])) {
-            static::$containers[$class] = new static($values);
+            static::$containers[$class] = new static();
         }
 
         return static::$containers[$class];
