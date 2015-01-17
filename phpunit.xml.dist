@@ -28,10 +28,6 @@
         </whitelist>
     </filter>
 
-    <logging>
-        <log type="coverage-html" target="./_coverage" />
-    </logging>
-
     <php>
         <!-- "Real" test database -->
         <!-- uncomment, otherwise sqlite memory runs -->
