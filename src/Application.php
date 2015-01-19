@@ -2,10 +2,10 @@
 
 namespace Pagekit;
 
-use Pagekit\Application\EventTrait;
-use Pagekit\Application\StaticTrait;
-use Pagekit\Framework\Exception\ExceptionListenerWrapper;
-use Pagekit\Framework\Provider\RoutingServiceProvider;
+use Pagekit\Application\Exception\ExceptionListenerWrapper;
+use Pagekit\Application\Provider\RoutingServiceProvider;
+use Pagekit\Application\Traits\EventTrait;
+use Pagekit\Application\Traits\StaticTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
