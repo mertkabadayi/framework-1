@@ -38,7 +38,7 @@ class UrlProvider
     }
 
     /**
-     * Get the base path for the current request.
+     * Gets the base path for the current request.
      *
      * @param  mixed $referenceType
      * @return string
@@ -46,7 +46,7 @@ class UrlProvider
     public function base($referenceType = UrlGenerator::ABSOLUTE_PATH)
     {
         $request = $this->router->getRequest();
-        $url = $request->getBasePath();
+        $url     = $request->getBasePath();
 
         if ($referenceType === UrlGenerator::ABSOLUTE_URL) {
             $url = $request->getSchemeAndHttpHost().$url;
@@ -56,7 +56,7 @@ class UrlProvider
     }
 
     /**
-     * Get the URL for the current request.
+     * Gets the URL for the current request.
      *
      * @param  mixed $referenceType
      * @return string
@@ -79,7 +79,7 @@ class UrlProvider
     }
 
     /**
-     * Get the URL for the previous request.
+     * Gets the URL for the previous request.
      *
      * @return string
      */
@@ -89,7 +89,7 @@ class UrlProvider
     }
 
     /**
-     * Get the URL appending the URI to the base URI.
+     * Gets the URL appending the URI to the base URI.
      *
      * @param  string $path
      * @param  mixed  $parameters
@@ -112,7 +112,7 @@ class UrlProvider
     }
 
     /**
-     * Get the URL to a named route.
+     * Gets the URL to a named route.
      *
      * @param  string $name
      * @param  mixed  $parameters
@@ -160,6 +160,8 @@ class UrlProvider
     }
 
     /**
+     * Parses query parameters into a URL.
+     *
      * @param  string $url
      * @param  array  $parameters
      * @return string
