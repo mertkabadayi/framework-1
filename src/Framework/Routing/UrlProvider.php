@@ -3,10 +3,8 @@
 namespace Pagekit\Framework\Routing;
 
 use Pagekit\Filesystem\File;
-use Pagekit\Filesystem\Path;
 use Pagekit\Routing\Generator\UrlGenerator;
 use Pagekit\Routing\Router;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class UrlProvider
