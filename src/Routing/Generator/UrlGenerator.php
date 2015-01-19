@@ -26,13 +26,7 @@ class UrlGenerator extends BaseUrlGenerator implements UrlGeneratorInterface
             return $link;
         }
 
-        $url = parent::doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $referenceType, $hostTokens, $requiredSchemes);
-
-        if ($referenceType === self::BASE_PATH) {
-            $url = substr($url, strlen($this->context->getBaseUrl()));
-        }
-
-        return $url;
+        return parent::doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $referenceType, $hostTokens, $requiredSchemes);
     }
 
     /**

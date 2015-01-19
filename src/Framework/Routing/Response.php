@@ -49,7 +49,7 @@ class Response
 	 */
 	public function redirect($url, $parameters = [], $status = 302, $headers = [])
 	{
-		return new RedirectResponse($this->url->to($url, $parameters), $status, $headers);
+		return new RedirectResponse($this->url->get($url, $parameters), $status, $headers);
 	}
 
 	/**

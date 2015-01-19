@@ -12,6 +12,11 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 class UrlProvider
 {
     /**
+     * Generates a path relative to the executed script, e.g. "/dir/file".
+     */
+    const BASE_PATH = 'base';
+
+    /**
      * @var Router
      */
     protected $router;
@@ -22,20 +27,14 @@ class UrlProvider
     protected $file;
 
     /**
-     * @var string
-     */
-    protected $basePath;
-
-    /**
      * Constructor.
      *
      * @param Router $router
      */
-    public function __construct(Router $router, File $file, $basePath)
+    public function __construct(Router $router, File $file)
     {
-        $this->router   = $router;
-        $this->file     = $file;
-        $this->basePath = $basePath;
+        $this->router = $router;
+        $this->file   = $file;
     }
 
     /**
@@ -46,7 +45,14 @@ class UrlProvider
      */
     public function base($referenceType = UrlGenerator::ABSOLUTE_PATH)
     {
-        return $this->file->getUrl('', $referenceType);
+        $request = $this->router->getRequest();
+        $url = $request->getBasePath();
+
+        if ($referenceType === UrlGenerator::ABSOLUTE_URL) {
+            $url = $request->getSchemeAndHttpHost().$url;
+        }
+
+        return $url;
     }
 
     /**
@@ -79,11 +85,53 @@ class UrlProvider
      */
     public function previous()
     {
-        if ($referer = $this->router->getRequest()->headers->get('referer')) {
-            return $this->to($referer);
+        return $this->router->getRequest()->headers->get('referer');
+    }
+
+    /**
+     * Get the URL appending the URI to the base URI.
+     *
+     * @param  string $path
+     * @param  mixed  $parameters
+     * @param  mixed  $referenceType
+     * @return string
+     */
+    public function get($path = '', $parameters = [], $referenceType = UrlGenerator::ABSOLUTE_PATH)
+    {
+        if (0 === strpos($path, '@')) {
+            return $this->getRoute($path, $parameters, $referenceType);
         }
 
-        return '';
+        if (filter_var($path, FILTER_VALIDATE_URL) !== false) {
+            return $path;
+        }
+
+        return $this->base($referenceType).'/'.ltrim($path, '/');
+    }
+
+    /**
+     * Get the URL to a named route.
+     *
+     * @param  string $name
+     * @param  mixed  $parameters
+     * @param  mixed  $referenceType
+     * @return string|false
+     */
+    public function getRoute($name, $parameters = [], $referenceType = UrlGenerator::ABSOLUTE_PATH)
+    {
+        try {
+
+            $url = $this->router->generate($name, $parameters, $referenceType);
+
+            if ($referenceType === self::BASE_PATH) {
+                $url = substr($url, strlen($this->router->getRequest()->getBaseUrl()));
+            }
+
+            return $url;
+
+        } catch (RouteNotFoundException $e) {}
+
+        return false;
     }
 
     /**
@@ -94,13 +142,9 @@ class UrlProvider
      * @param  mixed  $referenceType
      * @return string
      */
-    public function to($path = '', $parameters = [], $referenceType = UrlGenerator::ABSOLUTE_PATH)
+    public function getStatic($path, $parameters = [], $referenceType = UrlGenerator::ABSOLUTE_PATH)
     {
-        if (0 === strpos($path, '@')) {
-            return $this->route($path, $parameters, $referenceType);
-        }
-
-        $path = $this->file->getPath($path, true) ?: $path;
+        $path = $this->file->getUrl($path, $referenceType);
 
         if ($query = substr(strstr($path, '?'), 1)) {
             parse_str($query, $params);
@@ -112,46 +156,16 @@ class UrlProvider
             $query = '?'.$query;
         }
 
-        if (false === filter_var($path, FILTER_VALIDATE_URL)) {
-            if (Path::isAbsolute($path)) {
-                $path = str_replace('\\', '/', $path);
-                $path = strpos($path, $base = $this->basePath) === 0 ? substr($path, strlen($base)) : $path;
-            }
-
-            if ($referenceType !== UrlGenerator::BASE_PATH) {
-                $path = $this->base($referenceType).trim($path, '/');
-            }
-        }
-
         return $path.$query;
-    }
-
-    /**
-     * Get the URL to a named route.
-     *
-     * @param  string $name
-     * @param  mixed  $parameters
-     * @param  mixed  $referenceType
-     * @return string|false
-     */
-    public function route($name = '', $parameters = [], $referenceType = UrlGenerator::ABSOLUTE_PATH)
-    {
-        try {
-
-            return $this->router->generate($name, $parameters, $referenceType);
-
-        } catch (RouteNotFoundException $e) {}
-
-        return false;
     }
 
     /**
      * To shortcut.
      *
-     * @see to()
+     * @see get()
      */
     public function __invoke($path = '', $parameters = [], $referenceType = UrlGenerator::ABSOLUTE_PATH)
     {
-        return $this->to($path, $parameters, $referenceType);
+        return $this->get($path, $parameters, $referenceType);
     }
 }

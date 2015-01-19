@@ -135,7 +135,7 @@ class ProfilerServiceProvider implements ServiceProviderInterface, EventSubscrib
         }
 
         $token    = $response->headers->get('X-Debug-Token');
-        $route    = $this->app['url']->route('_profiler', compact('token'));
+        $route    = $this->app['url']->getRoute('_profiler', compact('token'));
         $url      = $this->app['file']->getUrl(__DIR__.'/assets');
         $markup[] = "<div id=\"profiler\" data-url=\"{$url}\" data-route=\"{$route}\" style=\"display: none;\"></div>";
         $markup[] = "<script src=\"{$url}/js/profiler.js\"></script>";

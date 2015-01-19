@@ -18,6 +18,6 @@ class Controller
      */
     public function redirect($url = '', $parameters = [], $status = 302, $headers = [])
     {
-        return new RedirectResponse(App::url()->to($url, $parameters), $status, $headers);
+        return new RedirectResponse(App::url($url, $parameters), $status, $headers);
     }
 }
