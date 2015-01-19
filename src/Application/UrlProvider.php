@@ -2,7 +2,7 @@
 
 namespace Pagekit\Application;
 
-use Pagekit\Filesystem\File;
+use Pagekit\Filesystem\Filesystem;
 use Pagekit\Routing\Generator\UrlGenerator;
 use Pagekit\Routing\Router;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -20,7 +20,7 @@ class UrlProvider
     protected $router;
 
     /**
-     * @var File
+     * @var Filesystem
      */
     protected $file;
 
@@ -29,7 +29,7 @@ class UrlProvider
      *
      * @param Router $router
      */
-    public function __construct(Router $router, File $file)
+    public function __construct(Router $router, Filesystem $file)
     {
         $this->router = $router;
         $this->file   = $file;

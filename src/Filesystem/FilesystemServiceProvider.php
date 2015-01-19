@@ -10,12 +10,12 @@ class FilesystemServiceProvider implements ServiceProviderInterface
     public function register(Application $app)
     {
         $app['file'] = function () {
-            return new File;
+            return new Filesystem;
         };
     }
 
     public function boot(Application $app)
     {
-        StreamWrapper::setFile($app['file']);
+        StreamWrapper::setFilesystem($app['file']);
     }
 }

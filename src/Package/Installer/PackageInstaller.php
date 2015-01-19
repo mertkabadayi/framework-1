@@ -2,7 +2,7 @@
 
 namespace Pagekit\Package\Installer;
 
-use Pagekit\Filesystem\File;
+use Pagekit\Filesystem\Filesystem;
 use Pagekit\Package\Exception\LogicException;
 use Pagekit\Package\Loader\JsonLoader;
 use Pagekit\Package\Loader\LoaderInterface;
@@ -25,7 +25,7 @@ class PackageInstaller implements InstallerInterface
     protected $loader;
 
     /**
-     * @var File
+     * @var Filesystem
      */
     protected $file;
 
@@ -34,13 +34,13 @@ class PackageInstaller implements InstallerInterface
      *
      * @param InstalledRepositoryInterface $repository
      * @param LoaderInterface              $loader
-     * @param File                         $file
+     * @param Filesystem                   $file
      */
-    public function __construct(InstalledRepositoryInterface $repository, LoaderInterface $loader = null, File $file = null)
+    public function __construct(InstalledRepositoryInterface $repository, LoaderInterface $loader = null, Filesystem $file = null)
     {
         $this->repository = $repository;
         $this->loader     = $loader ?: new JsonLoader;
-        $this->file       = $file ?: new File;
+        $this->file       = $file ?: new Filesystem;
     }
 
     /**

@@ -2,11 +2,11 @@
 
 namespace Pagekit\Filesystem\Tests\Adapter;
 
-use Pagekit\Filesystem\Adapter\StreamAdapter;
-use Pagekit\Filesystem\File;
+use Pagekit\Filesystem\Filesystem;
 use Pagekit\Filesystem\StreamWrapper;
+use Pagekit\Filesystem\Adapter\StreamAdapter;
 
-class TempAdapterTest extends \PHPUnit_Framework_TestCase
+class StreamAdapterTest extends \PHPUnit_Framework_TestCase
 {
     use \Pagekit\Tests\FileUtil;
 
@@ -16,13 +16,13 @@ class TempAdapterTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->file      = new File;
+        $this->file      = new Filesystem;
         $this->fixtures  = dirname(__DIR__).'/Fixtures';
         $this->workspace = $this->getTempDir('filesystem_');
 
         $this->file->registerAdapter('temp', new StreamAdapter($this->workspace));
 
-        StreamWrapper::setFile($this->file);
+        StreamWrapper::setFilesystem($this->file);
     }
 
     public function tearDown()

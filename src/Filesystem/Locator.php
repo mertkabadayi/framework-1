@@ -2,7 +2,7 @@
 
 namespace Pagekit\Filesystem;
 
-class FileLocator
+class Locator
 {
     /**
      * @var string

@@ -10,16 +10,16 @@ class StreamWrapper
     protected $handle;
 
     /**
-     * @var File
+     * @var Filesystem
      */
     protected static $file;
 
     /**
-     * @param File $file
+     * @param Filesystem $file
      */
-    public static function setFile(File $file)
+    public static function setFilesystem(Filesystem $file)
     {
-        self::$file = $file;
+        static::$file = $file;
     }
 
     /**

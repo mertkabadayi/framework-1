@@ -3,7 +3,7 @@
 namespace Pagekit\Filesystem\Tests;
 
 use Pagekit\Filesystem\Adapter\FileAdapter;
-use Pagekit\Filesystem\File;
+use Pagekit\Filesystem\Filesystem;
 
 class FileTest extends \PHPUnit_Framework_TestCase
 {
@@ -15,7 +15,7 @@ class FileTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->file      = new File;
+        $this->file      = new Filesystem;
         $this->fixtures  = __DIR__.'/Fixtures';
         $this->workspace = $this->getTempDir('filesystem_');
 

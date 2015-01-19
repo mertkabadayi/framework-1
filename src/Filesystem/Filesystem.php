@@ -4,7 +4,7 @@ namespace Pagekit\Filesystem;
 
 use Pagekit\Filesystem\Adapter\AdapterInterface;
 
-class File
+class Filesystem
 {
     /**
      * @var AdapterInterface[]

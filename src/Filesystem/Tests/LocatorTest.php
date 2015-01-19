@@ -2,18 +2,18 @@
 
 namespace Pagekit\Filesystem\Tests;
 
-use Pagekit\Filesystem\File;
-use Pagekit\Filesystem\FileLocator;
+use Pagekit\Filesystem\Filesystem;
+use Pagekit\Filesystem\Locator;
 
-class FileLocatorTest extends \PHPUnit_Framework_TestCase
+class LocatorTest extends \PHPUnit_Framework_TestCase
 {
     protected $file;
     protected $locator;
 
     public function setUp()
     {
-        $this->file    = new File;
-        $this->locator = new FileLocator(__DIR__);
+        $this->file    = new Filesystem;
+        $this->locator = new Locator(__DIR__);
     }
 
     /**

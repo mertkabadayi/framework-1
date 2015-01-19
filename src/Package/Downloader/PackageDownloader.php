@@ -7,7 +7,7 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\TransferException;
 use Pagekit\Filesystem\Archive\Zip;
-use Pagekit\Filesystem\File;
+use Pagekit\Filesystem\Filesystem;
 use Pagekit\Package\Exception\ArchiveExtractionException;
 use Pagekit\Package\Exception\ChecksumVerificationException;
 use Pagekit\Package\Exception\DownloadErrorException;
@@ -24,20 +24,20 @@ class PackageDownloader implements DownloaderInterface
     protected $client;
 
     /**
-     * @var File
+     * @var Filesystem
      */
     protected $file;
 
     /**
      * Constructor.
      *
-     * @param File            $file
+     * @param Filesystem      $file
      * @param ClientInterface $client
      */
-    public function __construct(ClientInterface $client = null, File $file = null)
+    public function __construct(ClientInterface $client = null, Filesystem $file = null)
     {
         $this->client = $client ?: new Client;
-        $this->file   = $file  ?: new File;
+        $this->file   = $file  ?: new Filesystem;
     }
 
     /**
