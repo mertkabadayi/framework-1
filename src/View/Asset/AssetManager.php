@@ -31,6 +31,16 @@ class AssetManager implements \IteratorAggregate
     }
 
     /**
+     * Queue shortcut.
+     *
+     * @see queue()
+     */
+    public function __invoke($name, $asset = null, $dependencies = [], $options = [])
+    {
+        return $this->queue($name, $asset, $dependencies, $options);
+    }
+
+    /**
      * Create a asset instance.
      *
      * @param  string $name

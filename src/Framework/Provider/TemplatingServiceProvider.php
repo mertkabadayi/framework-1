@@ -37,16 +37,16 @@ class TemplatingServiceProvider implements ServiceProviderInterface
 
             $helpers = [new SlotsHelper, new GravatarHelper];
 
-            if (isset($app['view.styles'])) {
-                $helpers[] = new StyleHelper($app['view.styles']);
+            if (isset($app['styles'])) {
+                $helpers[] = new StyleHelper($app['styles']);
             }
 
-            if (isset($app['view.scripts'])) {
-                $helpers[] = new ScriptHelper($app['view.scripts']);
+            if (isset($app['scripts'])) {
+                $helpers[] = new ScriptHelper($app['scripts']);
             }
 
-            if (isset($app['view.sections'])) {
-                $helpers[] = new SectionHelper($app['view.sections']);
+            if (isset($app['sections'])) {
+                $helpers[] = new SectionHelper($app['sections']);
             }
 
             if (isset($app['csrf'])) {
@@ -67,6 +67,6 @@ class TemplatingServiceProvider implements ServiceProviderInterface
     public function boot(Application $app)
     {
         $app['tmpl']->addEngine($app['tmpl.php']);
-        $app['view.sections']->addRenderer('delayed', new DelayedRenderer($app['events']));
+        $app['sections']->addRenderer('delayed', new DelayedRenderer($app['events']));
     }
 }

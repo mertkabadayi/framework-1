@@ -16,22 +16,22 @@ class AssetServiceProvider implements ServiceProviderInterface
     {
         $this->app = $app;
 
-        $app['view.styles'] = function($app) {
+        $app['styles'] = function($app) {
             return new AssetManager($app['config']['app.version']);
         };
 
-        $app['view.scripts'] = function($app) {
+        $app['scripts'] = function($app) {
             return new AssetManager($app['config']['app.version']);
         };
     }
 
     public function boot(Application $app)
     {
-        $app['view.sections']->append('head', function() use ($app) {
+        $app['sections']->append('head', function() use ($app) {
 
             $result = [];
 
-            foreach ($app['view.styles'] as $style) {
+            foreach ($app['styles'] as $style) {
 
                 $attributes = $this->getDataAttributes($style);
 
@@ -42,7 +42,7 @@ class AssetServiceProvider implements ServiceProviderInterface
                 }
             }
 
-            foreach ($app['view.scripts'] as $script) {
+            foreach ($app['scripts'] as $script) {
 
                 $attributes = $this->getDataAttributes($script);
 

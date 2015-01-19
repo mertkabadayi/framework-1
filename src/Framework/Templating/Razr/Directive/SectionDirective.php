@@ -43,11 +43,11 @@ class SectionDirective extends Directive
 
             $stream->resetPeek();
 
-            return sprintf("\$app['view.sections']->%s%s", empty($stack) ? 'start' : 'output', $this->parser->parseExpression());
+            return sprintf("\$app['sections']->%s%s", empty($stack) ? 'start' : 'output', $this->parser->parseExpression());
         }
 
         if ($stream->nextIf('endsection')) {
-            return "echo(\$app['view.sections']->end())";
+            return "echo(\$app['sections']->end())";
         }
     }
 }

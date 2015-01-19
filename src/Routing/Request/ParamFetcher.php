@@ -74,7 +74,11 @@ class ParamFetcher implements ParamFetcherInterface
             return null;
         }
 
-        // $name, $type, $options
+        /**
+         * @var string $name
+         * @var string $type
+         * @var array  $options
+         */
         extract($this->params[$index]);
 
         foreach (['query', 'request'] as $bag) {

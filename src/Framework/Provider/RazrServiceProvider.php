@@ -31,21 +31,21 @@ class RazrServiceProvider implements ServiceProviderInterface
             $engine->addDirective(new FunctionDirective('url_static', [$app['url'], 'getStatic']));
             $engine->addFunction('url_static', [$app['url'], 'getStatic']);
 
-            if (isset($app['view.styles'])) {
+            if (isset($app['styles'])) {
                 $engine->addDirective(new FunctionDirective('style', function($name, $asset = null, $dependencies = [], $options = []) use ($app) {
-                    $app['view.styles']->queue($name, $asset, $dependencies, $options);
+                    $app['styles']->queue($name, $asset, $dependencies, $options);
                 }));
             }
 
-            if (isset($app['view.scripts'])) {
+            if (isset($app['scripts'])) {
                 $engine->addDirective(new FunctionDirective('script', function($name, $asset = null, $dependencies = [], $options = []) use ($app) {
-                    $app['view.scripts']->queue($name, $asset, $dependencies, $options);
+                    $app['scripts']->queue($name, $asset, $dependencies, $options);
                 }));
             }
 
-            if (isset($app['view.sections'])) {
+            if (isset($app['sections'])) {
                 $engine->addDirective(new SectionDirective);
-                $engine->addFunction('hasSection', [$app['view.sections'], 'has']);
+                $engine->addFunction('hasSection', [$app['sections'], 'has']);
             }
 
             if (isset($app['csrf'])) {

@@ -13,13 +13,13 @@ class ViewServiceProvider implements ServiceProviderInterface
     {
         $app['view'] = function($app) {
 
-            $view = new View($app['view.sections']);
+            $view = new View($app['sections']);
             $view->set('app', $app);
 
             return $view;
         };
 
-        $app['view.sections'] = function() {
+        $app['sections'] = function() {
             return new SectionManager;
         };
     }
@@ -28,7 +28,7 @@ class ViewServiceProvider implements ServiceProviderInterface
     {
         $app->subscribe(new ViewListener($view = $app['view']));
 
-        $app['view.sections']->prepend('head', function() use ($view) {
+        $app['sections']->prepend('head', function() use ($view) {
 
             $result = [];
 

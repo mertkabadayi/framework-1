@@ -33,15 +33,16 @@ class UrlGenerator extends BaseUrlGenerator implements UrlGeneratorInterface
      * Gets the properties of a route.
      *
      * @param  string $name
-     * @return array
+     * @return array|null
      */
     public function getRouteProperties($name)
     {
-        if ($route = $this->routes->get($name)) {
-
-            $compiled = $route->compile();
-
-            return [$compiled->getVariables(), $route->getDefaults(), $route->getRequirements(), $compiled->getTokens(), $compiled->getHostTokens(), $route->getSchemes()];
+        if (!$route = $this->routes->get($name)) {
+            return null;
         }
+
+        $compiled = $route->compile();
+
+        return [$compiled->getVariables(), $route->getDefaults(), $route->getRequirements(), $compiled->getTokens(), $compiled->getHostTokens(), $route->getSchemes()];
     }
 }

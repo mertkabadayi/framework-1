@@ -125,15 +125,17 @@ class ControllerReader implements ControllerReaderInterface
      */
     protected function addRoute(ReflectionClass $class, ReflectionMethod $method, array $globals, $annotation)
     {
-        $options['path']         = rtrim($globals['path'].(null !== $annotation->getPath() ? $annotation->getPath() : $this->getDefaultRoutePath($class, $method, $globals)), '/');
-        $options['defaults']     = array_merge($globals['defaults'], $annotation->getDefaults());
-        $options['requirements'] = array_merge($globals['requirements'], $annotation->getRequirements());
-        $options['options']      = array_merge($globals['options'], $annotation->getOptions());
-        $options['host']         = null !== $annotation->getHost() ? $annotation->getHost() : $globals['host'];
-        $options['schemes']      = array_merge($globals['schemes'], $annotation->getSchemes());
-        $options['methods']      = array_merge($globals['methods'], $annotation->getMethods());
-        $options['condition']    = null !== $annotation->getCondition() ? $annotation->getCondition() : $globals['condition'];
-        $options['name']         = $annotation->getName() ?: $this->getDefaultRouteName($class, $method, $globals);
+        $options = [
+            'path'         => rtrim($globals['path'].(null !== $annotation->getPath() ? $annotation->getPath() : $this->getDefaultRoutePath($class, $method, $globals)), '/'),
+            'defaults'     => array_merge($globals['defaults'], $annotation->getDefaults()),
+            'requirements' => array_merge($globals['requirements'], $annotation->getRequirements()),
+            'options'      => array_merge($globals['options'], $annotation->getOptions()),
+            'host'         => null !== $annotation->getHost() ? $annotation->getHost() : $globals['host'],
+            'schemes'      => array_merge($globals['schemes'], $annotation->getSchemes()),
+            'methods'      => array_merge($globals['methods'], $annotation->getMethods()),
+            'condition'    => null !== $annotation->getCondition() ? $annotation->getCondition() : $globals['condition'],
+            'name'         => $annotation->getName() ?: $this->getDefaultRouteName($class, $method, $globals)
+        ];
 
         if ($route = $this->configureRoute($this->route->newInstanceArgs($options), $class, $method, $options)) {
             $this->routes->add($options['name'], $route);
