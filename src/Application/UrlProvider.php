@@ -1,6 +1,6 @@
 <?php
 
-namespace Pagekit\Application\Routing;
+namespace Pagekit\Application;
 
 use Pagekit\Filesystem\File;
 use Pagekit\Routing\Generator\UrlGenerator;

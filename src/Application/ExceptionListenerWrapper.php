@@ -1,6 +1,6 @@
 <?php
 
-namespace Pagekit\Application\Exception;
+namespace Pagekit\Application;
 
 use Pagekit\Application;
 use Symfony\Component\HttpFoundation\Response;

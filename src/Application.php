@@ -2,7 +2,7 @@
 
 namespace Pagekit;
 
-use Pagekit\Application\Exception\ExceptionListenerWrapper;
+use Pagekit\Application\ExceptionListenerWrapper;
 use Pagekit\Application\Provider\RoutingServiceProvider;
 use Pagekit\Application\Traits\EventTrait;
 use Pagekit\Application\Traits\StaticTrait;

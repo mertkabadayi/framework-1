@@ -3,8 +3,8 @@
 namespace Pagekit\Application\Provider;
 
 use Pagekit\Application;
-use Pagekit\Application\Routing\Response;
-use Pagekit\Application\Routing\UrlProvider;
+use Pagekit\Application\Response;
+use Pagekit\Application\UrlProvider;
 use Pagekit\Routing\RoutingServiceProvider as BaseRoutingServiceProvider;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
