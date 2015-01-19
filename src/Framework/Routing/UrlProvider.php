@@ -102,6 +102,8 @@ class UrlProvider
             return $this->getRoute($path, $parameters, $referenceType);
         }
 
+        $path = $this->parseQuery($path, $parameters);
+
         if (filter_var($path, FILTER_VALIDATE_URL) !== false) {
             return $path;
         }
@@ -144,19 +146,7 @@ class UrlProvider
      */
     public function getStatic($path, $parameters = [], $referenceType = UrlGenerator::ABSOLUTE_PATH)
     {
-        $path = $this->file->getUrl($path, $referenceType);
-
-        if ($query = substr(strstr($path, '?'), 1)) {
-            parse_str($query, $params);
-            $path       = strstr($path, '?', true);
-            $parameters = array_replace($parameters, $params);
-        }
-
-        if ($query = http_build_query($parameters, '', '&')) {
-            $query = '?'.$query;
-        }
-
-        return $path.$query;
+        return $this->parseQuery($this->file->getUrl($path, $referenceType), $parameters);
     }
 
     /**
@@ -167,5 +157,25 @@ class UrlProvider
     public function __invoke($path = '', $parameters = [], $referenceType = UrlGenerator::ABSOLUTE_PATH)
     {
         return $this->get($path, $parameters, $referenceType);
+    }
+
+    /**
+     * @param  string $url
+     * @param  array  $parameters
+     * @return string
+     */
+    protected function parseQuery($url, $parameters = [])
+    {
+        if ($query = substr(strstr($url, '?'), 1)) {
+            parse_str($query, $params);
+            $url        = strstr($url, '?', true);
+            $parameters = array_replace($parameters, $params);
+        }
+
+        if ($query = http_build_query($parameters, '', '&')) {
+            $url .= '?'.$query;
+        }
+
+        return $url;
     }
 }
