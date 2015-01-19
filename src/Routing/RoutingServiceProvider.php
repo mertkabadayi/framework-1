@@ -10,7 +10,7 @@ use Pagekit\Routing\Controller\ControllerCollection;
 use Pagekit\Routing\Controller\ControllerReader;
 use Pagekit\Routing\Controller\ControllerResolver;
 use Pagekit\Routing\Event\ConfigureRouteListener;
-use Pagekit\Routing\Event\JsonResponseListener;
+use Pagekit\Routing\Event\JsonListener;
 use Pagekit\Routing\Event\StringResponseListener;
 use Pagekit\Routing\Request\Event\ParamFetcherListener;
 use Pagekit\Routing\Request\ParamFetcher;
@@ -65,7 +65,7 @@ class RoutingServiceProvider implements ServiceProviderInterface
         $app->subscribe(new ParamFetcherListener(new ParamFetcher(new FilterManager)));
         $app->subscribe(new RouterListener($app['router'], null, null, $app['request_stack']));
         $app->subscribe(new ResponseListener('UTF-8'));
-        $app->subscribe(new JsonResponseListener);
+        $app->subscribe(new JsonListener);
         $app->subscribe(new StringResponseListener);
         $app->subscribe($app['aliases']);
         $app->subscribe($app['callbacks']);
