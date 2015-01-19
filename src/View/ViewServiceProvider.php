@@ -3,7 +3,7 @@
 namespace Pagekit\View;
 
 use Pagekit\Application;
-use Pagekit\ServiceProviderInterface;
+use Pagekit\Application\ServiceProviderInterface;
 use Pagekit\View\Event\ViewListener;
 use Pagekit\View\Section\SectionManager;
 

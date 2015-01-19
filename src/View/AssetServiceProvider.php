@@ -3,7 +3,7 @@
 namespace Pagekit\View;
 
 use Pagekit\Application;
-use Pagekit\ServiceProviderInterface;
+use Pagekit\Application\ServiceProviderInterface;
 use Pagekit\View\Asset\AssetInterface;
 use Pagekit\View\Asset\AssetManager;
 use Pagekit\View\Asset\FileAsset;

@@ -3,7 +3,7 @@
 namespace Pagekit\Option;
 
 use Pagekit\Application;
-use Pagekit\ServiceProviderInterface;
+use Pagekit\Application\ServiceProviderInterface;
 
 class OptionServiceProvider implements ServiceProviderInterface
 {

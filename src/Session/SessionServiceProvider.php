@@ -3,7 +3,7 @@
 namespace Pagekit\Session;
 
 use Pagekit\Application;
-use Pagekit\ServiceProviderInterface;
+use Pagekit\Application\ServiceProviderInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;

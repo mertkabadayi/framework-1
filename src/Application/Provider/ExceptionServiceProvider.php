@@ -3,7 +3,7 @@
 namespace Pagekit\Application\Provider;
 
 use Pagekit\Application;
-use Pagekit\ServiceProviderInterface;
+use Pagekit\Application\ServiceProviderInterface;
 use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\ExceptionHandler;
 

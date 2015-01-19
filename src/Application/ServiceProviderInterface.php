@@ -1,6 +1,8 @@
 <?php
 
-namespace Pagekit;
+namespace Pagekit\Application;
+
+use Pagekit\Application as Application;
 
 interface ServiceProviderInterface
 {

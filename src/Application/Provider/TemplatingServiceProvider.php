@@ -11,7 +11,7 @@ use Pagekit\Application\Templating\Helper\StyleHelper;
 use Pagekit\Application\Templating\Helper\TokenHelper;
 use Pagekit\Application\Templating\Section\DelayedRenderer;
 use Pagekit\Application\Templating\TemplateNameParser;
-use Pagekit\ServiceProviderInterface;
+use Pagekit\Application\ServiceProviderInterface;
 use Symfony\Component\Templating\DelegatingEngine;
 use Symfony\Component\Templating\Helper\SlotsHelper;
 use Symfony\Component\Templating\Loader\FilesystemLoader;

@@ -3,7 +3,7 @@
 namespace Pagekit\Session;
 
 use Pagekit\Application;
-use Pagekit\ServiceProviderInterface;
+use Pagekit\Application\ServiceProviderInterface;
 use Pagekit\Session\Csrf\Event\CsrfListener;
 use Pagekit\Session\Csrf\Provider\SessionCsrfProvider;
 

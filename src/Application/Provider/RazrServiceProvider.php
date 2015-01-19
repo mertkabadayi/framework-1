@@ -8,7 +8,7 @@ use Pagekit\Application\Templating\Helper\TokenHelper;
 use Pagekit\Application\Templating\Razr\Directive\SectionDirective;
 use Pagekit\Application\Templating\Razr\Directive\TransDirective;
 use Pagekit\Application\Templating\RazrEngine;
-use Pagekit\ServiceProviderInterface;
+use Pagekit\Application\ServiceProviderInterface;
 use Razr\Directive\FunctionDirective;
 use Razr\Loader\FilesystemLoader;
 

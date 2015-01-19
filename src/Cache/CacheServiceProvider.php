@@ -6,7 +6,7 @@ use Doctrine\Common\Cache\ApcCache;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\XcacheCache;
 use Pagekit\Application;
-use Pagekit\ServiceProviderInterface;
+use Pagekit\Application\ServiceProviderInterface;
 
 class CacheServiceProvider implements ServiceProviderInterface
 {

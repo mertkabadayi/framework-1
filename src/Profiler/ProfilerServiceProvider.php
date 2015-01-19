@@ -6,7 +6,7 @@ use Pagekit\Application;
 use Pagekit\Database\DataCollector\DatabaseDataCollector;
 use Pagekit\Profiler\Event\ToolbarListener;
 use Pagekit\Routing\DataCollector\RoutesDataCollector;
-use Pagekit\ServiceProviderInterface;
+use Pagekit\Application\ServiceProviderInterface;
 use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;

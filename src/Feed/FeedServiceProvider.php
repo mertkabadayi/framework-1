@@ -3,7 +3,7 @@
 namespace Pagekit\Feed;
 
 use Pagekit\Application;
-use Pagekit\ServiceProviderInterface;
+use Pagekit\Application\ServiceProviderInterface;
 
 class FeedServiceProvider implements ServiceProviderInterface
 {

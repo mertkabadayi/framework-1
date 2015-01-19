@@ -3,7 +3,7 @@
 namespace Pagekit\Filter;
 
 use Pagekit\Application;
-use Pagekit\ServiceProviderInterface;
+use Pagekit\Application\ServiceProviderInterface;
 
 class FilterServiceProvider implements ServiceProviderInterface
 {

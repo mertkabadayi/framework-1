@@ -14,7 +14,7 @@ use Pagekit\Routing\Event\JsonListener;
 use Pagekit\Routing\Event\StringResponseListener;
 use Pagekit\Routing\Request\Event\ParamFetcherListener;
 use Pagekit\Routing\Request\ParamFetcher;
-use Pagekit\ServiceProviderInterface;
+use Pagekit\Application\ServiceProviderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\EventListener\ResponseListener;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;

@@ -3,7 +3,7 @@
 namespace Pagekit\Filesystem;
 
 use Pagekit\Application;
-use Pagekit\ServiceProviderInterface;
+use Pagekit\Application\ServiceProviderInterface;
 
 class FilesystemServiceProvider implements ServiceProviderInterface
 {
