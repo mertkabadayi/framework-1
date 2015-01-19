@@ -20,100 +20,19 @@ class Container implements \ArrayAccess
     protected $factories = [];
 
     /**
-     * @var array
-     */
-    protected static $containers = [];
-
-    /**
      * Constructor.
      *
      * @param array $values
-     *
-     * @throws \RuntimeException
      */
     public function __construct(array $values = [])
     {
-        $class = get_called_class();
-
         foreach ($values as $name => $value) {
             $this->offsetSet($name, $value);
         }
 
-        if (isset(static::$containers[$class])) {
-            throw new \RuntimeException(sprintf('Container for class "%s" already exists.', $class));
+        if (in_array('Pagekit\Application\StaticTrait', class_uses($this))) {
+            static::$instance = $this;
         }
-
-        static::$containers[$class] = $this;
-    }
-
-    /**
-     * Gets a container instance.
-     *
-     * @return Container
-     */
-    public static function getInstance()
-    {
-        $class = get_called_class();
-
-        if (!isset(static::$containers[$class])) {
-            static::$containers[$class] = new static();
-        }
-
-        return static::$containers[$class];
-    }
-
-    /**
-     * Checks if a parameter or service is defined.
-     *
-     * @param  string $name
-     * @return bool
-     */
-    public static function has($name)
-    {
-        return static::getInstance()->offsetExists($name);
-    }
-
-    /**
-     * Gets a parameter or service.
-     *
-     * @param  string $name
-     * @return mixed
-     */
-    public static function get($name)
-    {
-        return static::getInstance()->offsetGet($name);
-    }
-
-    /**
-     * Sets a parameter or service.
-     *
-     * @param string $name
-     * @param mixed  $value
-     */
-    public static function set($name, $value)
-    {
-        static::getInstance()->offsetSet($name, $value);
-    }
-
-    /**
-     * Removes a parameter or service.
-     *
-     * @param string $name
-     */
-    public static function remove($name)
-    {
-        static::getInstance()->offsetUnset($name);
-    }
-
-    /**
-     * Resets all parameters and services.
-     */
-    public static function reset()
-    {
-        $container = static::getInstance();
-        $container->values = [];
-        $container->factories = [];
-        $container->raw = [];
     }
 
     /**
@@ -122,11 +41,10 @@ class Container implements \ArrayAccess
      * @param string  $name
      * @param closure $closure
      */
-    public static function factory($name, \Closure $closure)
+    public function factory($name, \Closure $closure)
     {
-        $container = static::getInstance();
-        $container->offsetSet($name, $closure);
-        $container->factories[$name] = true;
+        $this->offsetSet($name, $closure);
+        $this->factories[$name] = true;
     }
 
     /**
@@ -137,21 +55,19 @@ class Container implements \ArrayAccess
      *
      * @throws \InvalidArgumentException
      */
-    public static function extend($name, \Closure $closure)
+    public function extend($name, \Closure $closure)
     {
-        $container = static::getInstance();
-
-        if (!array_key_exists($name, $container->values)) {
+        if (!array_key_exists($name, $this->values)) {
             throw new \InvalidArgumentException(sprintf('"%s" is not defined.', $name));
         }
 
-        if (!($container->values[$name] instanceof \Closure)) {
+        if (!($this->values[$name] instanceof \Closure)) {
             throw new \InvalidArgumentException(sprintf('"%s" service definition is not a Closure.', $name));
         }
 
-        $factory = $container->values[$name];
+        $factory = $this->values[$name];
 
-        $container->offsetSet($name, function ($c) use ($closure, $factory) {
+        $this->offsetSet($name, function ($c) use ($closure, $factory) {
             return $closure($factory($c), $c);
         });
     }
@@ -164,15 +80,13 @@ class Container implements \ArrayAccess
      *
      * @throws \InvalidArgumentException
      */
-    public static function raw($name)
+    public function raw($name)
     {
-        $container = static::getInstance();
-
-        if (!array_key_exists($name, $container->values)) {
+        if (!array_key_exists($name, $this->values)) {
             throw new \InvalidArgumentException(sprintf('"%s" is not defined.', $name));
         }
 
-        return isset($container->raw[$name]) ? $container->raw[$name] : $container->values[$name];
+        return isset($this->raw[$name]) ? $this->raw[$name] : $this->values[$name];
     }
 
     /**
@@ -180,25 +94,9 @@ class Container implements \ArrayAccess
      *
      * @return array
      */
-    public static function keys()
+    public function keys()
     {
-        $container = static::getInstance();
-
-        return array_keys($container->values);
-    }
-
-    /**
-     * Magic method to access the container in a static context.
-     *
-     * @param  string $name
-     * @param  array  $args
-     * @return mixed
-     */
-    public static function __callStatic($name, $args)
-    {
-        $container = static::getInstance();
-
-        return $args ? call_user_func_array($container[$name], $args) : $container[$name];
+        return array_keys($this->values);
     }
 
     /**

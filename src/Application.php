@@ -3,6 +3,7 @@
 namespace Pagekit;
 
 use Pagekit\Application\EventTrait;
+use Pagekit\Application\StaticTrait;
 use Pagekit\Framework\Exception\ExceptionListenerWrapper;
 use Pagekit\Framework\Provider\RoutingServiceProvider;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -16,7 +17,7 @@ use Symfony\Component\HttpKernel\TerminableInterface;
 
 class Application extends Container implements HttpKernelInterface, TerminableInterface
 {
-    use EventTrait;
+    use StaticTrait, EventTrait;
 
     const EARLY_EVENT = 512;
     const LATE_EVENT  = -512;
