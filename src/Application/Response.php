@@ -25,6 +25,16 @@ class Response
         $this->url = $url;
     }
 
+    /**
+     * Create shortcut.
+     *
+     * @see create()
+     */
+    public function __invoke($content = '', $status = 200, $headers = [])
+    {
+        return $this->create($content, $status, $headers);
+    }
+
 	/**
 	 * Returns a response.
 	 *
