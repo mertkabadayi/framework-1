@@ -3,9 +3,9 @@
 namespace Pagekit\Auth;
 
 use Pagekit\Application;
+use Pagekit\Application\ServiceProviderInterface;
 use Pagekit\Auth\Event\AuthenticateEvent;
 use Pagekit\Auth\Event\LoginEvent;
-use Pagekit\Application\ServiceProviderInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 

@@ -3,10 +3,10 @@
 namespace Pagekit\Auth;
 
 use Pagekit\Application;
+use Pagekit\Application\ServiceProviderInterface;
 use Pagekit\Auth\Encoder\NativePasswordEncoder;
 use Pagekit\Auth\Event\LoginEvent;
 use Pagekit\Auth\Event\LogoutEvent;
-use Pagekit\Application\ServiceProviderInterface;
 use RandomLib\Factory;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
