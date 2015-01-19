@@ -38,6 +38,16 @@ class UrlProvider
     }
 
     /**
+     * Get shortcut.
+     *
+     * @see get()
+     */
+    public function __invoke($path = '', $parameters = [], $referenceType = UrlGenerator::ABSOLUTE_PATH)
+    {
+        return $this->get($path, $parameters, $referenceType);
+    }
+
+    /**
      * Gets the base path for the current request.
      *
      * @param  mixed $referenceType
@@ -147,16 +157,6 @@ class UrlProvider
     public function getStatic($path, $parameters = [], $referenceType = UrlGenerator::ABSOLUTE_PATH)
     {
         return $this->parseQuery($this->file->getUrl($path, $referenceType), $parameters);
-    }
-
-    /**
-     * To shortcut.
-     *
-     * @see get()
-     */
-    public function __invoke($path = '', $parameters = [], $referenceType = UrlGenerator::ABSOLUTE_PATH)
-    {
-        return $this->get($path, $parameters, $referenceType);
     }
 
     /**
