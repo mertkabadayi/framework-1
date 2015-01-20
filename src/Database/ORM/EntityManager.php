@@ -23,14 +23,19 @@ class EntityManager
     protected $metadata;
 
     /**
+     * @var string
+     */
+    protected $eventClass;
+
+    /**
      * @var EntityMap
      */
     protected $entities;
 
     /**
-     * @var string
+     * @var EntityManager
      */
-    protected $eventClass;
+    protected static $instance;
 
     /**
      * Creates a new Manager instance
@@ -42,15 +47,16 @@ class EntityManager
      */
     public function __construct(Connection $connection, MetadataManager $metadata, $eventClass = 'Pagekit\Database\Event\EntityEvent')
     {
-        $this->connection = $connection;
-        $this->metadata   = $metadata;
-
         if (!is_a($eventClass, 'Pagekit\Database\Event\EntityEvent', true)) {
             throw new \RuntimeException(sprintf('The Event Class %s is not a subclass of "Pagekit\Database\Event\EntityEvent"', $eventClass));
         }
 
+        $this->connection = $connection;
+        $this->metadata   = $metadata;
         $this->eventClass = $eventClass;
         $this->entities   = new EntityMap($this);
+
+        static::$instance = $this;
     }
 
     /**
@@ -314,5 +320,15 @@ class EntityManager
         }
 
         $this->connection->getEventDispatcher()->dispatch(($prefix ? $prefix.'.' : '').$name, $event);
+    }
+
+    /**
+     * Gets the instance.
+     *
+     * @return EntityManager
+     */
+    public static function getInstance()
+    {
+        return static::$instance;
     }
 }

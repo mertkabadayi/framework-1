@@ -9,7 +9,6 @@ use Pagekit\Database\Logging\DebugStack;
 use Pagekit\Database\ORM\EntityManager;
 use Pagekit\Database\ORM\Loader\AnnotationLoader;
 use Pagekit\Database\ORM\MetadataManager;
-use Pagekit\Database\ORM\ModelTrait;
 
 class DatabaseServiceProvider implements ServiceProviderInterface
 {
@@ -61,7 +60,5 @@ class DatabaseServiceProvider implements ServiceProviderInterface
 
     public function boot(Application $app)
     {
-        ModelTrait::setConnection($app['db']);
-        ModelTrait::setManager($app['db.em']);
     }
 }

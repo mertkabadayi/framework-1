@@ -7,31 +7,19 @@ use Pagekit\Database\Connection;
 trait ModelTrait
 {
     /**
-     * @var EntityManager
-     */
-    protected static $manager;
-
-    /**
-     * @var Connection
-     */
-    protected static $connection;
-
-    /**
-     * Gets the related Manager object.
+     * Gets the related EntityManager.
      *
      * @return EntityManager
      */
     public function getManager()
     {
-        return self::$manager;
-    }
+        static $manager;
 
-    /**
-     * @param EntityManager $manager
-     */
-    public static function setManager($manager)
-    {
-        self::$manager = $manager;
+        if (!$manager) {
+            $manager = EntityManager::getInstance();
+        }
+
+        return $manager;
     }
 
     /**
@@ -39,15 +27,7 @@ trait ModelTrait
      */
     public static function getConnection()
     {
-        return self::$connection;
-    }
-
-    /**
-     * @param Connection $connection
-     */
-    public static function setConnection($connection)
-    {
-        self::$connection = $connection;
+        return static::getManager()->getConnection();
     }
 
     /**
@@ -57,13 +37,7 @@ trait ModelTrait
      */
     public static function getMetadata()
     {
-        static $metadata;
-
-        if (!$metadata) {
-            $metadata = self::$manager->getMetadata(get_called_class());
-        }
-
-        return $metadata;
+        return static::getManager()->getMetadata(get_called_class());
     }
 
     /**
@@ -73,7 +47,7 @@ trait ModelTrait
      */
     public static function query()
     {
-        return new QueryBuilder(self::$manager, self::getMetadata());
+        return new QueryBuilder(static::getManager(), static::getMetadata());
     }
 
     /**
@@ -85,7 +59,7 @@ trait ModelTrait
      */
     public static function where($condition, array $params = [])
     {
-        return self::query()->where($condition, $params);
+        return static::query()->where($condition, $params);
     }
 
     /**
@@ -97,11 +71,11 @@ trait ModelTrait
      */
     public static function find($id)
     {
-        if ($entity = self::$manager->getById($id, get_called_class())) {
+        if ($entity = static::getManager()->getById($id, get_called_class())) {
             return $entity;
         }
 
-        return self::where([self::getMetadata()->getIdentifier() => $id])->first();
+        return static::where([static::getMetadata()->getIdentifier() => $id])->first();
     }
 
     /**
@@ -111,7 +85,7 @@ trait ModelTrait
      */
     public static function findAll()
     {
-        return self::query()->get();
+        return static::query()->get();
     }
 
     /**
@@ -121,7 +95,7 @@ trait ModelTrait
      */
     public function save(array $data = [])
     {
-        self::$manager->save($this, $data);
+        static::getManager()->save($this, $data);
     }
 
     /**
@@ -129,6 +103,6 @@ trait ModelTrait
      */
     public function delete()
     {
-        self::$manager->delete($this);
+        static::getManager()->delete($this);
     }
 }
