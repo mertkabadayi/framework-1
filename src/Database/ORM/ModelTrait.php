@@ -11,7 +11,7 @@ trait ModelTrait
      *
      * @return EntityManager
      */
-    public function getManager()
+    public static function getManager()
     {
         static $manager;
 
