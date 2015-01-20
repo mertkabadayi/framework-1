@@ -40,7 +40,7 @@ class EntityManager
      * @param  string          $eventClass
      * @throws \RuntimeException
      */
-    public function __construct($connection, MetadataManager $metadata, $eventClass = 'Pagekit\Database\Event\EntityEvent')
+    public function __construct(Connection $connection, MetadataManager $metadata, $eventClass = 'Pagekit\Database\Event\EntityEvent')
     {
         $this->connection = $connection;
         $this->metadata   = $metadata;
