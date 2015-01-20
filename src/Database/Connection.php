@@ -2,26 +2,18 @@
 
 namespace Pagekit\Database;
 
-use Doctrine\DBAL\DriverManager;
-use Pagekit\Database\Query\QueryBuilder;
+use Doctrine\Common\EventManager;
+use Doctrine\DBAL\Cache\QueryCacheProfile;
+use Doctrine\DBAL\Configuration;
+use Doctrine\DBAL\Connection as BaseConnection;
+use Doctrine\DBAL\Driver;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class Connection
+class Connection extends BaseConnection
 {
-    /**
-     * The database connection.
-     *
-     * @var \Doctrine\DBAL\Connection
-     */
-    protected $connection;
-
-    /**
-     * The database utility.
-     *
-     * @var Utility
-     */
-    protected $utility;
+    const SINGLE_QUOTED_TEXT = '\'([^\'\\\\]*(?:\\\\.[^\'\\\\]*)*)\'';
+    const DOUBLE_QUOTED_TEXT = '"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)"';
 
     /**
      * The event dispatcher.
@@ -31,15 +23,76 @@ class Connection
     protected $events;
 
     /**
-     * Constructor.
+     * The database utility.
      *
-     * @param array                    $params
-     * @param EventDispatcherInterface $events
+     * @var Utility
      */
-    public function __construct(array $params, EventDispatcherInterface $events = null)
+    protected $utility;
+
+    /**
+     * The table prefix.
+     *
+     * @var string
+     */
+    protected $prefix;
+
+    /**
+     * The table prefix placeholder.
+     *
+     * @var string
+     */
+    protected $placeholder = '@';
+
+    /**
+     * The regex for parsing SQL query parts.
+     *
+     * @var array
+     */
+    protected $regex;
+
+    /**
+     * Initializes a new instance of the Connection class.
+     *
+     * @param array         $params
+     * @param Driver        $driver
+     * @param Configuration $config
+     * @param EventManager  $eventManager
+     */
+    public function __construct(array $params, Driver $driver, Configuration $config = null, EventManager $eventManager = null)
     {
-        $this->connection = DriverManager::getConnection($params);
-        $this->events     = $events ?: new EventDispatcher;
+        if (!isset($params['defaultTableOptions'])) {
+            $params['defaultTableOptions'] = [];
+        }
+
+        foreach (['engine', 'charset', 'collate'] as $name) {
+            if (isset($params[$name])) {
+                $params['defaultTableOptions'][$name] = $params[$name];
+                unset($params[$name]);
+            }
+        }
+
+        $this->events = isset($params['events']) ? $params['events'] : new EventDispatcher;
+
+        if (isset($params['prefix'])) {
+            $this->prefix = $params['prefix'];
+        }
+
+        $this->regex = [
+            'quotes' => "/([^'\"]+)(?:".self::DOUBLE_QUOTED_TEXT."|".self::SINGLE_QUOTED_TEXT.")?/As",
+            'placeholder' => "/".preg_quote($this->placeholder)."([a-zA-Z_][a-zA-Z0-9_]*)/"
+        ];
+
+        parent::__construct($params, $driver, $config, $eventManager);
+    }
+
+    /**
+     * Gets the event dispatcher.
+     *
+     * @return EventDispatcherInterface
+     */
+    public function getEventDispatcher()
+    {
+        return $this->events;
     }
 
     /**
@@ -57,44 +110,113 @@ class Connection
     }
 
     /**
-     * Gets the event dispatcher.
+     * Gets the table prefix.
      *
-     * @return EventDispatcherInterface
+     * @return string
      */
-    public function getEventDispatcher()
+    public function getPrefix()
     {
-        return $this->events;
+        return $this->prefix;
     }
 
     /**
-     * Connects to the database.
+     * Replaces the table prefix placeholder with actual one.
      *
-     * @return boolean
+     * @param  string $query
+     * @return string
+     */
+    public function replacePrefix($query)
+    {
+        foreach ($this->getUnquotedQueryParts($query) as $part) {
+
+            if (strpos($part[0], $this->placeholder) === false) {
+                continue;
+            }
+
+            $replace = preg_replace($this->regex['placeholder'], $this->prefix.'$1', $part[0], -1, $count);
+
+            if ($count) {
+                $query = substr_replace($query, $replace, $part[1], strlen($part[0]));
+            }
+        }
+
+        return $query;
+    }
+
+    /**
+     * Prepares and executes an SQL query and returns the first row of the result as an object.
+     *
+     * @param  string $statement
+     * @param  array  $params
+     * @param  string $class
+     * @param  array  $args
+     * @return mixed
+     */
+    public function fetchObject($statement, array $params = [], $class = 'stdClass', $args = [])
+    {
+        return $this->executeQuery($statement, $params)->fetchObject($class, $args);
+    }
+
+    /**
+     * Prepares and executes an SQL query and returns the result as an array of objects.
+     *
+     * @param  string $statement
+     * @param  array  $params
+     * @param  string $class
+     * @param  array  $args
+     * @return array
+     */
+    public function fetchAllObjects($statement, array $params = [], $class = 'stdClass', $args = [])
+    {
+        return $this->executeQuery($statement, $params)->fetchAll(\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE, $class, $args);
+    }
+
+    /**
+     * @{inheritdoc}
      */
     public function connect()
     {
-        if ($connected = $this->connection->connect()) {
+        if (!parent::isConnected()) {
             $this->events->dispatch(Events::postConnect, new Event\ConnectionEvent($this));
         }
 
-        return $connected;
+        return parent::connect();
     }
 
     /**
-     * Gets the a query builder instance for a table.
-     *
-     * @param  string $table
-     * @return QueryBuilder
+     * @{inheritdoc}
      */
-    public function table($table)
+    public function prepare($statement)
     {
-        return $this->createQueryBuilder()->from($table);
+        return parent::prepare($this->replacePrefix($statement));
     }
 
     /**
-     * Gets the a query builder instance.
-     *
-     * @return QueryBuilder
+     * @{inheritdoc}
+     */
+    public function exec($statement)
+    {
+        return parent::exec($this->replacePrefix($statement));
+    }
+
+    /**
+     * @{inheritdoc}
+     */
+    public function executeQuery($query, array $params = [], $types = [], QueryCacheProfile $qcp = null)
+    {
+        return parent::executeQuery($this->replacePrefix($query), $params, $types, $qcp);
+    }
+
+    /**
+     * @{inheritdoc}
+     */
+    public function executeUpdate($query, array $params = [], array $types = [])
+    {
+        return parent::executeUpdate($this->replacePrefix($query), $params, $types);
+    }
+
+    /**
+     * @{inheritdoc}
      */
     public function createQueryBuilder()
     {
@@ -102,19 +224,15 @@ class Connection
     }
 
     /**
-     * Proxy method call to database connection.
+     * Parses the unquoted SQL query parts.
      *
-     * @param  string $method
-     * @param  array $args
-     * @throws \BadMethodCallException
-     * @return mixed
+     * @param  string $query
+     * @return array
      */
-    public function __call($method, $args)
+    protected function getUnquotedQueryParts($query)
     {
-        if (!method_exists($this->connection, $method)) {
-            throw new \BadMethodCallException(sprintf('Undefined method call "%s::%s"', get_class($this->connection), $method));
-        }
+        preg_match_all($this->regex['quotes'], $query, $parts, PREG_OFFSET_CAPTURE);
 
-        return call_user_func_array([$this->connection, $method], $args);
+        return $parts[1];
     }
 }

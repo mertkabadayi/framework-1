@@ -2,6 +2,7 @@
 
 namespace Pagekit\Database;
 
+use Doctrine\DBAL\DriverManager;
 use Pagekit\Application;
 use Pagekit\Application\ServiceProviderInterface;
 use Pagekit\Database\Logging\DebugStack;
@@ -15,8 +16,7 @@ class DatabaseServiceProvider implements ServiceProviderInterface
     public function register(Application $app)
     {
         $default = [
-            'wrapperClass'        => 'Pagekit\Database\ConnectionWrapper',
-            'defaultTableOptions' => []
+            'wrapperClass' => 'Pagekit\Database\Connection'
         ];
 
         $app['dbs'] = function($app) use ($default) {
@@ -27,15 +27,11 @@ class DatabaseServiceProvider implements ServiceProviderInterface
 
                 $params = array_replace($default, $params);
 
-                foreach (['engine', 'charset', 'collate'] as $option) {
-                    if (isset($params[$option])) {
-                        $params['defaultTableOptions'][$option] = $params[$option];
-                    }
+                if ($app['config']['database.default'] === $name) {
+                    $params['events'] = $app['events'];
                 }
 
-                $events = $app['config']['database.default'] === $name ? $app['events'] : null;
-
-                $dbs[$name] = new Connection($params, $events);
+                $dbs[$name] = DriverManager::getConnection($params);
             }
 
             return $dbs;
