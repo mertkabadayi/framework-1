@@ -27,7 +27,7 @@ class PhpFileLoader extends ArrayLoader implements LoaderInterface
             throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
         }
 
-        $messages = require $resource;
+        $messages = array_filter(require $resource);
 
         return parent::load($messages, $locale, $domain);
     }
