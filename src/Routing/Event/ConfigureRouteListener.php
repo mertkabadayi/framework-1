@@ -18,7 +18,7 @@ class ConfigureRouteListener implements EventSubscriberInterface
      */
     public function __construct(Reader $reader = null)
     {
-        $this->reader = $reader;
+        $this->reader    = $reader;
         $this->namespace = 'Pagekit\Routing\Annotation';
     }
 
@@ -29,11 +29,16 @@ class ConfigureRouteListener implements EventSubscriberInterface
      */
     public function onConfigureRoute(ConfigureRouteEvent $event)
     {
+        $reader = $this->getReader();
+
         foreach (['_request' => 'Request', '_response' => 'Response'] as $name => $class) {
-            if ($annotation = $this->getAnnotation($event->getMethod(), $class)) {
-                if ($data = $annotation->getData()) {
-                    $event->getRoute()->setDefault($name, $data);
-                }
+
+            $class = "{$this->namespace}\\$class";
+
+            if (($annotation = $reader->getClassAnnotation($event->getClass(), $class) or $annotation = $reader->getMethodAnnotation($event->getMethod(), $class))
+                and $data = $annotation->getData()
+            ) {
+                $event->getRoute()->setDefault($name, $data);
             }
         }
     }
@@ -49,19 +54,17 @@ class ConfigureRouteListener implements EventSubscriberInterface
     }
 
     /**
-     * Gets an annotation.
+     * Gets an annotation reader.
      *
-     * @param  mixed  $from
-     * @param  string $name
-     * @return object|null
+     * @return Reader
      */
-    protected function getAnnotation($from, $name)
+    protected function getReader()
     {
         if (!$this->reader) {
             $this->reader = new SimpleAnnotationReader;
             $this->reader->addNamespace($this->namespace);
         }
 
-        return $this->reader->getMethodAnnotation($from, "{$this->namespace}\\$name");
+        return $this->reader;
     }
 }
