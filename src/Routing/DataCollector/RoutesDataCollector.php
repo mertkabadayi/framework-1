@@ -33,13 +33,17 @@ class RoutesDataCollector extends DataCollector
      */
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
-        $path = sprintf($this->cache .'/'. $this->file, sha1(filemtime((new \ReflectionClass($this->router->getGenerator()))->getFileName())));
+        $path = sprintf($this->cache.'/'.$this->file, sha1(filemtime((new \ReflectionClass($this->router->getGenerator()))->getFileName())));
 
         if (!file_exists($path)) {
 
             $routes = [];
             foreach ($this->router->getRouteCollection() as $name => $route) {
-                $routes[$name] = ['pattern' => $route->getPattern(), 'controller' => is_string($ctrl = $route->getDefault('_controller')) ? $ctrl : 'Closure'];
+                $routes[$name] = [
+                    'pattern'    => $route->getPattern(),
+                    'controller' => is_string($ctrl = $route->getDefault('_controller')) ? $ctrl : 'Closure',
+                    'methods'    => $route->getMethods()
+                ];
             }
 
             file_put_contents($path, '<?php return '.var_export($routes, true).';');

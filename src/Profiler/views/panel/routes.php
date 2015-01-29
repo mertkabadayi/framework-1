@@ -17,6 +17,7 @@
             <th>Route name</th>
             <th>Pattern</th>
             <th>Controller</th>
+            <th>Methods</th>
         </tr>
     </thead>
     <tbody>
@@ -27,6 +28,7 @@
             <td><?php echo $name ?></td>
             <td><?php echo $route['pattern'] ?></td>
             <td><?php echo $abbrClass($route['controller']) ?></td>
+            <td><?php echo implode(', ', $route['methods']) ?></td>
         </tr>
     <?php endforeach ?>
     </tbody>
