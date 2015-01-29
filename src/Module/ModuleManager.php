@@ -7,6 +7,11 @@ use Pagekit\Application;
 class ModuleManager implements \ArrayAccess
 {
     /**
+     * @var Application
+     */
+    protected $app;
+
+    /**
      * @var array
      */
     protected $paths = [];
@@ -14,7 +19,22 @@ class ModuleManager implements \ArrayAccess
     /**
      * @var array
      */
+    protected $configs = [];
+
+    /**
+     * @var array
+     */
     protected $modules = [];
+
+    /**
+     * Constructor.
+     *
+     * @param Application $app
+     */
+    public function __construct(Application $app)
+    {
+        $this->app = $app;
+    }
 
     /**
      * Get shortcut.
@@ -48,23 +68,25 @@ class ModuleManager implements \ArrayAccess
     }
 
     /**
-     * Loads all modules.
+     * Loads the given modules.
      *
-     * @param Application $app
+     * @param string|array $modules
      */
-    public function load(Application $app)
+    public function load($modules)
     {
+        $pattern = implode('|', (array) $modules);
+
         foreach ($this->loadConfigs() as $config) {
 
             $name = $config['name'];
 
-            if (isset($this->modules[$name])) {
+            if (isset($this->modules[$name]) || !preg_match("/^($pattern)(\.|\/|$)/", $name)) {
                 continue;
             }
 
             if (isset($config['autoload'])) {
                 foreach ($config['autoload'] as $namespace => $path) {
-                    $app['autoloader']->addPsr4($namespace, $config['path']."/$path");
+                    $this->app['autoloader']->addPsr4($namespace, $config['path']."/$path");
                 }
             }
 
@@ -73,14 +95,14 @@ class ModuleManager implements \ArrayAccess
                 $module = new $class;
 
                 if ($module instanceof ModuleInterface) {
-                    $module->load($app, $config);
+                    $module->load($this->app, $config);
                 }
 
                 $this->modules[$name] = $module;
 
             } elseif (is_callable($config['main'])) {
 
-                $this->modules[$name] = call_user_func($config['main'], $app, $config) ?: true;
+                $this->modules[$name] = call_user_func($config['main'], $this->app, $config) ?: true;
             }
         }
     }
@@ -92,7 +114,6 @@ class ModuleManager implements \ArrayAccess
      */
     public function loadConfigs()
     {
-        $configs = [];
         $include = [];
 
         foreach ($this->paths as $path) {
@@ -115,15 +136,15 @@ class ModuleManager implements \ArrayAccess
                     $include = array_merge($include, (array) $config['include']);
                 }
 
-                $configs[] = $config;
+                $this->configs[] = $config;
             }
         }
 
         if ($this->paths = $include) {
-            $configs = array_merge($configs, $this->loadConfigs());
+            $this->loadConfigs();
         }
 
-        return $configs;
+        return $this->configs;
     }
 
     /**
