@@ -14,7 +14,7 @@ class ModuleManager implements \ArrayAccess
     /**
      * @var array
      */
-    protected $paths = [];
+    protected $config;
 
     /**
      * @var array
@@ -27,13 +27,19 @@ class ModuleManager implements \ArrayAccess
     protected $modules = [];
 
     /**
+     * @var array
+     */
+    protected $paths = [];
+
+    /**
      * Constructor.
      *
      * @param Application $app
      */
-    public function __construct(Application $app)
+    public function __construct(Application $app, array $config = [])
     {
         $this->app = $app;
+        $this->config = $config;
     }
 
     /**
@@ -82,6 +88,10 @@ class ModuleManager implements \ArrayAccess
 
             if (isset($this->modules[$name]) || !preg_match("/^($pattern)(\.|\/|$)/", $name)) {
                 continue;
+            }
+
+            if (isset($this->config[$name])) {
+                $config = array_replace_recursive($config, $this->config[$name]);
             }
 
             if (isset($config['autoload'])) {
