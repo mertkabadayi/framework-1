@@ -91,18 +91,15 @@ class ModuleManager implements \ArrayAccess
             }
 
             if (is_string($class = $config['main'])) {
-
                 $module = new $class;
-
-                if ($module instanceof ModuleInterface) {
-                    $module->load($this->app, $config);
-                }
-
-                $this->modules[$name] = $module;
-
             } elseif (is_callable($config['main'])) {
+                $module = new CallableModule($config['main']);
+            }
 
-                $this->modules[$name] = call_user_func($config['main'], $this->app, $config) ?: true;
+            if (isset($module) && $module instanceof ModuleInterface) {
+                $module->setConfig($config);
+                $module->load($this->app, $config);
+                $this->modules[$name] = $module;
             }
         }
     }
