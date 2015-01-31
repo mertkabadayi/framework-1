@@ -4,7 +4,7 @@ namespace Pagekit\Module;
 
 use Pagekit\Application;
 
-abstract class Module implements ModuleInterface
+class Module implements ModuleInterface
 {
     /**
      * @var array
@@ -60,5 +60,7 @@ abstract class Module implements ModuleInterface
     public function setConfig(array $config)
     {
         $this->config = $config;
+
+        return $this;
     }
 }

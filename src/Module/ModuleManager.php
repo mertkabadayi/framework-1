@@ -29,6 +29,11 @@ class ModuleManager implements \ArrayAccess
     /**
      * @var array
      */
+    protected $loaded = [];
+
+    /**
+     * @var array
+     */
     protected $paths = [];
 
     /**
@@ -87,7 +92,7 @@ class ModuleManager implements \ArrayAccess
 
             $name = $config['name'];
 
-            if (isset($this->modules[$name]) || !preg_match("/^($pattern)(\.|\/|$)/", $name)) {
+            if (isset($this->loaded[$name]) || !preg_match("/^($pattern)(\.|\/|$)/", $name)) {
                 continue;
             }
 
@@ -101,16 +106,15 @@ class ModuleManager implements \ArrayAccess
                 }
             }
 
-            if (is_string($class = $config['main'])) {
-                $module = new $class;
-            } elseif (is_callable($config['main'])) {
-                $module = new CallableModule($config['main']);
-            }
+            $this->loaded[$name] = true;
 
-            if (isset($module) && $module instanceof ModuleInterface) {
-                $module->setConfig($config);
-                $module->load($this->app, $config);
-                $this->modules[$name] = $module;
+            if (is_callable($config['main'])) {
+
+                $module = call_user_func($config['main'], $this->app, $config);
+
+                if ($module instanceof ModuleInterface) {
+                    $this->modules[$name] = $module->setConfig($config);
+                }
             }
         }
     }
@@ -130,15 +134,11 @@ class ModuleManager implements \ArrayAccess
 
             foreach ($paths as $p) {
 
-                if (!is_array($config = include($p)) && !isset($config['main'])) {
+                if (!is_array($config = include($p)) && !isset($config['name'])) {
                     continue;
                 }
 
                 $config['path'] = strtr(dirname($p), '\\', '/');
-
-                if (!isset($config['name'])) {
-                    $config['name'] = basename($config['path']);
-                }
 
                 if (isset($config['include'])) {
                     $include = array_merge($include, (array) $config['include']);

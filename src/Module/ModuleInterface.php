@@ -31,12 +31,4 @@ interface ModuleInterface
      * @param array $config
      */
     public function setConfig(array $config);
-
-    /**
-     * Loads the module.
-     *
-     * @param Application $app
-     * @param array       $config
-     */
-    public function load(Application $app, array $config);
 }
