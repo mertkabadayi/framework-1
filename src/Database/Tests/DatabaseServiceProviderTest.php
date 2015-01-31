@@ -3,7 +3,6 @@
 namespace Pagekit\Database\Tests;
 
 use Doctrine\Common\Cache\ArrayCache;
-use Pagekit\Cache\Cache;
 use Pagekit\Database\DatabaseServiceProvider;
 use Pagekit\Tests\ServiceProviderTestCase;
 
@@ -42,7 +41,7 @@ class DatabaseServiceProviderTest extends ServiceProviderTestCase
         ]];
 
 		$this->app['config'] = $this->getConfig($conf);
-        $this->app['cache.phpfile'] = new Cache(new ArrayCache);
+        $this->app['cache.phpfile'] = new ArrayCache;
 		$this->provider->register($this->app);
 
         $this->assertInstanceOf('Pagekit\Database\Connection', $this->app['db']);

@@ -2,7 +2,7 @@
 
 namespace Pagekit\Database\ORM;
 
-use Pagekit\Cache\CacheInterface;
+use Doctrine\Common\Cache\Cache;
 use Pagekit\Database\Connection;
 use Pagekit\Database\ORM\Loader\LoaderInterface;
 
@@ -19,7 +19,7 @@ class MetadataManager
     protected $loader;
 
     /**
-     * @var CacheInterface
+     * @var Cache
      */
     protected $cache;
 
@@ -68,7 +68,7 @@ class MetadataManager
     /**
      * Gets the cache used for caching Metadata objects.
      *
-     * @return CacheInterface
+     * @return Cache
      */
     public function getCache()
     {
@@ -78,9 +78,9 @@ class MetadataManager
     /**
      * Sets the cache used for caching Metadata objects.
      *
-     * @param CacheInterface $cache
+     * @param Cache $cache
      */
-    public function setCache(CacheInterface $cache)
+    public function setCache(Cache $cache)
     {
         $this->cache = $cache;
     }
