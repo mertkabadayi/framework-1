@@ -81,6 +81,7 @@ class ModuleManager implements \ArrayAccess
     public function load($modules)
     {
         $pattern = implode('|', (array) $modules);
+        $pattern = str_replace('\|', '|', preg_quote($pattern, '/'));
 
         foreach ($this->loadConfigs() as $config) {
 
