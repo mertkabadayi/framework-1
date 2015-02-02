@@ -69,16 +69,6 @@ class ModuleManager implements \ArrayAccess
     }
 
     /**
-     * Gets all modules.
-     *
-     * @return array
-     */
-    public function all()
-    {
-        return $this->modules;
-    }
-
-    /**
      * Loads the given modules.
      *
      * @param string|array $modules
@@ -108,13 +98,8 @@ class ModuleManager implements \ArrayAccess
 
             $this->loaded[$name] = $config;
 
-            if (is_callable($config['main'])) {
-
-                $module = call_user_func($config['main'], $this->app, $config);
-
-                if ($module instanceof ModuleInterface) {
-                    $this->modules[$name] = $module->setConfig($config);
-                }
+            if (is_callable($config['main']) && $module = call_user_func($config['main'], $this->app, $config)) {
+                $this->modules[$name] = $module;
             }
         }
     }
