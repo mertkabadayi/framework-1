@@ -90,10 +90,6 @@ class ModuleManager implements \ArrayAccess
 
         foreach ($this->loadConfigs() as $config) {
 
-            if (!isset($config['name'])) {
-                continue;
-            }
-
             $name = $config['name'];
 
             if (isset($this->loaded[$name]) || !preg_match("/^($pattern)(\.|\/|$)/", $name)) {
@@ -138,7 +134,7 @@ class ModuleManager implements \ArrayAccess
 
             foreach ($paths as $p) {
 
-                if (!is_array($config = include($p)) && !isset($config['name'])) {
+                if (!is_array($config = include($p)) || !isset($config['name'])) {
                     continue;
                 }
 
