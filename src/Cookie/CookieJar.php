@@ -56,7 +56,7 @@ class CookieJar
      */
     public function has($key)
     {
-        return !is_null($this->get($key));
+        return $this->request->cookies->has($key);
     }
 
     /**
@@ -68,9 +68,7 @@ class CookieJar
      */
     public function get($key, $default = null)
     {
-        $value = $this->request->cookies->get($key);
-
-        return is_null($value) ? $default : $value;
+        return $this->request->cookies->get($key, $default);
     }
 
     /**
@@ -87,17 +85,15 @@ class CookieJar
      */
     public function set($name, $value, $expire = 0, $path = null, $domain = null, $secure = false, $httpOnly = true)
     {
-        if (is_null($path)) {
+        if (null === $path) {
             $path = $this->path;
         }
 
-        if (is_null($domain)) {
+        if (null === $domain) {
             $domain = $this->domain;
         }
 
-        $this->cookies[] = $cookie = new Cookie($name, $value, $expire, $path, $domain, $secure, $httpOnly);
-
-        return $cookie;
+        return $this->cookies[] = new Cookie($name, $value, $expire, $path, $domain, $secure, $httpOnly);
     }
 
     /**
@@ -110,11 +106,11 @@ class CookieJar
      */
     public function remove($name, $path = null, $domain = null)
     {
-        if (is_null($path)) {
+        if (null === $path) {
             $path = $this->path;
         }
 
-        if (is_null($domain)) {
+        if (null === $domain) {
             $domain = $this->domain;
         }
 
