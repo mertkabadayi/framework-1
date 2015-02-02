@@ -8,11 +8,15 @@ interface ModuleInterface
 {
     /**
      * Returns the module's name.
+     *
+     * @return string
      */
     public function getName();
 
     /**
      * Returns the module's absolute path.
+     *
+     * @return string
      */
     public function getPath();
 
@@ -28,7 +32,8 @@ interface ModuleInterface
     /**
      * Sets the module's config.
      *
-     * @param array $config
+     * @param  array $config
+     * @return self
      */
     public function setConfig(array $config);
 }

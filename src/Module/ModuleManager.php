@@ -106,7 +106,7 @@ class ModuleManager implements \ArrayAccess
                 }
             }
 
-            $this->loaded[$name] = true;
+            $this->loaded[$name] = $config;
 
             if (is_callable($config['main'])) {
 
@@ -153,6 +153,16 @@ class ModuleManager implements \ArrayAccess
         }
 
         return $this->configs;
+    }
+
+    /**
+     * Gets loaded module configs.
+     *
+     * @return array
+     */
+    public function getConfigs()
+    {
+        return $this->loaded;
     }
 
     /**
