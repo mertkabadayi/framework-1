@@ -11,7 +11,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Pagekit\\Component\\Routing\\": ""
+            "Pagekit\\Routing\\": "src"
         }
     },
     "extra": {

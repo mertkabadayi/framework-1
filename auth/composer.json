@@ -12,7 +12,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Pagekit\\Component\\Auth\\": ""
+            "Pagekit\\Auth\\": "src"
         }
     },
     "extra": {

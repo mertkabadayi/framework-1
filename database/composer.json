@@ -8,7 +8,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Pagekit\\Component\\Database\\": ""
+            "Pagekit\\Database\\": "src"
         }
     },
     "extra": {

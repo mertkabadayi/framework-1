@@ -9,7 +9,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Pagekit\\Component\\Session\\": ""
+            "Pagekit\\Session\\": "src"
         }
     },
     "extra": {
