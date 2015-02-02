@@ -3,8 +3,8 @@
 namespace Pagekit;
 
 use Pagekit\Application\ExceptionListenerWrapper;
+use Pagekit\Application\ModuleManager;
 use Pagekit\Application\ServiceProviderInterface;
-use Pagekit\Application\Provider\RoutingServiceProvider;
 use Pagekit\Application\Traits\EventTrait;
 use Pagekit\Application\Traits\StaticTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -39,7 +39,9 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
             return new EventDispatcher;
         };
 
-        $this->register(new RoutingServiceProvider);
+        $this['module'] = function() {
+            return new ModuleManager($this);
+        };
     }
 
     /**
@@ -84,6 +86,8 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
             foreach ($this->providers as $provider) {
                 $provider->boot($this);
             }
+
+            $this['events']->dispatch('kernel.boot');
 
             $this->booted = true;
         }

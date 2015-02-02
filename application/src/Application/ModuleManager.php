@@ -1,6 +1,6 @@
 <?php
 
-namespace Pagekit\Module;
+namespace Pagekit\Application;
 
 use Pagekit\Application;
 
@@ -41,10 +41,9 @@ class ModuleManager implements \ArrayAccess
      *
      * @param Application $app
      */
-    public function __construct(Application $app, array $config = [])
+    public function __construct(Application $app)
     {
         $this->app = $app;
-        $this->config = $config;
     }
 
     /**
@@ -61,7 +60,7 @@ class ModuleManager implements \ArrayAccess
      * Gets a module.
      *
      * @param  string $name
-     * @return ModuleInterface|null
+     * @return mixed|null
      */
     public function get($name)
     {
@@ -148,6 +147,19 @@ class ModuleManager implements \ArrayAccess
     public function getConfigs()
     {
         return $this->loaded;
+    }
+
+    /**
+     * Sets module configs.
+     *
+     * @param array $config
+     * @return self
+     */
+    public function setConfig(array $config = [])
+    {
+        $this->config = $config;
+
+        return $this;
     }
 
     /**

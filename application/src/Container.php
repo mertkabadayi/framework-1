@@ -38,8 +38,8 @@ class Container implements \ArrayAccess
     /**
      * Sets a closure as a factory service.
      *
-     * @param string  $name
-     * @param closure $closure
+     * @param string   $name
+     * @param \Closure $closure
      */
     public function factory($name, \Closure $closure)
     {
@@ -50,8 +50,8 @@ class Container implements \ArrayAccess
     /**
      * Extends an existing service definition.
      *
-     * @param string  $name
-     * @param closure $closure
+     * @param string   $name
+     * @param \Closure $closure
      *
      * @throws \InvalidArgumentException
      */
