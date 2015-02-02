@@ -34,6 +34,11 @@ class ModuleManager implements \ArrayAccess
     /**
      * @var array
      */
+    protected $sorted = [];
+
+    /**
+     * @var array
+     */
     protected $paths = [];
 
     /**
@@ -77,11 +82,11 @@ class ModuleManager implements \ArrayAccess
         $pattern = implode('|', (array) $modules);
         $pattern = str_replace('\|', '|', preg_quote($pattern, '/'));
 
-        foreach ($this->loadConfigs() as $config) {
+        foreach ($this->sortedConfigs() as $config) {
 
             $name = $config['name'];
 
-            if (isset($this->loaded[$name]) || !preg_match("/^($pattern)(\.|\/|$)/", $name)) {
+            if (isset($this->configs[$name]) || !preg_match("/^($pattern)(\.|\/|$)/", $name)) {
                 continue;
             }
 
@@ -95,7 +100,7 @@ class ModuleManager implements \ArrayAccess
                 }
             }
 
-            $this->loaded[$name] = $config;
+            $this->configs[$name] = $config;
 
             if (is_callable($config['main']) && $module = call_user_func($config['main'], $this->app, $config)) {
                 $this->modules[$name] = $module;
@@ -122,13 +127,19 @@ class ModuleManager implements \ArrayAccess
                     continue;
                 }
 
-                $config['path'] = strtr(dirname($p), '\\', '/');
+                $priority = 0;
+
+                if (isset($config['priority'])) {
+                    $priority = (int) $config['priority'];
+                }
 
                 if (isset($config['include'])) {
                     $include = array_merge($include, (array) $config['include']);
                 }
 
-                $this->configs[] = $config;
+                $config['path'] = strtr(dirname($p), '\\', '/');
+
+                $this->loaded[$priority][] = $config;
             }
         }
 
@@ -136,7 +147,24 @@ class ModuleManager implements \ArrayAccess
             $this->loadConfigs();
         }
 
-        return $this->configs;
+        return $this->loaded;
+    }
+
+    /**
+     * Gets sorted module configs.
+     *
+     * @return array
+     */
+    public function sortedConfigs()
+    {
+        $configs = $this->loadConfigs();
+
+        if (empty($this->sorted)) {
+            krsort($configs);
+            $this->sorted = call_user_func_array('array_merge', $configs);
+        }
+
+        return $this->sorted;
     }
 
     /**
@@ -146,13 +174,13 @@ class ModuleManager implements \ArrayAccess
      */
     public function getConfigs()
     {
-        return $this->loaded;
+        return $this->configs;
     }
 
     /**
      * Sets module configs.
      *
-     * @param array $config
+     * @param  array $config
      * @return self
      */
     public function setConfig(array $config = [])
@@ -171,6 +199,7 @@ class ModuleManager implements \ArrayAccess
     public function addPath($paths)
     {
         $this->paths = array_merge($this->paths, (array) $paths);
+        $this->sorted = [];
 
         return $this;
     }
