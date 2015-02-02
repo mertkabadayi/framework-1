@@ -29,7 +29,17 @@
     },
     "autoload": {
         "psr-4": {
-            "Pagekit\\": "src"
+            "Pagekit\\": "application/src",
+            "Pagekit\\Auth\\": "auth/src",
+            "Pagekit\\Config\\": "config/src",
+            "Pagekit\\Cookie\\": "cookie/src",
+            "Pagekit\\Database\\": "database/src",
+            "Pagekit\\Filesystem\\": "filesystem/src",
+            "Pagekit\\Filter\\": "filter/src",
+            "Pagekit\\Module\\": "module/src",
+            "Pagekit\\Routing\\": "routing/src",
+            "Pagekit\\Session\\": "session/src",
+            "Pagekit\\View\\": "view/src"
         }
     },
     "extra": {
