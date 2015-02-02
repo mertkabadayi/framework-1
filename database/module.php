@@ -1,24 +1,22 @@
 <?php
 
-namespace Pagekit\Database;
-
 use Doctrine\DBAL\DriverManager;
-use Pagekit\Application;
-use Pagekit\Application\ServiceProviderInterface;
 use Pagekit\Database\Logging\DebugStack;
 use Pagekit\Database\ORM\EntityManager;
 use Pagekit\Database\ORM\Loader\AnnotationLoader;
 use Pagekit\Database\ORM\MetadataManager;
 
-class DatabaseServiceProvider implements ServiceProviderInterface
-{
-    public function register(Application $app)
-    {
+return [
+
+    'name' => 'framework/database',
+
+    'main' => function ($app, $config) {
+
         $default = [
             'wrapperClass' => 'Pagekit\Database\Connection'
         ];
 
-        $app['dbs'] = function($app) use ($default) {
+        $app['dbs'] = function ($app) use ($default) {
 
             $dbs = [];
 
@@ -40,11 +38,11 @@ class DatabaseServiceProvider implements ServiceProviderInterface
             return $app['dbs'][$app['config']['database.default']];
         };
 
-        $app['db.em'] = function($app) {
+        $app['db.em'] = function ($app) {
             return new EntityManager($app['db'], $app['db.metas']);
         };
 
-        $app['db.metas'] = function($app) {
+        $app['db.metas'] = function ($app) {
 
             $manager = new MetadataManager($app['db']);
             $manager->setLoader(new AnnotationLoader);
@@ -53,12 +51,10 @@ class DatabaseServiceProvider implements ServiceProviderInterface
             return $manager;
         };
 
-        $app['db.debug_stack'] = function($app) {
+        $app['db.debug_stack'] = function ($app) {
             return new DebugStack($app['profiler.stopwatch']);
         };
+
     }
 
-    public function boot(Application $app)
-    {
-    }
-}
+];
