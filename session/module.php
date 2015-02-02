@@ -15,7 +15,7 @@ use Pagekit\Session\Csrf\Provider\SessionCsrfProvider;
 
 return [
 
-    'name' => 'framework/application',
+    'name' => 'framework/session',
 
     'main' => function ($app, $config) {
 
