@@ -123,7 +123,7 @@ class ModuleManager implements \ArrayAccess
 
             foreach ($paths as $p) {
 
-                if (!is_array($config = include($p)) || !isset($config['name'])) {
+                if (!is_array($config = include $p) || !isset($config['name'])) {
                     continue;
                 }
 

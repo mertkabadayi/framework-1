@@ -4,7 +4,6 @@ namespace Pagekit;
 
 use Pagekit\Application\ExceptionListenerWrapper;
 use Pagekit\Application\ModuleManager;
-use Pagekit\Application\ServiceProviderInterface;
 use Pagekit\Application\Traits\EventTrait;
 use Pagekit\Application\Traits\StaticTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -23,7 +22,6 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
     const EARLY_EVENT = 512;
     const LATE_EVENT  = -512;
 
-    protected $providers = [];
     protected $booted = false;
 
     /**
@@ -45,35 +43,6 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
     }
 
     /**
-     * Registers a service provider.
-     *
-     * @param  ServiceProviderInterface|string $provider
-     * @param  array                           $values
-     * @throws \InvalidArgumentException
-     * @return Application
-     */
-    public function register($provider, array $values = [])
-    {
-        if (is_string($provider)) {
-            $provider = new $provider;
-        }
-
-        if (!$provider instanceof ServiceProviderInterface) {
-            throw new \InvalidArgumentException('Provider must implement the ServiceProviderInterface.');
-        }
-
-        $this->providers[] = $provider;
-
-        $provider->register($this);
-
-        foreach ($values as $key => $value) {
-            $this[$key] = $value;
-        }
-
-        return $this;
-    }
-
-    /**
      * Boots all service providers.
      *
      * This method is automatically called by handle(), but you can use it
@@ -81,16 +50,12 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
      */
     public function boot()
     {
-        if (!$this->booted) {
-
-            foreach ($this->providers as $provider) {
-                $provider->boot($this);
-            }
-
-            $this['events']->dispatch('kernel.boot');
-
-            $this->booted = true;
+        if ($this->booted) {
+            return;
         }
+
+        $this['events']->dispatch('kernel.boot');
+        $this->booted = true;
     }
 
     /**

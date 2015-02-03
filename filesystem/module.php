@@ -1,6 +1,7 @@
 <?php
 
 use Pagekit\Filesystem\Filesystem;
+use Pagekit\Filesystem\Locator;
 use Pagekit\Filesystem\StreamWrapper;
 
 return [
@@ -10,7 +11,11 @@ return [
     'main' => function ($app, $config) {
 
         $app['file'] = function () {
-            return new Filesystem();
+            return new Filesystem;
+        };
+
+        $app['locator'] = function ($app) {
+            return new Locator($app['path']);
         };
 
         $app->on('kernel.boot', function () use ($app) {
