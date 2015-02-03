@@ -63,6 +63,28 @@ return [
             $app->subscribe($app['controllers']);
         });
 
+        $app->on('kernel.request', function() use ($app) {
+
+            foreach ($app['module']->getConfigs() as $config) {
+
+                if (!isset($config['controllers'])) {
+                    continue;
+                }
+
+                foreach ($config['controllers'] as $prefix => $controller) {
+
+                    $namespace = '';
+
+                    if (strpos($prefix, ':') !== false) {
+                        list($namespace, $prefix) = explode(':', $prefix);
+                    }
+
+                    $app['controllers']->mount($prefix, $controller, "$namespace/");
+                }
+            }
+
+        }, 35);
+
     }
 
 ];
