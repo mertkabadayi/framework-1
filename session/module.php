@@ -1,5 +1,7 @@
 <?php
 
+use Pagekit\Session\Csrf\Event\CsrfListener;
+use Pagekit\Session\Csrf\Provider\SessionCsrfProvider;
 use Pagekit\Session\Handler\DatabaseSessionHandler;
 use Pagekit\Session\Message;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -10,8 +12,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Pagekit\Session\Csrf\Event\CsrfListener;
-use Pagekit\Session\Csrf\Provider\SessionCsrfProvider;
 
 return [
 
@@ -29,13 +29,13 @@ return [
             return new Message;
         };
 
-        $app['session.storage'] = function($app) {
+        $app['session.storage'] = function($app) use ($config) {
 
-            switch ($app['config']['session.storage']) {
+            switch ($config['storage']) {
 
                 case 'database':
 
-                    $handler = new DatabaseSessionHandler($app['db'], $app['config']['session.table']);
+                    $handler = new DatabaseSessionHandler($app['db'], $config['table']);
                     $storage = new NativeSessionStorage($app['session.options'], $handler);
 
                     break;
@@ -49,7 +49,7 @@ return [
 
                 default:
 
-                    $handler = new NativeFileSessionHandler($app['config']['session.files']);
+                    $handler = new NativeFileSessionHandler($config['files']);
                     $storage = new NativeSessionStorage($app['session.options'], $handler);
 
                     break;
@@ -58,9 +58,9 @@ return [
             return $storage;
         };
 
-        $app['session.options'] = function($app) {
+        $app['session.options'] = function() use ($config) {
 
-            $options = $app['config']['session'];
+            $options = array_diff_key($config, array_fill_keys(['name', 'main'], null));
 
             if (isset($options['cookie'])) {
 
@@ -88,8 +88,8 @@ return [
 
             if ($app['session.test']) {
 
-                $app['events']->addListener(KernelEvents::REQUEST, function (GetResponseEvent $event)
-                {
+                $app['events']->addListener(KernelEvents::REQUEST, function (GetResponseEvent $event) {
+
                     if (!$event->isMasterRequest() || !isset($this->app['session'])) {
                         return;
                     }
@@ -102,17 +102,16 @@ return [
                     } else {
                         $session->migrate(false);
                     }
+
                 }, 100);
 
-                $app['events']->addListener(KernelEvents::RESPONSE, function (FilterResponseEvent $event)
-                {
+                $app['events']->addListener(KernelEvents::RESPONSE, function (FilterResponseEvent $event) {
+
                     if (!$event->isMasterRequest()) {
                         return;
                     }
 
-                    $session = $event->getRequest()->getSession();
-
-                    if ($session && $session->isStarted()) {
+                    if ($session = $event->getRequest()->getSession() and $session->isStarted()) {
 
                         $session->save();
 
@@ -121,20 +120,31 @@ return [
 
                         $event->getResponse()->headers->setCookie($cookie);
                     }
+
                 }, -100);
             }
 
             $app['events']->addListener(KernelEvents::REQUEST, function (GetResponseEvent $event) {
+
                 if (!$this->app['session.test'] && !isset($this->app['session.options']['cookie_path'])) {
                     $this->app['session.storage']->setOptions(['cookie_path' => $event->getRequest()->getBasePath() ?: '/']);
                 }
 
                 $event->getRequest()->setSession($this->app['session']);
+
             }, 100);
 
             $app->subscribe(new CsrfListener($app['csrf']));
 
         });
-    }
+    },
+
+    'storage'  => null,
+    'lifetime' => 900,
+    'files'    => null,
+    'table'    => 'sessions',
+    'cookie'   => [
+        'name' => 'pagekit_session',
+    ]
 
 ];

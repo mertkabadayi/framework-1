@@ -2,9 +2,9 @@
 
 namespace Pagekit\Filesystem\Tests\Adapter;
 
+use Pagekit\Filesystem\Adapter\StreamAdapter;
 use Pagekit\Filesystem\Filesystem;
 use Pagekit\Filesystem\StreamWrapper;
-use Pagekit\Filesystem\Adapter\StreamAdapter;
 
 class StreamAdapterTest extends \PHPUnit_Framework_TestCase
 {

@@ -2,10 +2,10 @@
 
 use Pagekit\Application\Response;
 use Pagekit\Application\UrlProvider;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\Debug\ErrorHandler;
 use Symfony\Component\Debug\ExceptionHandler;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 return [
 
@@ -13,7 +13,7 @@ return [
 
     'main' => function ($app, $config) {
 
-        $debug   = (bool) $config['app.debug'];
+        $debug   = (bool) $app['config']['app.debug'];
         $handler = ExceptionHandler::register($debug);
 
         ErrorHandler::register(E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR | E_RECOVERABLE_ERROR);

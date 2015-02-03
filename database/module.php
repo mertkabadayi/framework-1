@@ -16,15 +16,15 @@ return [
             'wrapperClass' => 'Pagekit\Database\Connection'
         ];
 
-        $app['dbs'] = function ($app) use ($default) {
+        $app['dbs'] = function ($app) use ($config, $default) {
 
             $dbs = [];
 
-            foreach ($app['config']['database.connections'] as $name => $params) {
+            foreach ($config['connections'] as $name => $params) {
 
                 $params = array_replace($default, $params);
 
-                if ($app['config']['database.default'] === $name) {
+                if ($config['default'] === $name) {
                     $params['events'] = $app['events'];
                 }
 
@@ -34,8 +34,8 @@ return [
             return $dbs;
         };
 
-        $app['db'] = function ($app) {
-            return $app['dbs'][$app['config']['database.default']];
+        $app['db'] = function ($app) use ($config) {
+            return $app['dbs'][$config['default']];
         };
 
         $app['db.em'] = function ($app) {
@@ -55,6 +55,26 @@ return [
             return new DebugStack($app['profiler.stopwatch']);
         };
 
-    }
+    },
+
+    'default' => 'mysql',
+
+    'connections' => [
+
+        'mysql' => [
+
+            'driver'   => 'pdo_mysql',
+            'dbname'   => '',
+            'host'     => 'localhost',
+            'user'     => 'root',
+            'password' => '',
+            'engine'   => 'InnoDB',
+            'charset'  => 'utf8',
+            'collate'  => 'utf8_unicode_ci',
+            'prefix'   => ''
+
+        ]
+
+    ]
 
 ];
