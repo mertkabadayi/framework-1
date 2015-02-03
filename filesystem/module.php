@@ -14,14 +14,16 @@ return [
             return new Filesystem;
         };
 
-        $app['locator'] = function ($app) {
-            return new Locator($app['path']);
+        $app['locator'] = function () use ($config) {
+            return new Locator($config['config.path']);
         };
 
         $app->on('kernel.boot', function () use ($app) {
             StreamWrapper::setFilesystem($app['file']);
         });
 
-    }
+    },
+
+    'config.path' => getcwd()
 
 ];
