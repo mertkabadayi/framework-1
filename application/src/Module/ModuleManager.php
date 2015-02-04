@@ -13,11 +13,6 @@ class ModuleManager implements \ArrayAccess
     protected $app;
 
     /**
-     * @var LoaderInterface[]
-     */
-    protected $loaders = [];
-
-    /**
      * @var array
      */
     protected $configs = [];
@@ -41,6 +36,11 @@ class ModuleManager implements \ArrayAccess
      * @var array
      */
     protected $paths = [];
+
+    /**
+     * @var LoaderInterface[]
+     */
+    protected $loaders = [];
 
     /**
      * Constructor.
@@ -203,11 +203,12 @@ class ModuleManager implements \ArrayAccess
      * Adds a config loader.
      *
      * @param  LoaderInterface $loader
-     * @return $this
+     * @return self
      */
     public function addLoader(LoaderInterface $loader)
     {
         $this->loaders[] = $loader;
+
         return $this;
     }
 
