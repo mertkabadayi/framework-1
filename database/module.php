@@ -59,6 +59,8 @@ return [
 
     'default' => 'mysql',
 
+    'priority' => 16,
+
     'connections' => [
 
         'mysql' => [

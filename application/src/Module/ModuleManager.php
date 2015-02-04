@@ -3,8 +3,7 @@
 namespace Pagekit\Module;
 
 use Pagekit\Application;
-use Pagekit\Module\Config\Config;
-use Pagekit\Module\Config\ConfigInterface;
+use Pagekit\Module\Config\LoaderInterface;
 
 class ModuleManager implements \ArrayAccess
 {
@@ -14,9 +13,9 @@ class ModuleManager implements \ArrayAccess
     protected $app;
 
     /**
-     * @var ConfigInterface
+     * @var LoaderInterface[]
      */
-    protected $config;
+    protected $loaders = [];
 
     /**
      * @var array
@@ -48,10 +47,9 @@ class ModuleManager implements \ArrayAccess
      *
      * @param Application $app
      */
-    public function __construct(Application $app, ConfigInterface $config = null)
+    public function __construct(Application $app)
     {
         $this->app = $app;
-        $this->config = $config ?: new Config;
     }
 
     /**
@@ -93,7 +91,11 @@ class ModuleManager implements \ArrayAccess
                 continue;
             }
 
-            $config = $this->configs[$name] = $this->config->get($name, $config);
+            foreach ($this->loaders as $loader) {
+                $config = $loader->load($name, $config);
+            }
+
+            $this->configs[$name] = $config;
 
             if (isset($config['autoload'])) {
                 foreach ($config['autoload'] as $namespace => $path) {
@@ -177,29 +179,6 @@ class ModuleManager implements \ArrayAccess
     }
 
     /**
-     * Gets module configs.
-     *
-     * @return ConfigInterface
-     */
-    public function getConfig()
-    {
-        return $this->config;
-    }
-
-    /**
-     * Gets module configs.
-     *
-     * @param  ConfigInterface $config
-     * @return self
-     */
-    public function setConfig(ConfigInterface $config)
-    {
-        $this->config = $config;
-
-        return $this;
-    }
-
-    /**
      * Adds a module path(s).
      *
      * @param  string|array $paths
@@ -210,6 +189,18 @@ class ModuleManager implements \ArrayAccess
         $this->paths = array_merge($this->paths, (array) $paths);
         $this->sorted = [];
 
+        return $this;
+    }
+
+    /**
+     * Adds a config loader.
+     *
+     * @param  LoaderInterface $loader
+     * @return $this
+     */
+    public function addLoader(LoaderInterface $loader)
+    {
+        $this->loaders[] = $loader;
         return $this;
     }
 
