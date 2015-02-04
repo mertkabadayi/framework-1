@@ -1,8 +1,10 @@
 <?php
 
-namespace Pagekit\Application;
+namespace Pagekit\Module;
 
 use Pagekit\Application;
+use Pagekit\Module\Config\Config;
+use Pagekit\Module\Config\ConfigInterface;
 
 class ModuleManager implements \ArrayAccess
 {
@@ -12,7 +14,7 @@ class ModuleManager implements \ArrayAccess
     protected $app;
 
     /**
-     * @var array
+     * @var ConfigInterface
      */
     protected $config;
 
@@ -46,9 +48,10 @@ class ModuleManager implements \ArrayAccess
      *
      * @param Application $app
      */
-    public function __construct(Application $app)
+    public function __construct(Application $app, ConfigInterface $config = null)
     {
         $this->app = $app;
+        $this->config = $config ?: new Config;
     }
 
     /**
@@ -90,17 +93,13 @@ class ModuleManager implements \ArrayAccess
                 continue;
             }
 
-            if (isset($this->config[$name])) {
-                $config = array_replace_recursive($config, $this->config[$name]);
-            }
+            $config = $this->configs[$name] = $this->config->get($name, $config);
 
             if (isset($config['autoload'])) {
                 foreach ($config['autoload'] as $namespace => $path) {
                     $this->app['autoloader']->addPsr4($namespace, $config['path']."/$path");
                 }
             }
-
-            $this->configs[$name] = $config;
 
             if (is_callable($config['main']) && $module = call_user_func($config['main'], $this->app, $config)) {
                 $this->modules[$name] = $module;
@@ -178,12 +177,22 @@ class ModuleManager implements \ArrayAccess
     }
 
     /**
-     * Sets module configs.
+     * Gets module configs.
      *
-     * @param  array $config
+     * @return ConfigInterface
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
+     * Gets module configs.
+     *
+     * @param  ConfigInterface $config
      * @return self
      */
-    public function setConfig(array $config = [])
+    public function setConfig(ConfigInterface $config)
     {
         $this->config = $config;
 

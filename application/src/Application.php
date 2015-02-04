@@ -3,9 +3,9 @@
 namespace Pagekit;
 
 use Pagekit\Application\ExceptionListenerWrapper;
-use Pagekit\Application\ModuleManager;
 use Pagekit\Application\Traits\EventTrait;
 use Pagekit\Application\Traits\StaticTrait;
+use Pagekit\Module\ModuleManager;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
