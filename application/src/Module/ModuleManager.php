@@ -95,16 +95,23 @@ class ModuleManager implements \ArrayAccess
                 $config = $loader->load($name, $config);
             }
 
-            $this->configs[$name] = $config;
-
             if (isset($config['autoload'])) {
                 foreach ($config['autoload'] as $namespace => $path) {
                     $this->app['autoloader']->addPsr4($namespace, $config['path']."/$path");
                 }
             }
 
-            if (is_callable($config['main']) && $module = call_user_func($config['main'], $this->app, $config)) {
-                $this->modules[$name] = $module;
+            if (is_callable($config['main'])) {
+
+                $module = call_user_func($config['main'], $this->app, $config);
+
+                if ($module !== false) {
+                    $this->configs[$name] = $config;
+                }
+
+                if (is_object($module)) {
+                    $this->modules[$name] = $module;
+                }
             }
         }
     }
