@@ -88,13 +88,13 @@ return [
 
             if ($app['session.test']) {
 
-                $app['events']->addListener(KernelEvents::REQUEST, function (GetResponseEvent $event) {
+                $app['events']->addListener(KernelEvents::REQUEST, function (GetResponseEvent $event) use ($app) {
 
-                    if (!$event->isMasterRequest() || !isset($this->app['session'])) {
+                    if (!$event->isMasterRequest() || !isset($app['session'])) {
                         return;
                     }
 
-                    $session = $this->app['session'];
+                    $session = $app['session'];
                     $cookies = $event->getRequest()->cookies;
 
                     if ($cookies->has($session->getName())) {
@@ -124,13 +124,13 @@ return [
                 }, -100);
             }
 
-            $app['events']->addListener(KernelEvents::REQUEST, function (GetResponseEvent $event) {
+            $app['events']->addListener(KernelEvents::REQUEST, function (GetResponseEvent $event) use ($app) {
 
-                if (!$this->app['session.test'] && !isset($this->app['session.options']['cookie_path'])) {
-                    $this->app['session.storage']->setOptions(['cookie_path' => $event->getRequest()->getBasePath() ?: '/']);
+                if (!$app['session.test'] && !isset($app['session.options']['cookie_path'])) {
+                    $app['session.storage']->setOptions(['cookie_path' => $event->getRequest()->getBasePath() ?: '/']);
                 }
 
-                $event->getRequest()->setSession($this->app['session']);
+                $event->getRequest()->setSession($app['session']);
 
             }, 100);
 

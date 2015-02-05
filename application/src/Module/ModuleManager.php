@@ -101,9 +101,9 @@ class ModuleManager implements \ArrayAccess
                 }
             }
 
-            if (is_callable($config['main'])) {
+            if ($config['main'] instanceof \Closure) {
 
-                $module = call_user_func($config['main'], $this->app, $config);
+                $module = call_user_func($config['main']->bindTo((object) $config), $this->app, $config);
 
                 if ($module !== false) {
                     $this->configs[$name] = $config;
