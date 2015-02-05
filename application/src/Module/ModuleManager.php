@@ -101,18 +101,13 @@ class ModuleManager implements \ArrayAccess
                 }
             }
 
-            if ($config['main'] instanceof \Closure) {
+            $class = is_string($config['main']) ? $config['main'] : 'Pagekit\\Module\\Module';
 
-                $module = call_user_func($config['main']->bindTo((object) $config), $this->app, $config);
+            $module = new $class($config);
+            $module->main($this->app, $config);
 
-                if ($module !== false) {
-                    $this->configs[$name] = $config;
-                }
-
-                if (is_object($module)) {
-                    $this->modules[$name] = $module;
-                }
-            }
+            $this->configs[$name] = $config;
+            $this->modules[$name] = $module;
         }
     }
 
