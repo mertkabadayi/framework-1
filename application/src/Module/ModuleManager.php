@@ -5,7 +5,7 @@ namespace Pagekit\Module;
 use Pagekit\Application;
 use Pagekit\Module\Config\LoaderInterface;
 
-class ModuleManager implements \ArrayAccess
+class ModuleManager implements \ArrayAccess, \IteratorAggregate
 {
     /**
      * @var Application
@@ -169,6 +169,16 @@ class ModuleManager implements \ArrayAccess
     public function offsetUnset($name)
     {
         unset($this->modules[$name]);
+    }
+
+    /**
+     * Implements the IteratorAggregate.
+     *
+     * @return \ArrayIterator
+     */
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->modules);
     }
 
     /**

@@ -67,7 +67,7 @@ return [
 
         $app->on('kernel.request', function() use ($app) {
 
-            foreach ($app['module']->all() as $module) {
+            foreach ($app['module'] as $module) {
 
                 if (!isset($module->controllers)) {
                     continue;
