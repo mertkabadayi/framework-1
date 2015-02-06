@@ -38,17 +38,12 @@ return [
         }, -32);
 
         $app['auth.remember'] = function($app) {
-
-            // TODO fix config parameters
-
-            $name = $app['config']['cookie.remember_me'] ?: 'remember_'.md5($app['request']->getUriForPath(''));
-
-            return new RememberMe($app['config']['app.key'], $name, $app['cookie']);
+            return new RememberMe($this->config('rememberme.key'), $this->config('rememberme.cookie.name') ?: 'remember_'.md5($app['request']->getUriForPath('')), $app['cookie']);
         };
 
         $app->on('kernel.boot', function() use ($app) {
 
-            if (!$this->config['rememberme']['enabled']) {
+            if (!$this->config('rememberme.enabled') || !$this->config('rememberme.key')) {
                 return;
             }
 
@@ -90,7 +85,15 @@ return [
 
         'rememberme' => [
 
-            'enabled' => true
+            'enabled' => true,
+
+            'key' => '',
+
+            'cookie' => [
+
+                'name' => ''
+
+            ]
 
         ]
 

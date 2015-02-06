@@ -14,22 +14,22 @@ class Application extends BaseApplication
      *
      * @var Container
      */
-    protected $pagekit;
+    protected $container;
 
     /**
      * Constructor.
      *
-     * @param Container $pagekit
+     * @param Container $container
      * @param string    $name
      */
-    public function __construct(Container $pagekit, $name = null)
+    public function __construct(Container $container, $name = 'UNKNOWN', $version = 'UNKNOWN')
     {
-        parent::__construct($name ?: 'Pagekit', $pagekit['config']['app.version']);
+        parent::__construct($name, $version);
 
-        $this->pagekit = $pagekit;
+        $this->container = $container;
 
-        if (isset($pagekit['events'])) {
-            $pagekit['events']->dispatch('console.init', new ConsoleEvent($this));
+        if (isset($container['events'])) {
+            $container['events']->dispatch('console.init', new ConsoleEvent($this));
         }
     }
 
@@ -42,7 +42,7 @@ class Application extends BaseApplication
     public function add(BaseCommand $command)
     {
         if ($command instanceof Command) {
-            $command->setPagekit($this->pagekit);
+            $command->setContainer($this->container);
         }
 
         return parent::add($command);

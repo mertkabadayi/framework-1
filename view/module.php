@@ -26,11 +26,11 @@ return [
         };
 
         $app['styles'] = function($app) {
-            return new AssetManager($app['config']['app.version']);
+            return new AssetManager($app['version']);
         };
 
         $app['scripts'] = function($app) {
-            return new AssetManager($app['config']['app.version']);
+            return new AssetManager($app['version']);
         };
 
         $app->on('kernel.boot', function() use ($app) {
