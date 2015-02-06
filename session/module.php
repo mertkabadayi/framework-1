@@ -17,7 +17,7 @@ return [
 
     'name' => 'framework/session',
 
-    'main' => function ($app, $config) {
+    'main' => function ($app) {
 
         $app['session'] = function($app) {
             $session = new Session($app['session.storage']);
@@ -29,13 +29,13 @@ return [
             return new Message;
         };
 
-        $app['session.storage'] = function($app) use ($config) {
+        $app['session.storage'] = function($app) {
 
-            switch ($config['storage']) {
+            switch ($this->config['storage']) {
 
                 case 'database':
 
-                    $handler = new DatabaseSessionHandler($app['db'], $config['table']);
+                    $handler = new DatabaseSessionHandler($app['db'], $this->config['table']);
                     $storage = new NativeSessionStorage($app['session.options'], $handler);
 
                     break;
@@ -49,7 +49,7 @@ return [
 
                 default:
 
-                    $handler = new NativeFileSessionHandler($config['files']);
+                    $handler = new NativeFileSessionHandler($this->config['files']);
                     $storage = new NativeSessionStorage($app['session.options'], $handler);
 
                     break;
@@ -58,9 +58,9 @@ return [
             return $storage;
         };
 
-        $app['session.options'] = function() use ($config) {
+        $app['session.options'] = function() {
 
-            $options = array_diff_key($config, array_fill_keys(['name', 'main'], null));
+            $options = array_diff_key($this->config, array_fill_keys(['name', 'main'], null));
 
             if (isset($options['cookie'])) {
 
@@ -88,7 +88,7 @@ return [
 
             if ($app['session.test']) {
 
-                $app['events']->addListener(KernelEvents::REQUEST, function (GetResponseEvent $event) use ($app) {
+                $app->on(KernelEvents::REQUEST, function (GetResponseEvent $event) use ($app) {
 
                     if (!$event->isMasterRequest() || !isset($app['session'])) {
                         return;
@@ -105,7 +105,7 @@ return [
 
                 }, 100);
 
-                $app['events']->addListener(KernelEvents::RESPONSE, function (FilterResponseEvent $event) {
+                $app->on(KernelEvents::RESPONSE, function (FilterResponseEvent $event) {
 
                     if (!$event->isMasterRequest()) {
                         return;
@@ -124,7 +124,7 @@ return [
                 }, -100);
             }
 
-            $app['events']->addListener(KernelEvents::REQUEST, function (GetResponseEvent $event) use ($app) {
+            $app->on(KernelEvents::REQUEST, function (GetResponseEvent $event) use ($app) {
 
                 if (!$app['session.test'] && !isset($app['session.options']['cookie_path'])) {
                     $app['session.storage']->setOptions(['cookie_path' => $event->getRequest()->getBasePath() ?: '/']);
@@ -139,12 +139,16 @@ return [
         });
     },
 
-    'storage'  => null,
-    'lifetime' => 900,
-    'files'    => null,
-    'table'    => 'sessions',
-    'cookie'   => [
-        'name' => 'pagekit_session',
+    'config' => [
+
+        'storage'  => null,
+        'lifetime' => 900,
+        'files'    => null,
+        'table'    => 'sessions',
+        'cookie'   => [
+            'name' => '',
+        ]
+
     ]
 
 ];

@@ -11,7 +11,7 @@ return [
 
     'name' => 'framework/view',
 
-    'main' => function ($app, $config) {
+    'main' => function ($app) {
 
         $app['view'] = function($app) {
 
@@ -108,6 +108,21 @@ return [
                 return implode(PHP_EOL, $result);
 
             });
+        });
+
+        $app->on('kernel.controller', function() use ($app) {
+            foreach ($app['module'] as $module) {
+
+                if (!isset($module->renderer)) {
+                    continue;
+                }
+
+                foreach ($module->renderer as $name => $template) {
+                    $app['sections']->addRenderer($name, function ($name, $value, $options = []) use ($app, $template) {
+                        return $app['view']->render($template, compact('name', 'value', 'options'));
+                    });
+                }
+            }
         });
     }
 

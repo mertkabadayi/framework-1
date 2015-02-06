@@ -8,14 +8,14 @@ return [
 
     'name' => 'framework/filesystem',
 
-    'main' => function ($app, $config) {
+    'main' => function ($app) {
 
         $app['file'] = function () {
             return new Filesystem;
         };
 
-        $app['locator'] = function () use ($config) {
-            return new Locator($config['config.path']);
+        $app['locator'] = function () {
+            return new Locator($this->config['path']);
         };
 
         $app->on('kernel.boot', function () use ($app) {
@@ -24,6 +24,10 @@ return [
 
     },
 
-    'config.path' => getcwd()
+    'config' => [
+
+        'path' => getcwd()
+
+    ]
 
 ];

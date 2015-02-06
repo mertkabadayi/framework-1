@@ -13,12 +13,7 @@ class ModuleManager implements \ArrayAccess
     protected $app;
 
     /**
-     * @var array
-     */
-    protected $configs = [];
-
-    /**
-     * @var array
+     * @var ModuleInterface[]
      */
     protected $modules = [];
 
@@ -66,11 +61,21 @@ class ModuleManager implements \ArrayAccess
      * Gets a module.
      *
      * @param  string $name
-     * @return mixed|null
+     * @return ModuleInterface|null
      */
     public function get($name)
     {
         return isset($this->modules[$name]) ? $this->modules[$name] : null;
+    }
+
+    /**
+     * Get all loaded modules.
+     *
+     * @return ModuleInterface[]
+     */
+    public function all()
+    {
+        return $this->modules;
     }
 
     /**
@@ -87,7 +92,7 @@ class ModuleManager implements \ArrayAccess
 
             $name = $config['name'];
 
-            if (isset($this->configs[$name]) || !preg_match("/^($pattern)(\.|\/|$)/", $name)) {
+            if (isset($this->modules[$name]) || !preg_match("/^($pattern)(\.|\/|$)/", $name)) {
                 continue;
             }
 
@@ -104,10 +109,10 @@ class ModuleManager implements \ArrayAccess
             $class = is_string($config['main']) ? $config['main'] : 'Pagekit\\Module\\Module';
 
             $module = new $class($config);
-            $module->main($this->app, $config);
 
-            $this->configs[$name] = $config;
-            $this->modules[$name] = $module;
+            if (false !== $module->main($this->app)) {
+                $this->modules[$name] = $module;
+            }
         }
     }
 
@@ -168,16 +173,6 @@ class ModuleManager implements \ArrayAccess
         }
 
         return $this->sorted;
-    }
-
-    /**
-     * Gets loaded module configs.
-     *
-     * @return array
-     */
-    public function getConfigs()
-    {
-        return $this->configs;
     }
 
     /**

@@ -20,17 +20,44 @@ class Module
                 $this->$key = $value;
             }
         }
+
+        if (!isset($this->config)) {
+            $this->config = [];
+        }
     }
 
     /**
-     * Main bootstrap method.
-     *
-     * @param  App   $app
-     * @param  array $config
-     * @return mixed
+     * {@inheritdoc}
      */
-    public function main(App $app, array $config)
+    public function main(App $app)
     {
-        return call_user_func($this->main, $app, $config);
+        return call_user_func($this->main, $app);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function config($key = null, $default = null)
+    {
+        if (null === $key) {
+            return $this->config;
+        }
+
+        $array = $this->config;
+
+        if (isset($array[$key])) {
+            return $array[$key];
+        }
+
+        foreach (explode('.', $key) as $segment) {
+
+            if (!is_array($array) || !array_key_exists($segment, $array)) {
+                return $default;
+            }
+
+            $array = $array[$segment];
+        }
+
+        return $array;
     }
 }

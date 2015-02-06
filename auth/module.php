@@ -15,7 +15,7 @@ return [
 
     'name' => 'framework/auth',
 
-    'main' => function ($app, $config) {
+    'main' => function ($app) {
 
         $app['auth'] = function ($app) {
             return new Auth($app['events'], $app['session']);
@@ -39,18 +39,21 @@ return [
 
         $app['auth.remember'] = function($app) {
 
+            // TODO fix config parameters
+
             $name = $app['config']['cookie.remember_me'] ?: 'remember_'.md5($app['request']->getUriForPath(''));
 
             return new RememberMe($app['config']['app.key'], $name, $app['cookie']);
         };
 
-        $app->on('kernel.boot', function() use ($app, $config) {
+        $app->on('kernel.boot', function() use ($app) {
 
-            if (!$config['rememberme']['enabled']) {
+            if (!$this->config['rememberme']['enabled']) {
                 return;
             }
 
-            $app['events']->addListener(KernelEvents::REQUEST, function () use ($app) {
+            $app->on(KernelEvents::REQUEST, function () use ($app) {
+
                 try {
 
                     if (null !== $app['auth']->getUser()) {
@@ -64,17 +67,18 @@ return [
                     $app['events']->dispatch(AuthEvents::LOGIN, new LoginEvent($user));
 
                 } catch (\Exception $e) {}
+
             }, 20);
 
-            $app['events']->addListener(AuthEvents::SUCCESS, function (AuthenticateEvent $event) use ($app) {
+            $app->on(AuthEvents::SUCCESS, function (AuthenticateEvent $event) use ($app) {
                 $app['auth.remember']->set($app['request'], $event->getUser());
             });
 
-            $app['events']->addListener(AuthEvents::FAILURE, function () use ($app) {
+            $app->on(AuthEvents::FAILURE, function () use ($app) {
                 $app['auth.remember']->remove();
             });
 
-            $app['events']->addListener(AuthEvents::LOGOUT, function () use ($app) {
+            $app->on(AuthEvents::LOGOUT, function () use ($app) {
                 $app['auth.remember']->remove();
             });
 
@@ -82,9 +86,13 @@ return [
 
     },
 
-    'rememberme' => [
+    'config' => [
 
-        'enabled' => true
+        'rememberme' => [
+
+            'enabled' => true
+
+        ]
 
     ]
 ];

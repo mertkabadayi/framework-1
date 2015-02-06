@@ -10,21 +10,21 @@ return [
 
     'name' => 'framework/database',
 
-    'main' => function ($app, $config) {
+    'main' => function ($app) {
 
         $default = [
             'wrapperClass' => 'Pagekit\Database\Connection'
         ];
 
-        $app['dbs'] = function ($app) use ($config, $default) {
+        $app['dbs'] = function ($app) use ($default) {
 
             $dbs = [];
 
-            foreach ($config['connections'] as $name => $params) {
+            foreach ($this->config['connections'] as $name => $params) {
 
                 $params = array_replace($default, $params);
 
-                if ($config['default'] === $name) {
+                if ($this->config['default'] === $name) {
                     $params['events'] = $app['events'];
                 }
 
@@ -34,8 +34,8 @@ return [
             return $dbs;
         };
 
-        $app['db'] = function ($app) use ($config) {
-            return $app['dbs'][$config['default']];
+        $app['db'] = function ($app) {
+            return $app['dbs'][$this->config['default']];
         };
 
         $app['db.em'] = function ($app) {
@@ -57,23 +57,27 @@ return [
 
     },
 
-    'default' => 'mysql',
-
     'priority' => 16,
 
-    'connections' => [
+    'config' => [
 
-        'mysql' => [
+        'default' => 'mysql',
 
-            'driver'   => 'pdo_mysql',
-            'dbname'   => '',
-            'host'     => 'localhost',
-            'user'     => 'root',
-            'password' => '',
-            'engine'   => 'InnoDB',
-            'charset'  => 'utf8',
-            'collate'  => 'utf8_unicode_ci',
-            'prefix'   => ''
+        'connections' => [
+
+            'mysql' => [
+
+                'driver'   => 'pdo_mysql',
+                'dbname'   => '',
+                'host'     => 'localhost',
+                'user'     => 'root',
+                'password' => '',
+                'engine'   => 'InnoDB',
+                'charset'  => 'utf8',
+                'collate'  => 'utf8_unicode_ci',
+                'prefix'   => ''
+
+            ]
 
         ]
 

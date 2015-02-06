@@ -6,14 +6,17 @@ return [
 
     'name' => 'framework/filter',
 
-    'main' => function ($app, $config) {
+    'main' => function ($app) {
 
-        $app['filter'] = function($app) use ($config) {
-            return new FilterManager($config['defaults']);
+        $app['filter'] = function() {
+            return new FilterManager($this->config['defaults']);
         };
 
     },
 
-    'defaults' => null
+    'config' => [
 
+        'defaults' => null
+
+    ]
 ];

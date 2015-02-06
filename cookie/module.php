@@ -7,19 +7,17 @@ return [
 
     'name' => 'framework/cookie',
 
-    'main' => function ($app, $config) {
+    'main' => function ($app) {
 
-        $app['cookie'] = function ($app) use ($config) {
-
-            extract($config['config'], EXTR_SKIP);
+        $app['cookie'] = function ($app) {
 
             $app['cookie.init'] = true;
 
-            if (!$path) {
+            if (!$path = $this->config['path']) {
                 $path = $app['request']->getBasePath() ?: '/';
             }
 
-            return new CookieJar($app['request'], $path, $domain);
+            return new CookieJar($app['request'], $path, $this->config['domain']);
         };
 
         $app->on('kernel.response', function (FilterResponseEvent $event) use ($app) {

@@ -25,6 +25,6 @@ class ConfigLoader implements LoaderInterface
      */
     public function load($name, array $config)
     {
-        return array_replace_recursive($config, $this->config->get($name, []));
+        return array_replace_recursive($config, ['config' => $this->config->get($name, [])]);
     }
 }

@@ -21,7 +21,7 @@ return [
 
     'name' => 'framework/routing',
 
-    'main' => function ($app, $config) {
+    'main' => function ($app) {
 
         $app['router'] = function($app) {
             return new Router($app['events'], $app['kernel'], ['cache' => $app['path.cache']]);
@@ -52,26 +52,28 @@ return [
         };
 
         $app->on('kernel.boot', function() use ($app) {
-            $app->subscribe(new ConfigureRouteListener);
-            $app->subscribe(new ParamFetcherListener(new ParamFetcher(new FilterManager)));
-            $app->subscribe(new RouterListener($app['router'], null, null, $app['request_stack']));
-            $app->subscribe(new ResponseListener('UTF-8'));
-            $app->subscribe(new JsonListener);
-            $app->subscribe(new StringResponseListener);
-            $app->subscribe($app['aliases']);
-            $app->subscribe($app['callbacks']);
-            $app->subscribe($app['controllers']);
+            $app->subscribe(
+                new ConfigureRouteListener,
+                new ParamFetcherListener(new ParamFetcher(new FilterManager)),
+                new RouterListener($app['router'], null, null, $app['request_stack']),
+                new ResponseListener('UTF-8'),
+                new JsonListener,
+                new StringResponseListener,
+                $app['aliases'],
+                $app['callbacks'],
+                $app['controllers']
+            );
         });
 
         $app->on('kernel.request', function() use ($app) {
 
-            foreach ($app['module']->getConfigs() as $config) {
+            foreach ($app['module']->all() as $module) {
 
-                if (!isset($config['controllers'])) {
+                if (!isset($module->controllers)) {
                     continue;
                 }
 
-                foreach ($config['controllers'] as $prefix => $controller) {
+                foreach ($module->controllers as $prefix => $controller) {
 
                     $namespace = '';
 
@@ -81,6 +83,7 @@ return [
 
                     $app['controllers']->mount($prefix, $controller, "$namespace/");
                 }
+
             }
 
         }, 35);

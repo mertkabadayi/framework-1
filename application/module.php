@@ -11,9 +11,9 @@ return [
 
     'name' => 'framework/application',
 
-    'main' => function ($app, $config) {
+    'main' => function ($app) {
 
-        $debug   = (bool) $app['config']['app.debug'];
+        $debug   = (bool) $this->config('debug');
         $handler = ExceptionHandler::register($debug);
 
         ErrorHandler::register(E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR | E_RECOVERABLE_ERROR);
@@ -48,6 +48,12 @@ return [
         }
     },
 
-    'priority' => 10
+    'priority' => 10,
+
+    'config' => [
+
+        'debug' => true
+
+    ]
 
 ];
