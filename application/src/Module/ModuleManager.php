@@ -13,19 +13,9 @@ class ModuleManager implements \ArrayAccess
     protected $app;
 
     /**
-     * @var ModuleInterface[]
+     * @var LoaderInterface[]
      */
-    protected $modules = [];
-
-    /**
-     * @var array
-     */
-    protected $loaded = [];
-
-    /**
-     * @var array
-     */
-    protected $sorted = [];
+    protected $loaders = [];
 
     /**
      * @var array
@@ -33,9 +23,14 @@ class ModuleManager implements \ArrayAccess
     protected $paths = [];
 
     /**
-     * @var LoaderInterface[]
+     * @var array
      */
-    protected $loaders = [];
+    protected $modules = [];
+
+    /**
+     * @var array
+     */
+    protected $registered = [];
 
     /**
      * Constructor.
@@ -61,7 +56,7 @@ class ModuleManager implements \ArrayAccess
      * Gets a module.
      *
      * @param  string $name
-     * @return ModuleInterface|null
+     * @return mixed|null
      */
     public function get($name)
     {
@@ -69,9 +64,9 @@ class ModuleManager implements \ArrayAccess
     }
 
     /**
-     * Get all loaded modules.
+     * Gets all modules.
      *
-     * @return ModuleInterface[]
+     * @return array
      */
     public function all()
     {
@@ -79,100 +74,44 @@ class ModuleManager implements \ArrayAccess
     }
 
     /**
-     * Loads the given modules.
+     * Loads modules by name.
      *
      * @param string|array $modules
      */
     public function load($modules)
     {
-        $pattern = implode('|', (array) $modules);
-        $pattern = str_replace('\|', '|', preg_quote($pattern, '/'));
+        $resolved = [];
 
-        foreach ($this->sortedConfigs() as $config) {
+        if (is_string($modules)) {
+            $modules = (array) $modules;
+        }
 
-            $name = $config['name'];
+        $this->registerModules();
 
-            if (isset($this->modules[$name]) || !preg_match("/^($pattern)(\.|\/|$)/", $name)) {
-                continue;
-            }
+        foreach ($modules as $name) {
+            $this->resolveModules($this->registered[$name], $resolved);
+        }
 
-            foreach ($this->loaders as $loader) {
-                $config = $loader->load($name, $config);
-            }
+        $resolved = array_diff_key($resolved, $this->modules);
 
-            if (isset($config['autoload'])) {
-                foreach ($config['autoload'] as $namespace => $path) {
-                    $this->app['autoloader']->addPsr4($namespace, $config['path']."/$path");
-                }
-            }
-
-            $class = is_string($config['main']) ? $config['main'] : 'Pagekit\\Module\\Module';
-
-            $module = new $class($config);
-
-            if (false !== $module->main($this->app)) {
-                $this->modules[$name] = $module;
+        foreach ($resolved as $name => $module) {
+            if ($mod = $this->loadModule($name, $module)) {
+                $mod->main($this->app, $module);
             }
         }
     }
 
     /**
-     * Loads all module configs.
+     * Adds a module config loader.
      *
-     * @return array
+     * @param  LoaderInterface $loader
+     * @return self
      */
-    public function loadConfigs()
+    public function addLoader(LoaderInterface $loader)
     {
-        $include = [];
+        $this->loaders[] = $loader;
 
-        foreach ($this->paths as $path) {
-
-            $paths = glob($path, GLOB_NOSORT) ?: [];
-
-            foreach ($paths as $p) {
-
-                if (!is_array($config = include $p) || !isset($config['name'])) {
-                    continue;
-                }
-
-                $priority = 0;
-
-                if (isset($config['priority'])) {
-                    $priority = (int) $config['priority'];
-                }
-
-                if (isset($config['include'])) {
-                    $include = array_merge($include, (array) $config['include']);
-                }
-
-                $config['path'] = strtr(dirname($p), '\\', '/');
-
-                $this->loaded[$priority][] = $config;
-            }
-        }
-
-        if ($this->paths = $include) {
-            $this->loadConfigs();
-        }
-
-        return $this->loaded;
-    }
-
-    /**
-     * Gets sorted module configs.
-     *
-     * @return array
-     */
-    public function sortedConfigs()
-    {
-        $configs = $this->loadConfigs();
-
-        if (empty($this->sorted)) {
-            krsort($configs);
-            $this->sorted = call_user_func_array('array_merge', $configs);
-        }
-
-        return $this->sorted;
+        return $this;
     }
 
     /**
@@ -184,23 +123,10 @@ class ModuleManager implements \ArrayAccess
     public function addPath($paths)
     {
         $this->paths = array_merge($this->paths, (array) $paths);
-        $this->sorted = [];
 
         return $this;
     }
 
-    /**
-     * Adds a config loader.
-     *
-     * @param  LoaderInterface $loader
-     * @return self
-     */
-    public function addLoader(LoaderInterface $loader)
-    {
-        $this->loaders[] = $loader;
-
-        return $this;
-    }
 
     /**
      * Checks if a module exists.
@@ -243,5 +169,113 @@ class ModuleManager implements \ArrayAccess
     public function offsetUnset($name)
     {
         unset($this->modules[$name]);
+    }
+
+    /**
+     * Loads a module.
+     *
+     * @param  string $name
+     * @param  array  $module
+     * @return ModuleInterface
+     */
+    protected function loadModule($name, $module)
+    {
+        foreach ($this->loaders as $loader) {
+            $module = $loader->load($name, $module);
+        }
+
+        if (isset($module['autoload'])) {
+            foreach ($module['autoload'] as $namespace => $path) {
+                $this->app['autoloader']->addPsr4($namespace, $this->resolvePath($module, $path));
+            }
+        }
+
+        $class = is_string($module['main']) ? $module['main'] : 'Pagekit\\Module\\Module';
+
+        return $this->modules[$name] = new $class($module);
+    }
+
+    /**
+     * Register modules from paths.
+     */
+    protected function registerModules()
+    {
+        $includes = [];
+
+        foreach ($this->paths as $path) {
+
+            $paths = glob($path, GLOB_NOSORT) ?: [];
+
+            foreach ($paths as $p) {
+
+                if (!is_array($module = include $p) || !isset($module['name'])) {
+                    continue;
+                }
+
+                $module['path'] = strtr(dirname($p), '\\', '/');
+
+                if (isset($module['include'])) {
+                    foreach ((array) $module['include'] as $include) {
+                        $includes[] = $this->resolvePath($module, $include);
+                    }
+                }
+
+                $this->registered[$module['name']] = $module;
+            }
+        }
+
+        if ($this->paths = $includes) {
+            $this->registerModules();
+        }
+    }
+
+    /**
+     * Resolves module requirements.
+     *
+     * @param array $module
+     * @param array $resolved
+     * @param array $unresolved
+     *
+     * @throws \RuntimeException
+     */
+    protected function resolveModules($module, &$resolved = [], &$unresolved = [])
+    {
+        $unresolved[$module['name']] = $module;
+
+        if (isset($module['require'])) {
+            foreach ((array) $module['require'] as $required) {
+                if (!isset($resolved[$required])) {
+
+                    if (isset($unresolved[$required])) {
+                        throw new \RuntimeException(sprintf('Circular requirement "%s > %s" detected.', $module['name'], $required));
+                    }
+
+                    if (isset($this->registered[$required])) {
+                        $this->resolveModules($this->registered[$required], $resolved, $unresolved);
+                    }
+                }
+            }
+        }
+
+        $resolved[$module['name']] = $module;
+        unset($unresolved[$module['name']]);
+    }
+
+    /**
+     * Resolves a path to a absolute module path.
+     *
+     * @param  array  $module
+     * @param  string $path
+     * @return string
+     */
+    protected function resolvePath($module, $path)
+    {
+        $path = strtr($path, '\\', '/');
+
+        if (!($path[0] == '/' || (strlen($path) > 3 && ctype_alpha($path[0]) && $path[1] == ':' && $path[2] == '/'))) {
+            $path = $module['path']."/$path";
+        }
+
+        return $path;
     }
 }

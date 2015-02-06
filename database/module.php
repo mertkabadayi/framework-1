@@ -57,8 +57,6 @@ return [
 
     },
 
-    'priority' => 16,
-
     'config' => [
 
         'default' => 'mysql',

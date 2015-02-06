@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 return [
 
-    'name' => 'framework/application',
+    'name' => 'framework',
 
     'main' => function ($app) {
 
@@ -48,7 +48,19 @@ return [
         }
     },
 
-    'priority' => 10,
+    'require' => [
+
+        'framework/auth',
+        'framework/config',
+        'framework/cookie',
+        'framework/database',
+        'framework/filesystem',
+        'framework/filter',
+        'framework/routing',
+        'framework/session',
+        'framework/view'
+
+    ],
 
     'config' => [
 
