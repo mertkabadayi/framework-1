@@ -19,9 +19,9 @@ class Application extends Container implements HttpKernelInterface, TerminableIn
 {
     use StaticTrait, EventTrait;
 
-    const EARLY_EVENT = 512;
-    const LATE_EVENT  = -512;
-
+    /**
+     * @var boolean
+     */
     protected $booted = false;
 
     /**
