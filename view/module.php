@@ -88,7 +88,7 @@ return [
                     $attributes = $getDataAttibutes($style);
 
                     if ($style instanceof FileAsset) {
-                        $result[] = sprintf('        <link href="%s" rel="stylesheet"%s>', $style, $attributes);
+                        $result[] = sprintf('        <link href="%s" rel="stylesheet"%s>', $app['url']->getStatic($style), $attributes);
                     } else {
                         $result[] = sprintf('        <style%s>%s</style>', $attributes, $style);
                     }
@@ -99,7 +99,7 @@ return [
                     $attributes = $getDataAttibutes($script);
 
                     if ($script instanceof FileAsset) {
-                        $result[] = sprintf('        <script src="%s"%s></script>', $script, $attributes);
+                        $result[] = sprintf('        <script src="%s"%s></script>', $app['url']->getStatic($script), $attributes);
                     } else {
                         $result[] = sprintf('        <script%s>%s</script>', $attributes, $script);
                     }
