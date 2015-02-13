@@ -57,8 +57,8 @@ class ControllerCollection implements EventSubscriberInterface
                         $routes->add($route->getOption('namespace').$name, $r
                             ->setPath(rtrim($route->getPath().$r->getPath(), '/'))
                             ->addDefaults($route->getDefaults())
-                            ->addRequirements($route->getRequirements()
-                            ));
+                            ->addRequirements($route->getRequirements())
+                        );
 
                     } catch (\InvalidArgumentException $e) {
                     }
@@ -78,7 +78,7 @@ class ControllerCollection implements EventSubscriberInterface
         foreach ($this->routes as $route) {
             foreach ((array) $route->getOption('controllers') as $controller) {
                 if (is_string($controller) && $file = $this->loader->findFile($controller)) {
-                    $resources[] = ['file' => $file, 'prefix' => $route->getPath()];
+                    $resources[] = ['file' => $file, 'prefix' => $route->getPath(), 'namespace' => $route->getOption('namespace')];
                 }
             }
         }
