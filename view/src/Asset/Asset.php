@@ -4,32 +4,32 @@ namespace Pagekit\View\Asset;
 
 abstract class Asset implements AssetInterface
 {
-	/**
-	 * @var string
-	 */
-	protected $name;
+    /**
+     * @var string
+     */
+    protected $name;
 
-	/**
-	 * @var string
-	 */
-	protected $asset;
+    /**
+     * @var mixed
+     */
+    protected $asset;
 
-	/**
-	 * @var array
-	 */
+    /**
+     * @var array
+     */
     protected $options;
 
-	/**
-	 * Constructor.
+    /**
+     * Constructor.
      *
      * @param string $name
      * @param mixed  $asset
-	 * @param array  $options
-	 */
+     * @param array  $options
+     */
     public function __construct($name, $asset, array $options = [])
     {
-        $this->name = $name;
-        $this->asset = $asset;
+        $this->name    = $name;
+        $this->asset   = $asset;
         $this->options = $options;
     }
 
@@ -38,8 +38,8 @@ abstract class Asset implements AssetInterface
      */
     public function getName()
     {
-		return $this->name;
-	}
+        return $this->name;
+    }
 
     /**
      * {@inheritdoc}

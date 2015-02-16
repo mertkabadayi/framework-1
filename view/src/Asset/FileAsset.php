@@ -14,8 +14,8 @@ class FileAsset extends Asset
      */
     public function getContent()
     {
-        if ($this->content === null && $this['path']) {
-            $this->content = file_get_contents($this['path']);
+        if ($this->content === null && $this->asset) {
+            $this->content = file_get_contents($this->asset);
         }
 
         return $this->content;

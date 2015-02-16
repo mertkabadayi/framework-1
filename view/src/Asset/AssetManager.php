@@ -5,9 +5,9 @@ namespace Pagekit\View\Asset;
 class AssetManager implements \IteratorAggregate
 {
     /**
-     * @var string
+     * @var AssetFactory
      */
-    protected $version;
+    protected $factory;
 
     /**
      * @var AssetCollection
@@ -22,11 +22,11 @@ class AssetManager implements \IteratorAggregate
     /**
      * Constructor.
      *
-     * @param string $version
+     * @param AssetFactory $factory
      */
-    public function __construct($version = null)
+    public function __construct(AssetFactory $factory = null)
     {
-        $this->version    = $version;
+        $this->factory    = $factory ?: new AssetFactory;
         $this->registered = new AssetCollection;
     }
 
@@ -41,48 +41,6 @@ class AssetManager implements \IteratorAggregate
     }
 
     /**
-     * Create a asset instance.
-     *
-     * @param  string $name
-     * @param  mixed  $asset
-     * @param  array  $dependencies
-     * @param  array  $options
-     * @throws \InvalidArgumentException
-     * @return AssetInterface
-     */
-    protected function create($name, $asset, $dependencies = [], $options = [])
-    {
-        if (is_string($options)) {
-            $options = ['type' => $options];
-        }
-
-        if (!isset($options['type'])) {
-            $options['type'] = 'file';
-        }
-
-        if ($dependencies) {
-            $options = array_merge($options, ['dependencies' => (array) $dependencies]);
-        }
-
-        if ('string' == $options['type']) {
-            return new StringAsset($name, $asset, $options);
-        }
-
-        if ('file' == $options['type']) {
-
-            if (!isset($options['version'])) {
-                $options['version'] = $this->version;
-            }
-
-            $options['path'] = $asset;
-
-            return new FileAsset($name, $options['path'], $options);
-        }
-
-        throw new \InvalidArgumentException('Unable to determine asset type.');
-    }
-
-    /**
      * Registers an asset.
      *
      * @param  string $name
@@ -93,7 +51,7 @@ class AssetManager implements \IteratorAggregate
      */
     public function register($name, $asset, $dependencies = [], $options = [])
     {
-        $this->registered->add($this->create($name, $asset, $dependencies, $options));
+        $this->registered->add($this->factory->create($name, $asset, $dependencies, $options));
 
         return $this;
     }
@@ -124,7 +82,7 @@ class AssetManager implements \IteratorAggregate
     public function queue($name, $asset = null, $dependencies = [], $options = [])
     {
         if (!$instance = $this->registered->get($name)) {
-            $this->registered->add($instance = $this->create($name, $asset, $dependencies, $options));
+            $this->registered->add($instance = $this->factory->create($name, $asset, $dependencies, $options));
         }
 
         $this->queued[$instance->getName()] = true;
@@ -146,6 +104,17 @@ class AssetManager implements \IteratorAggregate
     }
 
     /**
+     * Gets an registered asset.
+     *
+     * @param  $name
+     * @return AssetInterface
+     */
+    public function get($name)
+    {
+        return $this->registered->get($name);
+    }
+
+    /**
      * IteratorAggregate interface implementation.
      */
     public function getIterator()
@@ -160,7 +129,7 @@ class AssetManager implements \IteratorAggregate
     }
 
     /**
-     * Resolve asset dependencies.
+     * Resolves asset dependencies.
      *
      * @param  AssetInterface $asset
      * @param  array          $resolved

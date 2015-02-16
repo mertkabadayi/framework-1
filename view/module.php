@@ -1,5 +1,6 @@
 <?php
 
+use Pagekit\View\Asset\AssetFactory;
 use Pagekit\View\Asset\AssetInterface;
 use Pagekit\View\Asset\AssetManager;
 use Pagekit\View\Asset\FileAsset;
@@ -25,12 +26,16 @@ return [
             return new SectionManager;
         };
 
+        $app['assets'] = function($app) {
+            return new AssetFactory($app['version']);
+        };
+
         $app['styles'] = function($app) {
-            return new AssetManager($app['version']);
+            return new AssetManager($app['assets']);
         };
 
         $app['scripts'] = function($app) {
-            return new AssetManager($app['version']);
+            return new AssetManager($app['assets']);
         };
 
         $app->on('kernel.boot', function() use ($app) {
@@ -71,7 +76,7 @@ return [
 
                 $result = [];
 
-                $getDataAttibutes = function (AssetInterface $asset) {
+                $getDataAttributes = function (AssetInterface $asset) {
                     $attributes = '';
 
                     foreach ($asset->getOptions() as $name => $value) {
@@ -85,7 +90,7 @@ return [
 
                 foreach ($app['styles'] as $style) {
 
-                    $attributes = $getDataAttibutes($style);
+                    $attributes = $getDataAttributes($style);
 
                     if ($style instanceof FileAsset) {
                         $result[] = sprintf('        <link href="%s" rel="stylesheet"%s>', $app['url']->getStatic($style), $attributes);
@@ -96,7 +101,7 @@ return [
 
                 foreach ($app['scripts'] as $script) {
 
-                    $attributes = $getDataAttibutes($script);
+                    $attributes = $getDataAttributes($script);
 
                     if ($script instanceof FileAsset) {
                         $result[] = sprintf('        <script src="%s"%s></script>', $app['url']->getStatic($script), $attributes);
