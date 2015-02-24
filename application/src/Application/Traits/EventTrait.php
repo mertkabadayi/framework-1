@@ -3,16 +3,25 @@
 namespace Pagekit\Application\Traits;
 
 use Pagekit\Application as App;
-use Symfony\Component\EventDispatcher\Event;
+use Pagekit\Event\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 trait EventTrait
 {
     /**
-     * @see EventDispatcherInterface::dispatch
+     * Dispatches an event to all registered listeners.
+     *
+     * @param  string      $eventName
+     * @param  Event|array $event
+     * @return Event
      */
-    public static function trigger($eventName, Event $event = null)
+    public static function trigger($eventName, $event = null)
     {
+        if (is_array($event)) {
+            $event = new Event($event);
+            $event->setName($eventName);
+        }
+
         return App::events()->dispatch($eventName, $event);
     }
 

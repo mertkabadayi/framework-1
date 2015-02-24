@@ -32,7 +32,7 @@ class ViewListener implements EventSubscriberInterface
      * @param string                              $name
      * @param EventDispatcherInterface            $dispatcher
      */
-    public function onKernelView(GetResponseForControllerResultEvent $event, $name, EventDispatcherInterface $dispatcher)
+    public function onKernelView(GetResponseForControllerResultEvent $event)
     {
         $request = $event->getRequest();
         $result  = $event->getControllerResult();
@@ -43,7 +43,7 @@ class ViewListener implements EventSubscriberInterface
 
         if ($layout = $request->attributes->get('_response[layout]', null, true) or (null === $layout && $layout = $this->view->getLayout())) {
             $this->view->getSections()->set('content', (string) $result);
-            $dispatcher->dispatch('view.layout', $e = new LayoutEvent($layout));
+            $event->getDispatcher()->dispatch('view.layout', $e = new LayoutEvent($layout));
             $response = $this->view->render($e->getLayout(), $e->getParameters());
         }
 
