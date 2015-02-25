@@ -10,7 +10,7 @@ install:
     - composer install --prefer-source --dev
 
 script:
-    - php vendor/bin/phpunit
+    - phpunit
 
 matrix:
     allow_failures:
